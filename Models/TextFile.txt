@@ -1,0 +1,2 @@
+﻿Contains Entity models mapped to database tables.
+Used by Entity Framework.

@@ -1,0 +1,3 @@
+﻿Business logic layer.
+Handles core application logic.
+Controllers call Services.

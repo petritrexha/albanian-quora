@@ -1,0 +1,2 @@
+﻿Contains service and repository interfaces.
+Used for dependency injection and abstraction.
