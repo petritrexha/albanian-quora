@@ -1,0 +1,2 @@
+﻿Contains Data Transfer Objects.
+Used to send/receive data without exposing entities directly.

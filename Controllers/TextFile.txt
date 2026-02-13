@@ -1,0 +1,3 @@
+﻿This folder contains API controllers.
+Each controller should handle HTTP requests and responses.
+Controllers should not contain business logic.
