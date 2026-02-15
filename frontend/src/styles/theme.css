@@ -1,0 +1,17 @@
+:root {
+  --navbar-bg: #334155;
+  --page-bg: #FAFAFA;
+  --card-bg: #FFFFFF;
+  --primary-btn: #0EA5E9;
+  --accepted-bg: #D1FAE5;
+  --accepted-accent: #10B981;
+  --text-dark: #0f172a;
+  --text-light: #64748b;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background-color: var(--page-bg);
+  color: var(--text-dark);
+}
