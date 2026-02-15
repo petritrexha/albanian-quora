@@ -1,0 +1,26 @@
+/* MAIN PAGE LAYOUT */
+.content-layout {
+  max-width: 1100px;
+  margin: 30px auto;
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 30px;
+  align-items: flex-start;
+}
+
+/* LEFT SIDEBAR */
+.sidebar {
+  width: 100%;
+}
+
+/* CENTER COLUMN */
+.questions-section {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: 100%;
+}
+
+.questions-section h2 {
+  margin: 10px 0;
+}
