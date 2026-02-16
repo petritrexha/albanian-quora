@@ -19,7 +19,7 @@
 }
 
 
-/* LOGO */
+
 .logo {
   display: flex;
   align-items: center;
@@ -45,7 +45,6 @@
   color: #7c3aed;
 }
 
-/* CENTER SEARCH */
 .nav-center {
   flex: 1;
   display: flex;
@@ -67,14 +66,13 @@
   box-shadow: 0 0 0 3px rgba(37,99,235,0.1);
 }
 
-/* RIGHT SIDE */
+
 .nav-right {
   display: flex;
   align-items: center;
   gap: 22px;
 }
 
-/* NAV ITEMS */
 .nav-item {
   display: flex;
   align-items: center;
@@ -92,7 +90,7 @@
   color: var(--primary);
 }
 
-/* ICONS */
+
 .nav-icon {
   font-size: 18px;
   transition: 0.2s ease;
@@ -102,7 +100,7 @@
   transform: translateY(-2px);
 }
 
-/* ICON COLORS */
+
 .home-icon {
   color: #6b7280;
 }
@@ -115,7 +113,7 @@
   color: #4b5563;
 }
 
-/* BUTTON */
+
 .btn-primary {
   display: flex;
   align-items: center;

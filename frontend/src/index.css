@@ -1,11 +1,9 @@
-/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* DESIGN SYSTEM */
 :root {
   --primary: #2563EB;
   --primary-light: #3B82F6;
@@ -24,13 +22,13 @@ body {
   line-height: 1.6;
 }
 
-/* Links */
+
 a {
   text-decoration: none;
   color: inherit;
 }
 
-/* Buttons */
+
 button {
   border: none;
   cursor: pointer;

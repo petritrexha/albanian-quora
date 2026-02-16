@@ -12,7 +12,7 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
 }
 
-/* LEFT – VOTES */
+
 .question-votes {
   display: flex;
   flex-direction: column;
@@ -45,7 +45,6 @@
   font-size: 15px;
 }
 
-/* RIGHT – CONTENT */
 .question-content h3 {
   font-size: 17px;
   margin-bottom: 6px;
@@ -62,7 +61,7 @@
   margin-bottom: 10px;
 }
 
-/* META INFO */
+
 .question-meta {
   display: flex;
   align-items: center;
@@ -72,7 +71,7 @@
 }
 
 
-/* LEFT STATS */
+
 .question-stats {
   min-width: 70px;
   text-align: center;
@@ -90,7 +89,7 @@
   color: var(--text-main);
 }
 
-/* RIGHT CONTENT */
+
 .question-content h3 {
   font-size: 17px;
   margin-bottom: 6px;
@@ -102,7 +101,6 @@
   margin-bottom: 10px;
 }
 
-/* TAGS */
 .tags {
   display: flex;
   gap: 8px;

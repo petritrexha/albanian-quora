@@ -7,13 +7,11 @@ import "../styles/home.css";
 const Home = () => {
   return (
     <>
-      <Navbar />
 
       <div className="content-layout">
-        {/* LEFT */}
         <Sidebar />
 
-        {/* CENTER */}
+        
         <div className="questions-section">
           <AskBox />
 

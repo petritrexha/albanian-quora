@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import "../styles/navbar.css";
 import {
   FaComments,
@@ -10,10 +11,8 @@ import {
 const Navbar = () => {
   return (
     <nav className="navbar">
-      {/* INNER CONTAINER (SYNC WIDTH) */}
       <div className="navbar-container">
 
-        {/* LEFT - LOGO */}
         <div className="logo">
           <FaComments className="logo-icon" />
           <span className="logo-text">
@@ -21,7 +20,6 @@ const Navbar = () => {
           </span>
         </div>
 
-        {/* CENTER - SEARCH */}
         <div className="nav-center">
           <input
             className="search"
@@ -29,13 +27,13 @@ const Navbar = () => {
           />
         </div>
 
-        {/* RIGHT - NAV ITEMS */}
+
         <div className="nav-right">
 
-          <a href="#" className="nav-item">
+          <Link to="/" className="nav-item">
             <FaHome className="nav-icon home-icon" />
             Ballina
-          </a>
+          </Link>
 
           <a href="#" className="nav-item">
             <FaQuestionCircle className="nav-icon ask-icon" />
