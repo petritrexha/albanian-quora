@@ -1,62 +1,82 @@
-import React from "react";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import AnswerCard from "../components/AnswerCard";
+import { getQuestionById } from "../services/questionService";
 import "../styles/questionDetails.css";
 
 const QuestionDetails = () => {
+  const { id } = useParams();
+  const [question, setQuestion] = useState(null);
+  const [answers, setAnswers] = useState([
+    {
+      id: 1,
+      author: "Bajram Gashi",
+      content:
+        "Virtual DOM është një kopje e DOM-it real që React e përdor për të përditësuar UI-n më shpejt.",
+      votes: 8,
+    },
+  ]);
+  const [newAnswer, setNewAnswer] = useState("");
+
+  useEffect(() => {
+    getQuestionById(id).then((data) => setQuestion(data));
+  }, [id]);
+
+  const handleAddAnswer = () => {
+    if (newAnswer.trim() === "") return;
+    const answer = { id: Date.now(), author: "Ti", content: newAnswer, votes: 0 };
+    setAnswers([...answers, answer]);
+    setNewAnswer("");
+  };
+
+  const handleUpvote = (id) => {
+    setAnswers(
+      answers.map((a) => (a.id === id ? { ...a, votes: a.votes + 1 } : a))
+    );
+  };
+
+  const handleDownvote = (id) => {
+    setAnswers(
+      answers.map((a) => (a.id === id ? { ...a, votes: a.votes - 1 } : a))
+    );
+  };
+
+  if (!question) return <p>Loading...</p>;
+
   return (
     <div className="question-details-page">
       <div className="question-main">
-
         <div className="question-header">
-          <h1>Si funksionon React dhe Virtual DOM?</h1>
-
-          <p className="question-description">
-            Dikush mund të shpjegojë konceptin e Virtual DOM dhe pse React është kaq i shpejtë?
-          </p>
-
+          <h1>{question.title}</h1>
+          <p className="question-description">{question.description}</p>
           <div className="question-meta">
-            <span>45 shikime</span>
+            <span>{question.views} shikime</span>
             <span>•</span>
-            <span>12 përgjigje</span>
-            <span>•</span>
-            <span>postuar 2 ditë më parë</span>
+            <span>{answers.length} përgjigje</span>
           </div>
         </div>
 
-        
         <div className="answers-section">
-          <h2>Përgjigje</h2>
-
-          <div className="answer-card">
-            <div className="answer-author">
-              <div className="avatar">B</div>
-              <span>Bajram</span>
-            </div>
-
-            <p>
-              React përdor Virtual DOM për të minimizuar ndryshimet direkte në DOM-in real,
-              duke e bërë përditësimin më të shpejtë.
-            </p>
-          </div>
-
-          <div className="answer-card">
-            <div className="answer-author">
-              <div className="avatar">A</div>
-              <span>Ardit</span>
-            </div>
-
-            <p>
-              Virtual DOM është një përfaqësim në memorie i DOM-it real dhe React krahason
-              ndryshimet përpara se të bëjë update.
-            </p>
-          </div>
+          <h2>Përgjigjet</h2>
+          {answers.map((answer) => (
+            <AnswerCard
+              key={answer.id}
+              answer={answer}
+              onUpvote={handleUpvote}
+              onDownvote={handleDownvote}
+            />
+          ))}
         </div>
 
         <div className="add-answer">
-          <h3>Shto një përgjigje</h3>
-          <textarea placeholder="Shkruaj përgjigjen tënde..." />
-          <button>Posto përgjigjen</button>
+          <h3>Shto përgjigje</h3>
+          <textarea
+            placeholder="Shkruaj përgjigjen tënde..."
+            value={newAnswer}
+            onChange={(e) => setNewAnswer(e.target.value)}
+          />
+          <button onClick={handleAddAnswer}>Dërgo përgjigjen</button>
         </div>
-
       </div>
     </div>
   );

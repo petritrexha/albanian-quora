@@ -8,15 +8,14 @@ import {
   FaUserPlus
 } from "react-icons/fa";
 
-const Navbar = () => {
+const Navbar = ({ onOpenAskModal }) => {
   return (
     <nav className="navbar">
       <div className="navbar-container">
 
         <div className="logo">
           <FaComments className="logo-icon" />
-          <span className="logo-text">
-            AlbanianQuora<span className="dot">.</span>
+          <span className="logo-text">AlbanianQuora<span className="dot">.</span>
           </span>
         </div>
 
@@ -35,21 +34,21 @@ const Navbar = () => {
             Ballina
           </Link>
 
-          <a href="#" className="nav-item">
-            <FaQuestionCircle className="nav-icon ask-icon" />
-            Pyet
-          </a>
+          <a href="#" className="nav-item" onClick={(e) => {
+              e.preventDefault(); 
+              onOpenAskModal();   
+            }}
+          >
+            <FaQuestionCircle className="nav-icon ask-icon" /> Pyet</a>
+
 
           <a href="#" className="nav-item">
-            <FaSignInAlt className="nav-icon login-icon" />
-            Kyçu
-          </a>
+            <FaSignInAlt className="nav-icon login-icon" />Kyçu</a>
 
           <button className="btn-primary nav-item-btn">
             <FaUserPlus className="nav-icon-btn" />
             Regjistrohu
           </button>
-
         </div>
       </div>
     </nav>

@@ -1,7 +1,7 @@
 import React from "react";
 import "../styles/askBox.css";
 
-const AskBox = () => {
+const AskBox = ({ newQuestion, setNewQuestion, handlePostQuestion }) => {
   return (
     <div className="ask-box">
       <div className="ask-top">
@@ -11,13 +11,13 @@ const AskBox = () => {
           type="text"
           placeholder="Çfarë dëshiron të pyesësh ose të ndash?"
           className="ask-input"
+          value={newQuestion}
+          onChange={(e) => setNewQuestion(e.target.value)}
         />
       </div>
 
       <div className="ask-actions">
-        <button>Pyes</button>
-        <button>Përgjigju</button>
-        <button>Posto</button>
+        <button onClick={handlePostQuestion}>Posto</button>
       </div>
     </div>
   );
