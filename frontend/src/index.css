@@ -1,8 +1,37 @@
-html, body, #root {
-  height: 100%;
-  width: 100%;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --primary: #2563EB;
+  --primary-light: #3B82F6;
+  --accent: #E0E7FF;
+  --text-main: #1F2937;
+  --text-light: #6B7280;
+  --bg-light: #F9FAFB;
+  --card-bg: #FFFFFF;
+  --border: #E5E7EB;
 }
 
 body {
-  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-light);
+  color: var(--text-main);
+  line-height: 1.6;
 }
+
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
