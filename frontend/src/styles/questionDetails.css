@@ -1,0 +1,81 @@
+.question-details-page {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 32px 16px;
+}
+
+.question-main {
+  max-width: 800px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.question-header {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.question-header h1 {
+  font-size: 28px;
+  margin-bottom: 12px;
+}
+
+.question-description {
+  font-size: 16px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+  color: #333;
+}
+
+.question-meta {
+  font-size: 14px;
+  color: #777;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+
+
+.answers-section h2 {
+  margin-bottom: 16px;
+}
+
+.add-answer {
+  background-color: #fff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.add-answer h3 {
+  margin-bottom: 12px;
+}
+
+.add-answer textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  resize: vertical;
+}
+
+.add-answer button {
+  background-color: #2e69ff;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.add-answer button:hover {
+  background-color: #2350cc;
+}
