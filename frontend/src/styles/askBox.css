@@ -1,0 +1,62 @@
+.ask-box {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+
+.ask-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.ask-input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border);
+  background: var(--bg-light);
+  font-size: 14px;
+}
+
+.ask-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.ask-actions {
+  display: flex;
+  gap: 20px;
+  margin-top: 12px;
+  padding-left: 52px;
+}
+
+.ask-actions button {
+  background: transparent;
+  color: var(--text-light);
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  transition: 0.2s ease;
+}
+
+.ask-actions button:hover {
+  background: var(--accent);
+  color: var(--primary);
+}
