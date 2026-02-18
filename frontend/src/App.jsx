@@ -1,29 +1,51 @@
 import { useState } from "react";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
+
 import Home from "./pages/Home";
 import QuestionDetails from "./pages/QuestionDetails";
 
-function App() {
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+
+export default function App() {
   const [showAskModal, setShowAskModal] = useState(false);
 
   return (
-    <>
-      <Navbar onOpenAskModal={() => setShowAskModal(true)} />
-      <Routes>
-        <Route
-          path="/"
-          element={
-            <Home showAskModal={showAskModal} setShowAskModal={setShowAskModal} />
-          }
-        />
-        <Route path="/question/:id" element={<QuestionDetails />} />
-      </Routes>
-    </>
+    <Routes>
+      {/* Public Routes */}
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+
+      {/* App Layout Routes */}
+      <Route
+        path="/"
+        element={
+          <>
+            <Navbar onOpenAskModal={() => setShowAskModal(true)} />
+            <Home
+              showAskModal={showAskModal}
+              setShowAskModal={setShowAskModal}
+            />
+          </>
+        }
+      />
+
+      <Route
+        path="/question/:id"
+        element={
+          <>
+            <Navbar onOpenAskModal={() => setShowAskModal(true)} />
+            <QuestionDetails />
+          </>
+        }
+      />
+
+      {/* Fallback */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
   );
 }
-
-export default App;
-
-
-
