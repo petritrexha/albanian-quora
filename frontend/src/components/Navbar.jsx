@@ -4,11 +4,17 @@ import {
   FaComments,
   FaHome,
   FaQuestionCircle,
+  FaBookmark,
   FaSignInAlt,
   FaUserPlus
 } from "react-icons/fa";
+import { useBookmarks } from "../context/BookmarkContext";
+import NotificationDropdown from "./NotificationDropdown";
 
 const Navbar = ({ onOpenAskModal }) => {
+  const { bookmarkedQuestions, bookmarkedAnswers } = useBookmarks();
+  const totalBookmarks = bookmarkedQuestions.length + bookmarkedAnswers.length;
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -35,12 +41,23 @@ const Navbar = ({ onOpenAskModal }) => {
           </Link>
 
           <a href="#" className="nav-item" onClick={(e) => {
-              e.preventDefault(); 
-              onOpenAskModal();   
-            }}
+            e.preventDefault();
+            onOpenAskModal();
+          }}
           >
             <FaQuestionCircle className="nav-icon ask-icon" /> Pyet</a>
 
+          <Link to="/saved" className="nav-item" style={{ position: "relative" }}>
+            <FaBookmark className="nav-icon" style={{ color: "#2563EB" }} />
+            Bookmark-et
+            {totalBookmarks > 0 && (
+              <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-primary rounded-full absolute -top-1 -right-1">
+                {totalBookmarks}
+              </span>
+            )}
+          </Link>
+
+          <NotificationDropdown />
 
           <a href="#" className="nav-item">
             <FaSignInAlt className="nav-icon login-icon" />Kyçu</a>
@@ -56,7 +73,3 @@ const Navbar = ({ onOpenAskModal }) => {
 };
 
 export default Navbar;
-
-
-
-

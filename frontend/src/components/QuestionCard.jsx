@@ -1,9 +1,15 @@
-import React from "react";
-import { FaArrowUp, FaArrowDown } from "react-icons/fa";
+import { useState } from "react";
+import { FaArrowUp, FaArrowDown, FaBookmark, FaRegBookmark, FaFlag } from "react-icons/fa";
 import { Link } from "react-router-dom";
+import { useBookmarks } from "../context/BookmarkContext";
+import ReportModal from "./ReportModal";
 import "../styles/questionCard.css";
 
-const QuestionCard = ( { question, onUpvote, onDownvote }) => {
+const QuestionCard = ({ question, onUpvote, onDownvote }) => {
+  const { isQuestionBookmarked, toggleQuestionBookmark } = useBookmarks();
+  const bookmarked = isQuestionBookmarked(question.id);
+  const [showReport, setShowReport] = useState(false);
+
   return (
     <div className="question-card">
       <div className="question-votes">
@@ -28,9 +34,40 @@ const QuestionCard = ( { question, onUpvote, onDownvote }) => {
           <span>{question.answers} përgjigje</span>
         </div>
       </div>
+
+      {/* Bookmark Button */}
+      <button
+        onClick={() => toggleQuestionBookmark(question)}
+        className={`ml-auto self-start p-2 rounded-lg transition-all duration-200 ${bookmarked
+          ? "text-primary bg-accent"
+          : "text-text-light hover:text-primary hover:bg-accent"
+          }`}
+        title={bookmarked ? "Hiq nga bookmark-et" : "Shto në bookmark-et"}
+      >
+        {bookmarked ? (
+          <FaBookmark className="text-base" />
+        ) : (
+          <FaRegBookmark className="text-base" />
+        )}
+      </button>
+
+      {/* Report Button */}
+      <button
+        onClick={() => setShowReport(true)}
+        className="self-start p-2 rounded-lg text-text-light hover:text-red-500 hover:bg-red-50 transition-all duration-200"
+        title="Raporto pyetjen"
+      >
+        <FaFlag className="text-sm" />
+      </button>
+
+      <ReportModal
+        isOpen={showReport}
+        onClose={() => setShowReport(false)}
+        targetType="Question"
+        targetId={question.id}
+      />
     </div>
   );
 };
 
 export default QuestionCard;
-

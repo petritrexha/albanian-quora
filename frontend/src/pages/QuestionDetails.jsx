@@ -64,6 +64,7 @@ const QuestionDetails = () => {
               answer={answer}
               onUpvote={handleUpvote}
               onDownvote={handleDownvote}
+              questionTitle={question.title}
             />
           ))}
         </div>
