@@ -1,10 +1,11 @@
-using AlbanianQuora.Api.Data;
-using AlbanianQuora.Api.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AlbanianQuora.Api.Data;
+using AlbanianQuora.Api.DTOs;
+using AlbanianQuora.Api.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlbanianQuora.Api.Controllers
 {
@@ -19,16 +20,27 @@ namespace AlbanianQuora.Api.Controllers
             _context = context;
         }
 
-        // GET: api/questions
+        // GET: api/questions?categoryId=1&userId=1
         [HttpGet]
-        public async Task<IActionResult> GetQuestions([FromQuery] int? userId)
+        public async Task<IActionResult> GetQuestions([FromQuery] int? categoryId, [FromQuery] int? userId)
         {
-            var questions = await _context.Questions
+            var query = _context.Questions
+                .Include(q => q.Category)
+                .Include(q => q.QuestionTags)
+                    .ThenInclude(qt => qt.Tag)
+                .AsQueryable();
+
+            if (categoryId.HasValue)
+            {
+                query = query.Where(q => q.CategoryId == categoryId.Value);
+            }
+
+            var questions = await query
                 .OrderByDescending(q => q.CreatedAt)
                 .ToListAsync();
 
-            // If a userId is provided, determine which questions are bookmarked by that user
-            Dictionary<int, int> bookmarkMap = new Dictionary<int, int>();
+            // build bookmark map for provided userId
+            Dictionary<int, int> bookmarkMap = new();
             if (userId.HasValue)
             {
                 bookmarkMap = await _context.Bookmarks
@@ -40,11 +52,13 @@ namespace AlbanianQuora.Api.Controllers
             {
                 q.Id,
                 q.Title,
-                q.Description,
+                Content = q.Description,
                 q.Votes,
                 q.Views,
                 q.Answers,
                 q.CreatedAt,
+                Category = q.Category != null ? q.Category.Name : null,
+                Tags = q.QuestionTags.Select(qt => qt.Tag.Name).ToList(),
                 IsBookmarked = bookmarkMap.ContainsKey(q.Id),
                 BookmarkId = bookmarkMap.ContainsKey(q.Id) ? (int?)bookmarkMap[q.Id] : null
             });
@@ -52,17 +66,22 @@ namespace AlbanianQuora.Api.Controllers
             return Ok(result);
         }
 
-        // GET: api/questions/5
+        // GET: api/questions/5?userId=1
         [HttpGet("{id}")]
         public async Task<IActionResult> GetQuestion(int id, [FromQuery] int? userId)
         {
-            var question = await _context.Questions.FindAsync(id);
+            var question = await _context.Questions
+                .Include(q => q.Category)
+                .Include(q => q.QuestionTags)
+                    .ThenInclude(qt => qt.Tag)
+                .FirstOrDefaultAsync(q => q.Id == id);
 
             if (question == null)
             {
                 return NotFound();
             }
 
+            // increment views
             question.Views += 1;
             await _context.SaveChangesAsync();
 
@@ -82,11 +101,13 @@ namespace AlbanianQuora.Api.Controllers
             {
                 question.Id,
                 question.Title,
-                question.Description,
+                Content = question.Description,
                 question.Votes,
                 question.Views,
                 question.Answers,
                 question.CreatedAt,
+                Category = question.Category != null ? question.Category.Name : null,
+                Tags = question.QuestionTags.Select(qt => qt.Tag.Name).ToList(),
                 IsBookmarked = isBookmarked,
                 BookmarkId = bookmarkId
             };
@@ -96,45 +117,82 @@ namespace AlbanianQuora.Api.Controllers
 
         // POST: api/questions
         [HttpPost]
-        public async Task<ActionResult<Question>> CreateQuestion(Question question)
+        public async Task<IActionResult> Create([FromBody] CreateQuestionDto dto)
         {
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == dto.CategoryId && c.IsActive);
+            if (category == null)
+                return BadRequest("Invalid category.");
+
+            var question = new Question
+            {
+                Title = dto.Title,
+                Description = dto.Content,
+                CategoryId = dto.CategoryId
+            };
+
             _context.Questions.Add(question);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(
-                nameof(GetQuestion),
-                new { id = question.Id },
-                question
-            );
+            foreach (var tagId in dto.TagIds)
+            {
+                var tagExists = await _context.Tags.AnyAsync(t => t.Id == tagId);
+                if (!tagExists)
+                    continue;
+
+                _context.QuestionTags.Add(new QuestionTag
+                {
+                    QuestionId = question.Id,
+                    TagId = tagId
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetQuestion), new { id = question.Id }, question);
         }
 
         // PUT: api/questions/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateQuestion(int id, Question updatedQuestion)
+        public async Task<IActionResult> Update(int id, [FromBody] CreateQuestionDto dto)
         {
-            if (id != updatedQuestion.Id)
+            var question = await _context.Questions.Include(q => q.QuestionTags).FirstOrDefaultAsync(q => q.Id == id);
+            if (question == null)
+                return NotFound();
+
+            var categoryExists = await _context.Categories.AnyAsync(c => c.Id == dto.CategoryId && c.IsActive);
+            if (!categoryExists)
+                return BadRequest("Invalid category.");
+
+            question.Title = dto.Title;
+            question.Description = dto.Content;
+            question.CategoryId = dto.CategoryId;
+
+            _context.QuestionTags.RemoveRange(question.QuestionTags);
+
+            foreach (var tagId in dto.TagIds)
             {
-                return BadRequest();
+                var tagExists = await _context.Tags.AnyAsync(t => t.Id == tagId);
+                if (!tagExists) continue;
+
+                _context.QuestionTags.Add(new QuestionTag { QuestionId = question.Id, TagId = tagId });
             }
 
-            _context.Entry(updatedQuestion).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return NoContent();
+            return Ok(question);
         }
 
         // DELETE: api/questions/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteQuestion(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var question = await _context.Questions.FindAsync(id);
-
+            var question = await _context.Questions.Include(q => q.QuestionTags).FirstOrDefaultAsync(q => q.Id == id);
             if (question == null)
-            {
                 return NotFound();
-            }
 
+            _context.QuestionTags.RemoveRange(question.QuestionTags);
             _context.Questions.Remove(question);
+
             await _context.SaveChangesAsync();
 
             return NoContent();
