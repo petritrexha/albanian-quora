@@ -14,46 +14,40 @@ import ForgotPassword from "./pages/ForgotPassword";
 export default function App() {
   const [showAskModal, setShowAskModal] = useState(false);
 
+  const withNavbar = (Component) => (
+    <>
+      <Navbar onOpenAskModal={() => setShowAskModal(true)} />
+      {Component}
+    </>
+  );
+
   return (
     <BookmarkProvider>
       <Routes>
-        {/* Public Routes */}
+        {/* Public routes WITHOUT navbar */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* App Layout Routes */}
+        {/* Routes WITH navbar */}
         <Route
           path="/"
-          element={
-            <>
-              <Navbar onOpenAskModal={() => setShowAskModal(true)} />
-              <Home
-                showAskModal={showAskModal}
-                setShowAskModal={setShowAskModal}
-              />
-            </>
-          }
+          element={withNavbar(
+            <Home
+              showAskModal={showAskModal}
+              setShowAskModal={setShowAskModal}
+            />
+          )}
         />
 
         <Route
           path="/question/:id"
-          element={
-            <>
-              <Navbar onOpenAskModal={() => setShowAskModal(true)} />
-              <QuestionDetails />
-            </>
-          }
+          element={withNavbar(<QuestionDetails />)}
         />
 
         <Route
           path="/saved"
-          element={
-            <>
-              <Navbar onOpenAskModal={() => setShowAskModal(true)} />
-              <Bookmarks />
-            </>
-          }
+          element={withNavbar(<Bookmarks />)}
         />
 
         {/* Fallback */}

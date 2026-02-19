@@ -59,13 +59,14 @@ const Navbar = ({ onOpenAskModal }) => {
 
           <NotificationDropdown />
 
-          <a href="#" className="nav-item">
-            <FaSignInAlt className="nav-icon login-icon" />Kyçu</a>
+          <Link to="/login" className="nav-item">
+            <FaSignInAlt className="nav-icon login-icon" /> Kyçu
+          </Link>
 
-          <button className="btn-primary nav-item-btn">
+          <Link to="/register" className="btn-primary nav-item-btn">
             <FaUserPlus className="nav-icon-btn" />
             Regjistrohu
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
