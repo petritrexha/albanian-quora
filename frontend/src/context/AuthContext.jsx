@@ -14,6 +14,19 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     if (!token) {
+      // Development helper: allow auto-login if DEV_AUTO_LOGIN=1 and devUser is set in localStorage
+      const devAuto = localStorage.getItem("DEV_AUTO_LOGIN");
+      if (devAuto === "1") {
+        try {
+          const dev = JSON.parse(localStorage.getItem("devUser") || "null");
+          if (dev) {
+            setUser(dev);
+            setHydrating(false);
+            return;
+          }
+        } catch { }
+      }
+
       setHydrating(false);
       return;
     }
