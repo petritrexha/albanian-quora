@@ -35,20 +35,21 @@ const Navbar = ({ onOpenAskModal }) => {
           </Link>
 
           <a href="#" className="nav-item" onClick={(e) => {
-              e.preventDefault(); 
-              onOpenAskModal();   
-            }}
+            e.preventDefault();
+            onOpenAskModal();
+          }}
           >
             <FaQuestionCircle className="nav-icon ask-icon" /> Pyet</a>
 
 
-          <a href="#" className="nav-item">
-            <FaSignInAlt className="nav-icon login-icon" />Kyçu</a>
+          <Link to="/login" className="nav-item">
+            <FaSignInAlt className="nav-icon login-icon" /> Kyçu
+          </Link>
 
-          <button className="btn-primary nav-item-btn">
+          <Link to="/register" className="btn-primary nav-item-btn">
             <FaUserPlus className="nav-icon-btn" />
             Regjistrohu
-          </button>
+          </Link>
         </div>
       </div>
     </nav>
