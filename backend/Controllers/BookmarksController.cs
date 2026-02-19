@@ -26,6 +26,12 @@ namespace AlbanianQuora.Api.Controllers
             }
             catch (InvalidOperationException ex)
             {
+                // Return BadRequest when it's a validation-like message (e.g., question not found)
+                if (ex.Message.Contains("not found") || ex.Message.Contains("not exist") || ex.Message.Contains("not found."))
+                {
+                    return BadRequest(new { error = ex.Message });
+                }
+
                 return Conflict(new { error = ex.Message });
             }
         }
@@ -43,6 +49,17 @@ namespace AlbanianQuora.Api.Controllers
         public async Task<IActionResult> Delete(int id)
         {
             var deleted = await _bookmarkService.DeleteBookmarkAsync(id);
+            if (!deleted) return NotFound();
+            return NoContent();
+        }
+
+        // DELETE api/bookmarks?userId=1&questionId=2
+        [HttpDelete]
+        public async Task<IActionResult> DeleteByUserQuestion([FromQuery] int userId, [FromQuery] int questionId)
+        {
+            if (userId <= 0 || questionId <= 0) return BadRequest(new { error = "userId and questionId are required." });
+
+            var deleted = await _bookmarkService.DeleteBookmarkByUserAndQuestionAsync(userId, questionId);
             if (!deleted) return NotFound();
             return NoContent();
         }

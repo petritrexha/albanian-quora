@@ -3,6 +3,7 @@ using AlbanianQuora.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AlbanianQuora.Api.Controllers
@@ -20,18 +21,40 @@ namespace AlbanianQuora.Api.Controllers
 
         // GET: api/questions
         [HttpGet]
-        public async Task<ActionResult<List<Question>>> GetQuestions()
+        public async Task<IActionResult> GetQuestions([FromQuery] int? userId)
         {
             var questions = await _context.Questions
                 .OrderByDescending(q => q.CreatedAt)
                 .ToListAsync();
 
-            return Ok(questions);
+            // If a userId is provided, determine which questions are bookmarked by that user
+            Dictionary<int, int> bookmarkMap = new Dictionary<int, int>();
+            if (userId.HasValue)
+            {
+                bookmarkMap = await _context.Bookmarks
+                    .Where(b => b.UserId == userId.Value)
+                    .ToDictionaryAsync(b => b.QuestionId, b => b.Id);
+            }
+
+            var result = questions.Select(q => new
+            {
+                q.Id,
+                q.Title,
+                q.Description,
+                q.Votes,
+                q.Views,
+                q.Answers,
+                q.CreatedAt,
+                IsBookmarked = bookmarkMap.ContainsKey(q.Id),
+                BookmarkId = bookmarkMap.ContainsKey(q.Id) ? (int?)bookmarkMap[q.Id] : null
+            });
+
+            return Ok(result);
         }
 
         // GET: api/questions/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Question>> GetQuestion(int id)
+        public async Task<IActionResult> GetQuestion(int id, [FromQuery] int? userId)
         {
             var question = await _context.Questions.FindAsync(id);
 
@@ -43,7 +66,32 @@ namespace AlbanianQuora.Api.Controllers
             question.Views += 1;
             await _context.SaveChangesAsync();
 
-            return Ok(question);
+            int? bookmarkId = null;
+            bool isBookmarked = false;
+            if (userId.HasValue)
+            {
+                var bk = await _context.Bookmarks.FirstOrDefaultAsync(b => b.UserId == userId.Value && b.QuestionId == id);
+                if (bk != null)
+                {
+                    isBookmarked = true;
+                    bookmarkId = bk.Id;
+                }
+            }
+
+            var result = new
+            {
+                question.Id,
+                question.Title,
+                question.Description,
+                question.Votes,
+                question.Views,
+                question.Answers,
+                question.CreatedAt,
+                IsBookmarked = isBookmarked,
+                BookmarkId = bookmarkId
+            };
+
+            return Ok(result);
         }
 
         // POST: api/questions

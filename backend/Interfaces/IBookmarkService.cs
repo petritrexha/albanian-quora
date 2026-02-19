@@ -6,6 +6,7 @@ namespace AlbanianQuora.Api.Interfaces
     {
         Task<BookmarkResponseDto> CreateBookmarkAsync(CreateBookmarkDto dto);
         Task<bool> DeleteBookmarkAsync(int id);
+        Task<bool> DeleteBookmarkByUserAndQuestionAsync(int userId, int questionId);
         Task<List<BookmarkResponseDto>> GetBookmarksByUserAsync(int userId);
         Task<bool> IsBookmarkedAsync(int userId, int questionId);
     }

@@ -1,4 +1,6 @@
 import { useState } from "react";
+import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 import { FaFlag, FaTimes } from "react-icons/fa";
 
 const reportReasons = [
@@ -17,6 +19,8 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
 
     if (!isOpen) return null;
 
+    const { user } = useAuth();
+
     const handleSubmit = async () => {
         const reason =
             selectedReason === "Tjetër" ? customReason : selectedReason;
@@ -26,10 +30,17 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
 
         // In production this would call the backend API:
         // POST /api/reports { reporterId, targetType, targetId, reason }
-        console.log("Report submitted:", { targetType, targetId, reason });
-
-        // Simulate API delay
-        await new Promise((r) => setTimeout(r, 500));
+        try {
+            const reporterId = user?.id || Number(localStorage.getItem("userId")) || 1;
+            await api.post("/api/reports", {
+                reporterId,
+                targetType,
+                targetId,
+                reason,
+            });
+        } catch (e) {
+            console.error("Failed to submit report", e);
+        }
 
         setLoading(false);
         setSubmitted(true);

@@ -17,6 +17,11 @@ namespace AlbanianQuora.Api.Services
 
         public async Task<BookmarkResponseDto> CreateBookmarkAsync(CreateBookmarkDto dto)
         {
+            // Ensure question exists to avoid FK constraint errors
+            var question = await _context.Questions.FindAsync(dto.QuestionId);
+            if (question == null)
+                throw new InvalidOperationException("Question not found.");
+
             // Prevent duplicate bookmarks
             var existing = await _context.Bookmarks
                 .FirstOrDefaultAsync(b => b.UserId == dto.UserId && b.QuestionId == dto.QuestionId);
@@ -33,8 +38,6 @@ namespace AlbanianQuora.Api.Services
             _context.Bookmarks.Add(bookmark);
             await _context.SaveChangesAsync();
 
-            var question = await _context.Questions.FindAsync(dto.QuestionId);
-
             return new BookmarkResponseDto
             {
                 Id = bookmark.Id,
@@ -48,6 +51,16 @@ namespace AlbanianQuora.Api.Services
         public async Task<bool> DeleteBookmarkAsync(int id)
         {
             var bookmark = await _context.Bookmarks.FindAsync(id);
+            if (bookmark == null) return false;
+
+            _context.Bookmarks.Remove(bookmark);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> DeleteBookmarkByUserAndQuestionAsync(int userId, int questionId)
+        {
+            var bookmark = await _context.Bookmarks.FirstOrDefaultAsync(b => b.UserId == userId && b.QuestionId == questionId);
             if (bookmark == null) return false;
 
             _context.Bookmarks.Remove(bookmark);

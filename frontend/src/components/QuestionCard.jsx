@@ -7,7 +7,7 @@ import "../styles/questionCard.css";
 
 const QuestionCard = ({ question, onUpvote, onDownvote }) => {
   const { isQuestionBookmarked, toggleQuestionBookmark } = useBookmarks();
-  const bookmarked = isQuestionBookmarked(question.id);
+  const bookmarked = isQuestionBookmarked(question.id) || Boolean(question.isBookmarked);
   const [showReport, setShowReport] = useState(false);
 
   return (
