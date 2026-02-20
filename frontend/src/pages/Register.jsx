@@ -2,6 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+const passwordPolicy = (pw) => {
+  if (pw.length < 8 || pw.length > 64) return "Password duhet të jetë 8–64 karaktere.";
+  if (!/[a-z]/.test(pw)) return "Password duhet të ketë të paktën 1 shkronjë të vogël.";
+  if (!/[A-Z]/.test(pw)) return "Password duhet të ketë të paktën 1 shkronjë të madhe.";
+  if (!/[0-9]/.test(pw)) return "Password duhet të ketë të paktën 1 digit.";
+  if (!/[^A-Za-z0-9]/.test(pw)) return "Password duhet të ketë të paktën 1 karakter special.";
+  return "";
+};
+
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
@@ -23,14 +32,17 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    if (!form.name.trim() || !form.username.trim() || !form.email.trim() || !form.password.trim()) {
+    if (!form.name.trim() || !form.username.trim() || !form.email.trim() || !form.password.trim() || !form.confirm.trim()) {
       setError("Plotëso të gjitha fushat.");
       return;
     }
-    if (form.password.length < 6) {
-      setError("Password duhet të ketë së paku 6 karaktere.");
+
+    const policyErr = passwordPolicy(form.password);
+    if (policyErr) {
+      setError(policyErr);
       return;
     }
+
     if (form.password !== form.confirm) {
       setError("Password dhe Confirm Password nuk përputhen.");
       return;
@@ -39,20 +51,34 @@ export default function Register() {
     setLoading(true);
     try {
       const res = await register({
-        name: form.name,
-        username: form.username,
-        email: form.email,
+        name: form.name.trim(),
+        username: form.username.trim(),
+        email: form.email.trim(),
         password: form.password,
+        confirmPassword: form.confirm, // ✅ REQUIRED by backend
       });
 
-      if (res?.autoLoggedIn) navigate("/", { replace: true });
+      // zakonisht backend kthen token+user; kjo autoLoggedIn mund mos ekzistojë
+      if (res?.token) navigate("/", { replace: true });
       else navigate("/login", { replace: true });
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        "Register dështoi. Provo përsëri.";
-      setError(msg);
+      const res = err?.response;
+
+      if (!res) {
+        setError("S’u lidhëm me serverin. Kontrollo a është ndezur backend-i.");
+        return;
+      }
+
+      if (res.data?.errors) {
+        const entries = Object.entries(res.data.errors);
+        if (entries.length) {
+          const [field, msgs] = entries[0];
+          setError(`${field}: ${msgs?.[0] || "Invalid value."}`);
+          return;
+        }
+      }
+
+      setError(res.data?.message || res.data?.error || `Register dështoi (${res.status}).`);
     } finally {
       setLoading(false);
     }
