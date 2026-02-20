@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import AnswerCard from "../components/AnswerCard";
 import { getQuestionById } from "../services/questionService";
 import "../styles/questionDetails.css";
@@ -18,9 +19,15 @@ const QuestionDetails = () => {
   ]);
   const [newAnswer, setNewAnswer] = useState("");
 
+  const { user } = useAuth();
+
   useEffect(() => {
-    getQuestionById(id).then((data) => setQuestion(data));
-  }, [id]);
+    let mounted = true;
+    getQuestionById(id, user?.id).then((data) => {
+      if (mounted) setQuestion(data);
+    });
+    return () => (mounted = false);
+  }, [id, user]);
 
   const handleAddAnswer = () => {
     if (newAnswer.trim() === "") return;
@@ -64,6 +71,7 @@ const QuestionDetails = () => {
               answer={answer}
               onUpvote={handleUpvote}
               onDownvote={handleDownvote}
+              questionTitle={question.title}
             />
           ))}
         </div>

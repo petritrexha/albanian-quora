@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import AskModal from "../components/AskModal";
 import AskBox from "../components/AskBox";
 import QuestionCard from "../components/QuestionCard";
@@ -10,9 +11,15 @@ const Home = ({ showAskModal, setShowAskModal }) => {
   const [questions, setQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState("");
 
+  const { user } = useAuth();
+
   useEffect(() => {
-    getQuestions().then((data) => setQuestions(data));
-  }, []);
+    let mounted = true;
+    getQuestions(user?.id).then((data) => {
+      if (mounted) setQuestions(data);
+    });
+    return () => (mounted = false);
+  }, [user]);
 
   const handleUpvote = (id) => {
     setQuestions(

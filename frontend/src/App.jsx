@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-
+import { BookmarkProvider } from "./context/BookmarkContext";
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
 import QuestionDetails from "./pages/QuestionDetails";
+import Bookmarks from "./pages/Bookmarks";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -21,31 +22,37 @@ export default function App() {
   );
 
   return (
-    <Routes>
-      {/* Public routes WITHOUT navbar */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+    <BookmarkProvider>
+      <Routes>
+        {/* Public routes WITHOUT navbar */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Routes WITH navbar */}
-      <Route
-        path="/"
-        element={withNavbar(
-          <Home
-            showAskModal={showAskModal}
-            setShowAskModal={setShowAskModal}
-          />
-        )}
-      />
+        {/* Routes WITH navbar */}
+        <Route
+          path="/"
+          element={withNavbar(
+            <Home
+              showAskModal={showAskModal}
+              setShowAskModal={setShowAskModal}
+            />
+          )}
+        />
 
-      <Route
-        path="/question/:id"
-        element={withNavbar(<QuestionDetails />)}
-      />
+        <Route
+          path="/question/:id"
+          element={withNavbar(<QuestionDetails />)}
+        />
 
-      {/* Fallback */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
-    </Routes>
+        <Route
+          path="/saved"
+          element={withNavbar(<Bookmarks />)}
+        />
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    </BookmarkProvider>
   );
 }
-
