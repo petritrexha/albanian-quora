@@ -59,6 +59,14 @@ namespace AlbanianQuora.Api.Data
             modelBuilder.Entity<QuestionTag>()
                 .HasKey(qt => new { qt.QuestionId, qt.TagId });
 
+
+            modelBuilder.Entity<Question>()
+                .HasOne(q => q.User)
+                .WithMany(u => u.Questions)
+                .HasForeignKey(q => q.UserId) 
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             modelBuilder.Entity<QuestionTag>()
                 .HasOne(qt => qt.Question)
                 .WithMany(q => q.QuestionTags)

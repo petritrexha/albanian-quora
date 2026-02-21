@@ -23,5 +23,7 @@
         public Category Category { get; set; } = null!;
 
         public List<QuestionTag> QuestionTags { get; set; } = new();
+        public User User { get; set; } = null!;
+        public int UserId { get; set; }
     }
 }
