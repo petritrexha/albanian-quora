@@ -19,8 +19,8 @@
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         // Optional categorization / tagging support
-        public int? CategoryId { get; set; }
-        public Category? Category { get; set; }
+        public int CategoryId { get; set; }      // NOT nullable
+        public Category Category { get; set; } = null!;
 
         public List<QuestionTag> QuestionTags { get; set; } = new();
     }

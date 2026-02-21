@@ -44,30 +44,28 @@ export function AuthProvider({ children }) {
     })();
   }, []);
 
-  const login = async ({ identifier, password }) => {
-    const data = await auth.login({ identifier, password });
+const login = async ({ identifier, password }) => {
+  const data = await auth.login({ emailOrUsername: identifier, password });
 
-    if (data?.accessToken) {
-      localStorage.setItem("accessToken", data.accessToken);
-    }
-    if (data?.user) {
-      setUser(data.user);
-    }
+  const token = data?.accessToken || data?.token;
+  if (token) localStorage.setItem("accessToken", token);
 
-    return data?.user;
-  };
+  if (data?.user) setUser(data.user);
 
-  const register = async ({ name, username, email, password }) => {
-    const data = await auth.register({ name, username, email, password });
+  return data?.user;
+};
 
-    if (data?.accessToken && data?.user) {
-      localStorage.setItem("accessToken", data.accessToken);
-      setUser(data.user);
-      return { autoLoggedIn: true };
-    }
+  const register = async ({ name, username, email, password, confirmPassword }) => {
+  const data = await auth.register({ name, username, email, password, confirmPassword });
 
-    return { autoLoggedIn: false };
-  };
+  if (data?.accessToken && data?.user) {
+    localStorage.setItem("accessToken", data.accessToken);
+    setUser(data.user);
+    return { autoLoggedIn: true };
+  }
+
+  return { autoLoggedIn: false };
+};
 
   const logout = async () => {
     await auth.logout();

@@ -10,6 +10,8 @@ namespace AlbanianQuora.Api.Data
         {
         }
 
+        public DbSet<User> Users => Set<User>();
+
         public DbSet<Question> Questions => Set<Question>();
 
         // Bookmark/notification/report entities (HEAD)
@@ -26,6 +28,14 @@ namespace AlbanianQuora.Api.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Username)
+                .IsUnique();
+
             // Prevent duplicate bookmarks for same user + question
             modelBuilder.Entity<Bookmark>()
                 .HasIndex(b => new { b.UserId, b.QuestionId })
@@ -36,6 +46,13 @@ namespace AlbanianQuora.Api.Data
                 .HasOne(b => b.Question)
                 .WithMany()
                 .HasForeignKey(b => b.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Bookmark -> User relationship (FK)
+            modelBuilder.Entity<Bookmark>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             // QuestionTag composite key and relationships
