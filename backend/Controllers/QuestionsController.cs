@@ -40,9 +40,16 @@ public class QuestionsController : ControllerBase
                 q.Title,
                 q.Content,
                 q.CreatedAt,
+
+                CategoryId = q.CategoryId,
                 Category = q.Category!.Name,
+
                 Tags = q.QuestionTags
                     .Select(qt => qt.Tag.Name)
+                    .ToList(),
+
+                TagIds = q.QuestionTags
+                    .Select(qt => qt.TagId)
                     .ToList()
             })
             .ToList();
@@ -105,9 +112,16 @@ public class QuestionsController : ControllerBase
                 q.Title,
                 q.Content,
                 q.CreatedAt,
+
+                CategoryId = q.CategoryId,
                 Category = q.Category!.Name,
+
                 Tags = q.QuestionTags
                     .Select(qt => qt.Tag.Name)
+                    .ToList(),
+
+                TagIds = q.QuestionTags
+                    .Select(qt => qt.TagId)
                     .ToList()
             })
             .FirstOrDefault();
@@ -161,6 +175,7 @@ public class QuestionsController : ControllerBase
 
         return Ok(question);
     }
+
     // DELETE /api/questions/5
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
@@ -182,6 +197,4 @@ public class QuestionsController : ControllerBase
 
         return NoContent();
     }
-
-
 }
