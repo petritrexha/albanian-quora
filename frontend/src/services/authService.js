@@ -31,3 +31,9 @@ export async function forgotPassword(payload) {
   const res = await api.post("/auth/forgot-password", payload);
   return res.data;
 }
+
+// POST /auth/reset-password
+export async function resetPassword(payload) {
+  const res = await api.post("/auth/reset-password", payload);
+  return res.data;
+}
