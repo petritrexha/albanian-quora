@@ -14,6 +14,8 @@ namespace AlbanianQuora.Api.Data
 
         public DbSet<Question> Questions => Set<Question>();
 
+        public DbSet<Answer> Answers => Set<Answer>();
+
         // Bookmark/notification/report entities (HEAD)
         public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
         public DbSet<Notification> Notifications => Set<Notification>();
@@ -68,6 +70,18 @@ namespace AlbanianQuora.Api.Data
                 .WithMany(u => u.Questions)
                 .HasForeignKey(q => q.UserId) 
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.Question)
+                .WithMany()
+                .HasForeignKey(a => a.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.User)
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
             modelBuilder.Entity<QuestionTag>()

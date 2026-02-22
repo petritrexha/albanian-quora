@@ -2,6 +2,12 @@
 
 namespace AlbanianQuora.Api.Models;
 
+public enum UserRole
+{
+    User = 0,
+    Admin = 1
+}
+
 public class User
 {
     public int Id { get; set; }
@@ -17,11 +23,15 @@ public class User
 
     [Required]
     public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
-    [MaxLength(500)]
-    public string? Bio { get; set; }
 
     [Required]
     public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
+
+    [MaxLength(500)]
+    public string? Bio { get; set; }
+
+    public UserRole Role { get; set; } = UserRole.User;
+
     public ICollection<Question> Questions { get; set; } = new List<Question>();
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }
