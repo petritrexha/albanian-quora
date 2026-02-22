@@ -24,6 +24,9 @@ namespace AlbanianQuora.Api.Data
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<QuestionTag> QuestionTags => Set<QuestionTag>();
 
+        // Password reset tokens
+        public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -59,6 +62,14 @@ namespace AlbanianQuora.Api.Data
             modelBuilder.Entity<QuestionTag>()
                 .HasKey(qt => new { qt.QuestionId, qt.TagId });
 
+
+            modelBuilder.Entity<Question>()
+                .HasOne(q => q.User)
+                .WithMany(u => u.Questions)
+                .HasForeignKey(q => q.UserId) 
+                .OnDelete(DeleteBehavior.Restrict);
+
+
             modelBuilder.Entity<QuestionTag>()
                 .HasOne(qt => qt.Question)
                 .WithMany(q => q.QuestionTags)
@@ -74,6 +85,17 @@ namespace AlbanianQuora.Api.Data
                 .WithMany(c => c.Tags)
                 .HasForeignKey(t => t.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // Password reset token: unique hash
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasIndex(t => t.TokenHash)
+                .IsUnique();
+
+            modelBuilder.Entity<PasswordResetToken>()
+                .HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

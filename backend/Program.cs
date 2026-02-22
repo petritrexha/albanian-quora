@@ -3,6 +3,8 @@ using AlbanianQuora.Api.Interfaces;
 using AlbanianQuora.Api.Middleware;
 using AlbanianQuora.Api.Security;
 using AlbanianQuora.Api.Services;
+using AlbanianQuora.Interfaces;
+using AlbanianQuora.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -61,6 +63,8 @@ builder.Services.AddSwaggerGen(c =>
 // App services
 builder.Services.AddScoped<IBookmarkService, BookmarkService>();
 builder.Services.AddScoped<IReportService, ReportService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 // JWT Options + Token Service
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));

@@ -4,6 +4,7 @@ using AlbanianQuora.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260221104703_AddUserIdToQuestion")]
+    partial class AddUserIdToQuestion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,41 +80,6 @@ namespace AlbanianQuora.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("AlbanianQuora.Api.Models.PasswordResetToken", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("ExpiresAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("TokenHash")
-                        .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("nvarchar(64)");
-
-                    b.Property<DateTime?>("UsedAtUtc")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("PasswordResetTokens");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.Question", b =>
@@ -315,17 +283,6 @@ namespace AlbanianQuora.Migrations
                         .IsRequired();
 
                     b.Navigation("Question");
-                });
-
-            modelBuilder.Entity("AlbanianQuora.Api.Models.PasswordResetToken", b =>
-                {
-                    b.HasOne("AlbanianQuora.Api.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.Question", b =>

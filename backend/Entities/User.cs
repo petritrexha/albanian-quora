@@ -17,9 +17,11 @@ public class User
 
     [Required]
     public byte[] PasswordHash { get; set; } = Array.Empty<byte>();
+    [MaxLength(500)]
+    public string? Bio { get; set; }
 
     [Required]
     public byte[] PasswordSalt { get; set; } = Array.Empty<byte>();
-
+    public ICollection<Question> Questions { get; set; } = new List<Question>();
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }
