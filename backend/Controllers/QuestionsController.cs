@@ -6,6 +6,9 @@ using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace AlbanianQuora.Api.Controllers
 {
@@ -116,6 +119,7 @@ namespace AlbanianQuora.Api.Controllers
         }
 
         // POST: api/questions
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateQuestionDto dto)
         {
@@ -123,11 +127,14 @@ namespace AlbanianQuora.Api.Controllers
             if (category == null)
                 return BadRequest("Invalid category.");
 
+            var userId = GetUserIdFromJwt();
+
             var question = new Question
             {
                 Title = dto.Title,
                 Description = dto.Content,
-                CategoryId = dto.CategoryId
+                CategoryId = dto.CategoryId,
+                UserId = userId
             };
 
             _context.Questions.Add(question);
@@ -136,8 +143,7 @@ namespace AlbanianQuora.Api.Controllers
             foreach (var tagId in dto.TagIds)
             {
                 var tagExists = await _context.Tags.AnyAsync(t => t.Id == tagId);
-                if (!tagExists)
-                    continue;
+                if (!tagExists) continue;
 
                 _context.QuestionTags.Add(new QuestionTag
                 {
@@ -151,13 +157,32 @@ namespace AlbanianQuora.Api.Controllers
             return CreatedAtAction(nameof(GetQuestion), new { id = question.Id }, question);
         }
 
+        private int GetUserIdFromJwt()
+        {
+            var idStr =
+                User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue("id");
+
+            if (string.IsNullOrWhiteSpace(idStr) || !int.TryParse(idStr, out var id))
+                throw new UnauthorizedAccessException("Invalid token: missing user id.");
+
+            return id;
+        }
+
         // PUT: api/questions/5
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateQuestionDto dto)
         {
             var question = await _context.Questions.Include(q => q.QuestionTags).FirstOrDefaultAsync(q => q.Id == id);
             if (question == null)
                 return NotFound();
+
+            //only the author can delete their question
+            var userId = GetUserIdFromJwt();
+            if (question.UserId != userId)
+                return Forbid();
 
             var categoryExists = await _context.Categories.AnyAsync(c => c.Id == dto.CategoryId && c.IsActive);
             if (!categoryExists)
@@ -183,12 +208,18 @@ namespace AlbanianQuora.Api.Controllers
         }
 
         // DELETE: api/questions/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             var question = await _context.Questions.Include(q => q.QuestionTags).FirstOrDefaultAsync(q => q.Id == id);
             if (question == null)
                 return NotFound();
+
+            //only the author can delete their question
+            var userId = GetUserIdFromJwt();
+            if (question.UserId != userId)
+                return Forbid();
 
             _context.QuestionTags.RemoveRange(question.QuestionTags);
             _context.Questions.Remove(question);
