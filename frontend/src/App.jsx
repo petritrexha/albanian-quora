@@ -6,6 +6,8 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import QuestionDetails from "./pages/QuestionDetails";
 import Bookmarks from "./pages/Bookmarks";
+import AdminDashboard from "./pages/AdminDashboard";
+import RequireAdmin from "./components/RequireAdmin";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -49,6 +51,15 @@ export default function App() {
         <Route
           path="/saved"
           element={withNavbar(<Bookmarks />)}
+        />
+
+        <Route
+          path="/admin"
+          element={withNavbar(
+            <RequireAdmin>
+              <AdminDashboard />
+            </RequireAdmin>
+          )}
         />
 
         <Route 

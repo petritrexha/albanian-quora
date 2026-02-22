@@ -67,16 +67,16 @@ public class AuthController : ControllerBase
         await _db.SaveChangesAsync();
 
         var token = _jwt.CreateToken(user);
-
         return Ok(new AuthResponse
         {
-            Token = token,
+            AccessToken = token,
             User = new UserMeResponse
             {
                 Id = user.Id,
                 Name = user.Name,
                 Username = user.Username,
-                Email = user.Email
+                Email = user.Email,
+                Role = user.Role.ToString()
             }
         });
     }
@@ -103,16 +103,16 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Invalid credentials." });
 
         var token = _jwt.CreateToken(user);
-
         return Ok(new AuthResponse
         {
-            Token = token,
+            AccessToken = token,
             User = new UserMeResponse
             {
                 Id = user.Id,
                 Name = user.Name,
                 Username = user.Username,
-                Email = user.Email
+                Email = user.Email,
+                Role = user.Role.ToString()
             }
         });
     }
@@ -134,7 +134,8 @@ public class AuthController : ControllerBase
             Id = user.Id,
             Name = user.Name,
             Username = user.Username,
-            Email = user.Email
+            Email = user.Email,
+            Role = user.Role.ToString()
         });
     }
 
@@ -238,11 +239,7 @@ public class AuthController : ControllerBase
 
     private int GetUserId()
     {
-        var sub =
-            User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
-            User.FindFirstValue(ClaimTypes.NameIdentifier) ??
-            User.FindFirstValue("id");
-
+        var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
         if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var id))
             throw new UnauthorizedAccessException("Invalid token.");
         return id;

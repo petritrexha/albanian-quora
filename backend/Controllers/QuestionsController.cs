@@ -14,6 +14,7 @@ namespace AlbanianQuora.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class QuestionsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -127,14 +128,16 @@ namespace AlbanianQuora.Api.Controllers
             if (category == null)
                 return BadRequest("Invalid category.");
 
-            var userId = GetUserIdFromJwt();
+            var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+            if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
+                return Unauthorized();
 
             var question = new Question
             {
                 Title = dto.Title,
                 Description = dto.Content,
                 CategoryId = dto.CategoryId,
-                UserId = userId
+                UserId = currentUserId
             };
 
             _context.Questions.Add(question);
@@ -179,9 +182,11 @@ namespace AlbanianQuora.Api.Controllers
             if (question == null)
                 return NotFound();
 
-            //only the author can delete their question
-            var userId = GetUserIdFromJwt();
-            if (question.UserId != userId)
+            var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+            if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
+                return Unauthorized();
+
+            if (question.UserId != currentUserId && !User.IsInRole("Admin"))
                 return Forbid();
 
             var categoryExists = await _context.Categories.AnyAsync(c => c.Id == dto.CategoryId && c.IsActive);
@@ -216,9 +221,11 @@ namespace AlbanianQuora.Api.Controllers
             if (question == null)
                 return NotFound();
 
-            //only the author can delete their question
-            var userId = GetUserIdFromJwt();
-            if (question.UserId != userId)
+            var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+            if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
+                return Unauthorized();
+
+            if (question.UserId != currentUserId && !User.IsInRole("Admin"))
                 return Forbid();
 
             _context.QuestionTags.RemoveRange(question.QuestionTags);

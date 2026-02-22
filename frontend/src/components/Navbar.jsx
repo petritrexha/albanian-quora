@@ -9,11 +9,14 @@ import {
   FaUserPlus
 } from "react-icons/fa";
 import { useBookmarks } from "../context/BookmarkContext";
+import { useAuth } from "../context/AuthContext";
 import NotificationDropdown from "./NotificationDropdown";
 
 const Navbar = ({ onOpenAskModal }) => {
   const { bookmarkedQuestions, bookmarkedAnswers } = useBookmarks();
   const totalBookmarks = bookmarkedQuestions.length + bookmarkedAnswers.length;
+
+  const { isAuthenticated, isAdmin, user, logout } = useAuth();
 
   return (
     <nav className="navbar">
@@ -59,14 +62,25 @@ const Navbar = ({ onOpenAskModal }) => {
 
           <NotificationDropdown />
 
-          <Link to="/login" className="nav-item">
-            <FaSignInAlt className="nav-icon login-icon" /> Kyçu
-          </Link>
+          {!isAuthenticated ? (
+            <>
+              <Link to="/login" className="nav-item">
+                <FaSignInAlt className="nav-icon login-icon" /> Kyçu
+              </Link>
 
-          <Link to="/register" className="btn-primary nav-item-btn">
-            <FaUserPlus className="nav-icon-btn" />
-            Regjistrohu
-          </Link>
+              <Link to="/register" className="btn-primary nav-item-btn">
+                <FaUserPlus className="nav-icon-btn" />
+                Regjistrohu
+              </Link>
+            </>
+          ) : (
+            <>
+              {isAdmin && (
+                <Link to="/admin" className="nav-item">Admin</Link>
+              )}
+              <a href="#" onClick={(e) => { e.preventDefault(); logout(); }} className="nav-item">Çkyçu</a>
+            </>
+          )}
         </div>
       </div>
     </nav>

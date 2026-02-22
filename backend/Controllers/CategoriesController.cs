@@ -1,4 +1,5 @@
 ﻿using AlbanianQuora.Api.Data;
+using Microsoft.AspNetCore.Authorization;
 using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ public class CategoriesController : ControllerBase
         _context = context;
     }
 
+    [Authorize]
     [HttpPost]
     public IActionResult Create(CreateCategoryDto dto)
     {
@@ -38,6 +40,7 @@ public class CategoriesController : ControllerBase
         return Ok(categories);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
