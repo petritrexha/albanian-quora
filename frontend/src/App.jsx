@@ -10,6 +10,7 @@ import Bookmarks from "./pages/Bookmarks";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 export default function App() {
   const [showAskModal, setShowAskModal] = useState(false);
@@ -48,6 +49,11 @@ export default function App() {
         <Route
           path="/saved"
           element={withNavbar(<Bookmarks />)}
+        />
+
+        <Route 
+          path="/reset-password" 
+          element={<ResetPassword />} 
         />
 
         {/* Fallback */}

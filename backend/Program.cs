@@ -64,6 +64,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddScoped<IBookmarkService, BookmarkService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 // JWT Options + Token Service
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
