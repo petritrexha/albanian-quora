@@ -128,16 +128,34 @@ namespace AlbanianQuora.Api.Controllers
             if (category == null)
                 return BadRequest("Invalid category.");
 
+<<<<<<< HEAD
             var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
             if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
                 return Unauthorized();
+=======
+<<<<<<< HEAD
+            var userId = GetUserIdFromJwt();
+=======
+            var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+            if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
+                return Unauthorized();
+>>>>>>> c0ff189 (Admin user role and admin dashboard added)
+>>>>>>> 35a8ddf (Admin user role and admin dashboard added)
 
             var question = new Question
             {
                 Title = dto.Title,
                 Description = dto.Content,
                 CategoryId = dto.CategoryId,
+<<<<<<< HEAD
                 UserId = currentUserId
+=======
+<<<<<<< HEAD
+                UserId = userId
+=======
+                UserId = currentUserId
+>>>>>>> c0ff189 (Admin user role and admin dashboard added)
+>>>>>>> 35a8ddf (Admin user role and admin dashboard added)
             };
 
             _context.Questions.Add(question);
@@ -182,11 +200,23 @@ namespace AlbanianQuora.Api.Controllers
             if (question == null)
                 return NotFound();
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+            //only the author can delete their question
+            var userId = GetUserIdFromJwt();
+            if (question.UserId != userId)
+=======
+>>>>>>> 35a8ddf (Admin user role and admin dashboard added)
             var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
             if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
                 return Unauthorized();
 
             if (question.UserId != currentUserId && !User.IsInRole("Admin"))
+<<<<<<< HEAD
+=======
+>>>>>>> c0ff189 (Admin user role and admin dashboard added)
+>>>>>>> 35a8ddf (Admin user role and admin dashboard added)
                 return Forbid();
 
             var categoryExists = await _context.Categories.AnyAsync(c => c.Id == dto.CategoryId && c.IsActive);
@@ -221,11 +251,23 @@ namespace AlbanianQuora.Api.Controllers
             if (question == null)
                 return NotFound();
 
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+            //only the author can delete their question
+            var userId = GetUserIdFromJwt();
+            if (question.UserId != userId)
+=======
+>>>>>>> 35a8ddf (Admin user role and admin dashboard added)
             var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
             if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
                 return Unauthorized();
 
             if (question.UserId != currentUserId && !User.IsInRole("Admin"))
+<<<<<<< HEAD
+=======
+>>>>>>> c0ff189 (Admin user role and admin dashboard added)
+>>>>>>> 35a8ddf (Admin user role and admin dashboard added)
                 return Forbid();
 
             _context.QuestionTags.RemoveRange(question.QuestionTags);

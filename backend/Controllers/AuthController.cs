@@ -239,11 +239,16 @@ public class AuthController : ControllerBase
 
     private int GetUserId()
     {
-        var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+        var sub =
+            User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
+            User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+            User.FindFirstValue("id");
+
         if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var id))
             throw new UnauthorizedAccessException("Invalid token.");
+
         return id;
-    }
+    }   
 
     private static string CreateSecureToken()
     {
