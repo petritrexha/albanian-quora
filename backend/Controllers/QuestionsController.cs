@@ -6,6 +6,9 @@ using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace AlbanianQuora.Api.Controllers
 {
@@ -117,6 +120,7 @@ namespace AlbanianQuora.Api.Controllers
         }
 
         // POST: api/questions
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateQuestionDto dto)
         {
@@ -142,8 +146,7 @@ namespace AlbanianQuora.Api.Controllers
             foreach (var tagId in dto.TagIds)
             {
                 var tagExists = await _context.Tags.AnyAsync(t => t.Id == tagId);
-                if (!tagExists)
-                    continue;
+                if (!tagExists) continue;
 
                 _context.QuestionTags.Add(new QuestionTag
                 {
@@ -157,7 +160,21 @@ namespace AlbanianQuora.Api.Controllers
             return CreatedAtAction(nameof(GetQuestion), new { id = question.Id }, question);
         }
 
+        private int GetUserIdFromJwt()
+        {
+            var idStr =
+                User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue("id");
+
+            if (string.IsNullOrWhiteSpace(idStr) || !int.TryParse(idStr, out var id))
+                throw new UnauthorizedAccessException("Invalid token: missing user id.");
+
+            return id;
+        }
+
         // PUT: api/questions/5
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, [FromBody] CreateQuestionDto dto)
         {
@@ -196,6 +213,7 @@ namespace AlbanianQuora.Api.Controllers
         }
 
         // DELETE: api/questions/5
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
