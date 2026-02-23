@@ -28,11 +28,9 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
 
         setLoading(true);
 
-        // In production this would call the backend API:
-        // POST /api/reports { reporterId, targetType, targetId, reason }
         try {
             const reporterId = user?.id || Number(localStorage.getItem("userId")) || 1;
-            await api.post("/api/reports", {
+            await api.post("/reports", {
                 reporterId,
                 targetType,
                 targetId,
