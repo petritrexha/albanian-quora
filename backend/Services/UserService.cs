@@ -1,4 +1,4 @@
-﻿using AlbanianQuora.Api.Data;
+using AlbanianQuora.Api.Data;
 using AlbanianQuora.DTOs;
 using AlbanianQuora.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -18,6 +18,8 @@ namespace AlbanianQuora.Services
         {
             var user = await _db.Users
                 .Include(u => u.Questions)
+                .Include(u => u.Answers)
+                    .ThenInclude(a => a.Question)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null) return null;
@@ -28,7 +30,8 @@ namespace AlbanianQuora.Services
                 Username = user.Username,
                 Email = user.Email,
                 FullName = user.Name,
-                Bio = user.Bio,
+                    Bio = user.Bio,
+                    JoinedAt = user.CreatedAtUtc,
                 Questions = user.Questions
                     .OrderByDescending(q => q.CreatedAt)
                     .Select(q => new UserQuestionDto
@@ -38,7 +41,17 @@ namespace AlbanianQuora.Services
                         CreatedAt = q.CreatedAt
                     })
                     .ToList(),
-                Answers = new() // s’ke Answer entity ende
+                    Answers = user.Answers
+                        .OrderByDescending(a => a.CreatedAtUtc)
+                        .Select(a => new UserAnswerDto
+                        {
+                            Id = a.Id,
+                            Content = a.Content,
+                            QuestionId = a.QuestionId,
+                            QuestionTitle = a.Question.Title,
+                            CreatedAt = a.CreatedAtUtc
+                        })
+                        .ToList()
             };
         }
 
