@@ -1,5 +1,5 @@
 using AlbanianQuora.Api.Data;
-using AlbanianQuora.Api.DTOs;
+using AlbanianQuora.DTOs;
 using AlbanianQuora.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -25,7 +25,6 @@ namespace AlbanianQuora.Api.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<QuestionTag> QuestionTags => Set<QuestionTag>();
-        public DbSet<Answer> Answers => Set<Answer>();
 
         // Password reset tokens
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();

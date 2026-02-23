@@ -13,13 +13,10 @@ import {
 import { useBookmarks } from "../context/BookmarkContext";
 import { useAuth } from "../context/AuthContext";
 import NotificationDropdown from "./NotificationDropdown";
-import { useAuth } from "../context/AuthContext";
 
 const Navbar = ({ onOpenAskModal }) => {
   const { bookmarkedQuestions, bookmarkedAnswers } = useBookmarks();
   const totalBookmarks = bookmarkedQuestions.length + bookmarkedAnswers.length;
-  const { isAuthenticated, user, logout } = useAuth();
-
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
 
   return (

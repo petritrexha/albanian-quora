@@ -6,6 +6,11 @@ namespace AlbanianQuora.Api.Models
         public string Content { get; set; } = string.Empty;
         public int Votes { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAtUtc
+        {
+            get => CreatedAt;
+            set => CreatedAt = value;
+        }
 
         public int QuestionId { get; set; }
         public Question Question { get; set; } = null!;
