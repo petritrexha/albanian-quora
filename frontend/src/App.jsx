@@ -13,9 +13,12 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import { useAuth } from "./context/AuthContext";
 
 export default function App() {
   const [showAskModal, setShowAskModal] = useState(false);
+  const { isAuthenticated, hydrating } = useAuth();
 
   const withNavbar = (Component) => (
     <>
@@ -23,6 +26,13 @@ export default function App() {
       {Component}
     </>
   );
+
+  if (hydrating) {
+    return null;
+  }
+
+  const ProtectedRoute = ({ element }) =>
+    isAuthenticated ? element : <Navigate to="/login" replace />;
 
   return (
     <BookmarkProvider>
@@ -41,6 +51,11 @@ export default function App() {
               setShowAskModal={setShowAskModal}
             />
           )}
+        />
+
+        <Route
+          path="/profile"
+          element={withNavbar(<ProtectedRoute element={<Profile />} />)}
         />
 
         <Route

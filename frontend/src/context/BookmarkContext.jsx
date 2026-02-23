@@ -17,13 +17,13 @@ export function BookmarkProvider({ children }) {
         const load = async () => {
             try {
                 setLoading(true);
-                const res = await api.get(`/api/bookmarks/user/${userId}`);
+                const res = await api.get(`/bookmarks/user/${userId}`);
                 const bookmarks = res.data || [];
 
                 const questions = await Promise.all(
                     bookmarks.map(async (b) => {
                         try {
-                            const qRes = await api.get(`/api/questions/${b.questionId}`);
+                            const qRes = await api.get(`/questions/${b.questionId}`);
                             return { ...qRes.data, _bookmarkId: b.id };
                         } catch {
                             return { id: b.questionId, title: b.questionTitle || "", _bookmarkId: b.id };
@@ -58,7 +58,7 @@ export function BookmarkProvider({ children }) {
             setBookmarkedQuestions((p) => p.filter((q) => q.id !== question.id));
             try {
                 if (exists._bookmarkId) {
-                    await api.delete(`/api/bookmarks/${exists._bookmarkId}`);
+                    await api.delete(`/bookmarks/${exists._bookmarkId}`);
                 } else {
                     // Fallback: try to find the bookmark by user+question and delete via check endpoint
                     // nothing to do here as backend requires id to delete
@@ -75,7 +75,7 @@ export function BookmarkProvider({ children }) {
             // Optimistically add
             setBookmarkedQuestions((p) => [{ ...question, _bookmarkId: null, optimistic: true }, ...p]);
             try {
-                const res = await api.post(`/api/bookmarks`, { userId, questionId: question.id });
+                const res = await api.post(`/bookmarks`, { userId, questionId: question.id });
                 const b = res.data;
                 // replace optimistic entry with real data (and include bookmark id)
                 setBookmarkedQuestions((p) =>

@@ -6,15 +6,19 @@ import {
   FaQuestionCircle,
   FaBookmark,
   FaSignInAlt,
-  FaUserPlus
+  FaUserPlus,
+  FaUserCircle,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { useBookmarks } from "../context/BookmarkContext";
 import { useAuth } from "../context/AuthContext";
 import NotificationDropdown from "./NotificationDropdown";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar = ({ onOpenAskModal }) => {
   const { bookmarkedQuestions, bookmarkedAnswers } = useBookmarks();
   const totalBookmarks = bookmarkedQuestions.length + bookmarkedAnswers.length;
+  const { isAuthenticated, user, logout } = useAuth();
 
   const { isAuthenticated, isAdmin, user, logout } = useAuth();
 
@@ -62,7 +66,20 @@ const Navbar = ({ onOpenAskModal }) => {
 
           <NotificationDropdown />
 
-          {!isAuthenticated ? (
+          {isAuthenticated ? (
+            <>
+              <Link to="/profile" className="nav-item">
+                <FaUserCircle className="nav-icon" /> {user?.username || "Profili"}
+              </Link>
+              <button
+                onClick={logout}
+                className="nav-item"
+                style={{ border: "none", background: "transparent", cursor: "pointer" }}
+              >
+                <FaSignOutAlt className="nav-icon" /> Dil
+              </button>
+            </>
+          ) : (
             <>
               <Link to="/login" className="nav-item">
                 <FaSignInAlt className="nav-icon login-icon" /> Kyçu
@@ -72,13 +89,6 @@ const Navbar = ({ onOpenAskModal }) => {
                 <FaUserPlus className="nav-icon-btn" />
                 Regjistrohu
               </Link>
-            </>
-          ) : (
-            <>
-              {isAdmin && (
-                <Link to="/admin" className="nav-item">Admin</Link>
-              )}
-              <a href="#" onClick={(e) => { e.preventDefault(); logout(); }} className="nav-item">Çkyçu</a>
             </>
           )}
         </div>

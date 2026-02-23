@@ -1,4 +1,4 @@
-﻿namespace AlbanianQuora.DTOs
+namespace AlbanianQuora.DTOs
 {
     public class UserProfileDto
     {
@@ -7,6 +7,7 @@
         public string Email { get; set; } = "";
         public string? FullName { get; set; }
         public string? Bio { get; set; }
+        public DateTime JoinedAt { get; set; }
 
         public List<UserQuestionDto> Questions { get; set; } = new();
         public List<UserAnswerDto> Answers { get; set; } = new(); // për tani empty (s’ke Answer entity ende)
@@ -24,6 +25,7 @@
         public int Id { get; set; }
         public string Content { get; set; } = "";
         public int QuestionId { get; set; }
+        public string? QuestionTitle { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

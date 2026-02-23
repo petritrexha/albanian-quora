@@ -25,6 +25,7 @@ namespace AlbanianQuora.Api.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<QuestionTag> QuestionTags => Set<QuestionTag>();
+        public DbSet<Answer> Answers => Set<Answer>();
 
         // Password reset tokens
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
@@ -110,6 +111,12 @@ namespace AlbanianQuora.Api.Data
                 .WithMany()
                 .HasForeignKey(t => t.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.User)
+                .WithMany(u => u.Answers)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }
