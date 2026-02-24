@@ -1,105 +1,93 @@
 import { useEffect, useState } from "react";
 import { useAuth } from "../context/AuthContext";
-import AskModal from "../components/AskModal";
 import AskBox from "../components/AskBox";
 import QuestionCard from "../components/QuestionCard";
-import Sidebar from "../components/Sidebar";
-import { getQuestions } from "../services/questionService";
-import "../styles/home.css";
+import { getQuestions, createQuestion, upvoteQuestion, downvoteQuestion } from "../services/questionService";
 
-const Home = ({ showAskModal, setShowAskModal }) => {
+const Home = ({ selectedCategory, refreshTrigger }) => {
   const [questions, setQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState("");
-
   const { user } = useAuth();
 
   useEffect(() => {
     let mounted = true;
-    getQuestions(user?.id).then((data) => {
-      if (mounted) setQuestions(data);
-    });
-    return () => (mounted = false);
-  }, [user]);
+    getQuestions(user?.id, selectedCategory)
+      .then((data) => {
+        if (mounted && data) setQuestions(data);
+      })
+      .catch(() => {
+        if (mounted) setQuestions([]);
+      });
+    return () => { mounted = false; };
+  }, [user, selectedCategory, refreshTrigger]);
 
-  const handleUpvote = (id) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === id ? { ...q, votes: q.votes + 1 } : q
-      )
-    );
+  const handlePostQuestion = async () => {
+    if (!newQuestion.trim()) return;
+    try {
+      const created = await createQuestion({
+        title: newQuestion,
+        description: newQuestion,
+        categoryId: selectedCategory || 1,
+      });
+      setQuestions((prev) => [created, ...prev]);
+      setNewQuestion("");
+    } catch (error) {
+      console.error("Error posting question:", error);
+    }
   };
 
-  const handleDownvote = (id) => {
-    setQuestions(
-      questions.map((q) =>
-        q.id === id ? { ...q, votes: q.votes - 1 } : q
-      )
-    );
+  const handleUpvote = async (id) => {
+    try {
+      const newVotes = await upvoteQuestion(id);
+      setQuestions((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, votes: newVotes } : q))
+      );
+    } catch (err) {
+      console.error("Upvote failed", err);
+    }
   };
 
-  const handlePostQuestion = () => {
-    if (newQuestion.trim() === "") return;
-
-    const question = {
-      id: Date.now(),
-      title: newQuestion,
-      description: "Pyetja sapo u postua.",
-      votes: 0,
-      views: 0,
-      answers: 0,
-    };
-
-    setQuestions([question, ...questions]);
-    setNewQuestion("");
-    setShowAskModal(false);
+  const handleDownvote = async (id) => {
+    try {
+      const newVotes = await downvoteQuestion(id);
+      setQuestions((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, votes: newVotes } : q))
+      );
+    } catch (err) {
+      console.error("Downvote failed", err);
+    }
   };
 
   return (
-    <>
-      <div className="content-layout">
-        <Sidebar />
+    <div className="w-full">
+      <div className="flex flex-col gap-4">
+        <AskBox
+          newQuestion={newQuestion}
+          setNewQuestion={setNewQuestion}
+          handlePostQuestion={handlePostQuestion}
+        />
+        
+        <h2 className="my-1.5 mb-3 text-[20px] font-semibold text-[var(--text-main)]">
+          Trending Questions
+        </h2>
 
-        <div className="questions-section">
-          <AskBox
-            newQuestion={newQuestion}
-            setNewQuestion={setNewQuestion}
-            handlePostQuestion={handlePostQuestion}
-          />
-
-          <h2>Trending Questions</h2>
-
-          {questions.map((question) => (
-            <QuestionCard
-              key={question.id}
-              question={question}
-              onUpvote={handleUpvote}
-              onDownvote={handleDownvote}
-            />
-          ))}
-        </div>
-      </div>
-
-      {showAskModal && (
-        <div
-          className="modal-overlay"
-          onClick={() => setShowAskModal(false)}
-        >
-          <div
-            className="modal-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <AskModal
-              newQuestion={newQuestion}
-              setNewQuestion={setNewQuestion}
-              handlePostQuestion={handlePostQuestion}
-            />
+        {questions.length > 0 ? (
+          <div className="flex flex-col gap-4">
+            {questions.map((question) => (
+              <QuestionCard
+                key={question.id}
+                question={question}
+                onUpvote={handleUpvote}
+                onDownvote={handleDownvote}
+              />
+            ))}
           </div>
-        </div>
-      )}
-    </>
+        ) : (
+          <p className="text-[#777] italic text-sm">No questions available.</p>
+        )}
+      </div>
+    </div>
   );
 };
 
 export default Home;
-
-

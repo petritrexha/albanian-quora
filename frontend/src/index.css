@@ -2,60 +2,51 @@
 @tailwind components;
 @tailwind utilities;
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+@layer base {
+  /* Variables */
+  :root {
+    --primary: #2563eb;
+    --primary-light: #3b82f6;
+    --accent: #e0e7ff;
+    --text-main: #1f2937;
+    --text-light: #6b7280;
+    --bg-light: #f9fafb;
+    --card-bg: #ffffff;
+    --border: #e5e7eb;
+  }
+
+  /* Reset & Base Styles */
+  * {
+    @apply m-0 p-0 box-border;
+  }
+
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    @apply bg-[var(--bg-light)] text-[var(--text-main)] leading-relaxed;
+  }
+
+  /* Links */
+  a {
+    @apply no-underline transition-all;
+    color: inherit;
+  }
+
+  a:hover {
+    @apply underline;
+  }
+
+  /* Buttons */
+  button {
+    @apply border-none cursor-pointer font-inherit bg-transparent;
+  }
 }
 
-:root {
-  font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-}
-
-body {
-  background: #FAFAFA;
-  color: #020617;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-:root {
-  --primary: #2563EB;
-  --primary-light: #3B82F6;
-  --accent: #E0E7FF;
-  --text-main: #1F2937;
-  --text-light: #6B7280;
-  --bg-light: #F9FAFB;
-  --card-bg: #FFFFFF;
-  --border: #E5E7EB;
-}
-
-body {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: var(--bg-light);
-  color: var(--text-main);
-  line-height: 1.6;
-}
-
-
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-
-button {
-  border: none;
-  cursor: pointer;
-  font-family: inherit;
+@layer utilities {
+  .font-inherit {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    line-height: inherit;
+  }
 }
 

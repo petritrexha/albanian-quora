@@ -2,137 +2,159 @@ import { createContext, useContext, useState, useCallback, useEffect } from "rea
 import api from "../services/api";
 import { useAuth } from "./AuthContext";
 
-const BookmarkContext = createContext();
+const BookmarkContext = createContext(null);
 
 export function BookmarkProvider({ children }) {
-    const { user, isAuthenticated } = useAuth();
-    const userId = user?.id || (Number(localStorage.getItem("userId")) || null);
+  const { user, isAuthenticated } = useAuth();
+  const userId = user?.id;
 
-    const [bookmarkedQuestions, setBookmarkedQuestions] = useState([]);
-    const [bookmarkedAnswers, setBookmarkedAnswers] = useState([]);
-    const [loading, setLoading] = useState(false);
+  const [bookmarkedQuestions, setBookmarkedQuestions] = useState([]);
+  const [bookmarkedAnswers, setBookmarkedAnswers] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        let mounted = true;
-        const load = async () => {
+  // Load bookmarks when user logs in
+  useEffect(() => {
+    if (!isAuthenticated || !userId) {
+      setBookmarkedQuestions([]);
+      return;
+    }
+
+    let mounted = true;
+
+    const loadBookmarks = async () => {
+      try {
+        setLoading(true);
+
+        const res = await api.get(`/api/bookmarks/user/${userId}`);
+        const bookmarks = res.data || [];
+
+        const questions = await Promise.all(
+          bookmarks.map(async (b) => {
             try {
-                setLoading(true);
-                const res = await api.get(`/api/bookmarks/user/${userId}`);
-                const bookmarks = res.data || [];
-
-                const questions = await Promise.all(
-                    bookmarks.map(async (b) => {
-                        try {
-                            const qRes = await api.get(`/api/questions/${b.questionId}`);
-                            return { ...qRes.data, _bookmarkId: b.id };
-                        } catch {
-                            return { id: b.questionId, title: b.questionTitle || "", _bookmarkId: b.id };
-                        }
-                    })
-                );
-
-                if (!mounted) return;
-                setBookmarkedQuestions(questions);
-            } catch (e) {
-                console.error("Failed to load bookmarks", e);
-            } finally {
-                if (mounted) setLoading(false);
+              const qRes = await api.get(`/api/questions/${b.questionId}`);
+              return { ...qRes.data, _bookmarkId: b.id };
+            } catch {
+              return {
+                id: b.questionId,
+                title: b.questionTitle || "",
+                _bookmarkId: b.id,
+              };
             }
-        };
+          })
+        );
 
-        if (userId) load();
-        return () => (mounted = false);
-    }, [userId]);
-    const toggleQuestionBookmark = useCallback(async (question) => {
-        if (!isAuthenticated) {
-            // Prevent guests from triggering the API
-            alert("Please log in to save bookmarks.");
-            return { success: false, message: "Not authenticated" };
+        if (mounted) {
+          setBookmarkedQuestions(questions);
         }
+      } catch (error) {
+        console.error("Failed to load bookmarks", error);
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
 
-        const prev = bookmarkedQuestions;
-        const exists = prev.find((q) => q.id === question.id);
+    loadBookmarks();
 
-        if (exists) {
-            // Optimistically remove
-            setBookmarkedQuestions((p) => p.filter((q) => q.id !== question.id));
-            try {
-                if (exists._bookmarkId) {
-                    await api.delete(`/api/bookmarks/${exists._bookmarkId}`);
-                } else {
-                    // Fallback: try to find the bookmark by user+question and delete via check endpoint
-                    // nothing to do here as backend requires id to delete
-                }
-                return { success: true };
-            } catch (e) {
-                // Revert
-                setBookmarkedQuestions(prev);
-                console.error("Failed to delete bookmark", e);
-                alert("Could not remove bookmark, try again.");
-                return { success: false, message: e?.message };
-            }
-        } else {
-            // Optimistically add
-            setBookmarkedQuestions((p) => [{ ...question, _bookmarkId: null, optimistic: true }, ...p]);
-            try {
-                const res = await api.post(`/api/bookmarks`, { userId, questionId: question.id });
-                const b = res.data;
-                // replace optimistic entry with real data (and include bookmark id)
-                setBookmarkedQuestions((p) =>
-                    p.map((q) => (q.id === question.id ? { ...q, _bookmarkId: b.id, optimistic: false } : q))
-                );
-                return { success: true, bookmark: b };
-            } catch (e) {
-                // Revert optimistic add
-                setBookmarkedQuestions(prev);
-                console.error("Failed to create bookmark", e);
-                alert("Could not save bookmark, try again.");
-                return { success: false, message: e?.message };
-            }
+    return () => {
+      mounted = false;
+    };
+  }, [isAuthenticated, userId]);
+
+  const toggleQuestionBookmark = useCallback(
+    async (question) => {
+      if (!isAuthenticated) {
+        alert("Please log in to save bookmarks.");
+        return { success: false };
+      }
+
+      const existing = bookmarkedQuestions.find((q) => q.id === question.id);
+
+      if (existing) {
+        // Remove bookmark
+        setBookmarkedQuestions((prev) =>
+          prev.filter((q) => q.id !== question.id)
+        );
+
+        try {
+          await api.delete(`/api/bookmarks/${existing._bookmarkId}`);
+          return { success: true };
+        } catch (error) {
+          console.error("Failed to remove bookmark", error);
+          return { success: false };
         }
-    }, [bookmarkedQuestions, userId, isAuthenticated]);
+      } else {
+        // Add bookmark
+        try {
+          const res = await api.post(`/api/bookmarks`, {
+            userId,
+            questionId: question.id,
+          });
 
-    const toggleAnswerBookmark = useCallback((answer, questionTitle) => {
-        setBookmarkedAnswers((prev) => {
-            const exists = prev.find((a) => a.id === answer.id);
-            if (exists) {
-                return prev.filter((a) => a.id !== answer.id);
-            }
-            return [...prev, { ...answer, questionTitle, bookmarkedAt: Date.now() }];
-        });
-    }, []);
+          const bookmark = res.data;
 
-    const isQuestionBookmarked = useCallback(
-        (id) => bookmarkedQuestions.some((q) => q.id === id),
-        [bookmarkedQuestions]
-    );
+          setBookmarkedQuestions((prev) => [
+            { ...question, _bookmarkId: bookmark.id },
+            ...prev,
+          ]);
 
-    const isAnswerBookmarked = useCallback(
-        (id) => bookmarkedAnswers.some((a) => a.id === id),
-        [bookmarkedAnswers]
-    );
+          return { success: true };
+        } catch (error) {
+          console.error("Failed to add bookmark", error);
+          return { success: false };
+        }
+      }
+    },
+    [bookmarkedQuestions, isAuthenticated, userId]
+  );
 
-    return (
-        <BookmarkContext.Provider
-            value={{
-                bookmarkedQuestions,
-                bookmarkedAnswers,
-                toggleQuestionBookmark,
-                toggleAnswerBookmark,
-                isQuestionBookmarked,
-                isAnswerBookmarked,
-                loading,
-            }}
-        >
-            {children}
-        </BookmarkContext.Provider>
-    );
+  const toggleAnswerBookmark = useCallback((answer, questionTitle) => {
+    setBookmarkedAnswers((prev) => {
+      const exists = prev.find((a) => a.id === answer.id);
+
+      if (exists) {
+        return prev.filter((a) => a.id !== answer.id);
+      }
+
+      return [
+        ...prev,
+        { ...answer, questionTitle, bookmarkedAt: Date.now() },
+      ];
+    });
+  }, []);
+
+  const isQuestionBookmarked = useCallback(
+    (id) => bookmarkedQuestions.some((q) => q.id === id),
+    [bookmarkedQuestions]
+  );
+
+  const isAnswerBookmarked = useCallback(
+    (id) => bookmarkedAnswers.some((a) => a.id === id),
+    [bookmarkedAnswers]
+  );
+
+  return (
+    <BookmarkContext.Provider
+      value={{
+        bookmarkedQuestions,
+        bookmarkedAnswers,
+        toggleQuestionBookmark,
+        toggleAnswerBookmark,
+        isQuestionBookmarked,
+        isAnswerBookmarked,
+        loading,
+      }}
+    >
+      {children}
+    </BookmarkContext.Provider>
+  );
 }
 
 export function useBookmarks() {
-    const context = useContext(BookmarkContext);
-    if (!context) {
-        throw new Error("useBookmarks must be used within a BookmarkProvider");
-    }
-    return context;
+  const context = useContext(BookmarkContext);
+
+  if (!context) {
+    throw new Error("useBookmarks must be used within BookmarkProvider");
+  }
+
+  return context;
 }

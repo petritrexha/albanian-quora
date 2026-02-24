@@ -32,7 +32,7 @@ export default function Register() {
     e.preventDefault();
     setError("");
 
-    if (!form.name.trim() || !form.username.trim() || !form.email.trim() || !form.password.trim() || !form.confirm.trim()) {
+    if (!form.name || !form.username || !form.email || !form.password || !form.confirm) {
       setError("Plotëso të gjitha fushat.");
       return;
     }
@@ -50,93 +50,104 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const res = await register({
+      await register({
         name: form.name.trim(),
         username: form.username.trim(),
         email: form.email.trim(),
         password: form.password,
-        confirmPassword: form.confirm, // ✅ REQUIRED by backend
+        confirmPassword: form.confirm,
       });
 
-      // zakonisht backend kthen token+user; kjo autoLoggedIn mund mos ekzistojë
-      if (res?.token) navigate("/", { replace: true });
-      else navigate("/login", { replace: true });
+      navigate("/", { replace: true });
     } catch (err) {
       const res = err?.response;
-
-      if (!res) {
-        setError("S’u lidhëm me serverin. Kontrollo a është ndezur backend-i.");
-        return;
-      }
-
-      if (res.data?.errors) {
-        const entries = Object.entries(res.data.errors);
-        if (entries.length) {
-          const [field, msgs] = entries[0];
-          setError(`${field}: ${msgs?.[0] || "Invalid value."}`);
-          return;
-        }
-      }
-
-      setError(res.data?.message || res.data?.error || `Register dështoi (${res.status}).`);
+      setError(
+        res?.data?.message ||
+          res?.data?.error ||
+          `Register dështoi (${res?.status || "server"}).`
+      );
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="login-wrapper">
-      <div className="login-card">
-        <h2 className="login-title">Register</h2>
+    <div className="min-h-screen bg-[#fafafa] flex justify-center items-center p-6">
+      <div className="bg-white p-10 w-full max-w-[400px] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <h2 className="mb-6 text-[#334155] text-2xl font-bold text-center">Register</h2>
 
         {error && (
-          <div style={{ marginBottom: 12, color: "crimson", fontSize: 14 }}>
+          <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-[#dc143c] text-sm leading-relaxed">
             {error}
           </div>
         )}
 
-        <form onSubmit={onSubmit}>
-          <div className="form-group">
-            <label>Name</label>
-            <input name="name" value={form.name} onChange={onChange} autoComplete="name" />
+        <form onSubmit={onSubmit} className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm text-[#334155] font-medium">Name</label>
+            <input 
+              name="name" 
+              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
+              value={form.name} 
+              onChange={onChange} 
+            />
           </div>
 
-          <div className="form-group">
-            <label>Username</label>
-            <input name="username" value={form.username} onChange={onChange} autoComplete="username" />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm text-[#334155] font-medium">Username</label>
+            <input 
+              name="username" 
+              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
+              value={form.username} 
+              onChange={onChange} 
+            />
           </div>
 
-          <div className="form-group">
-            <label>Email</label>
-            <input name="email" value={form.email} onChange={onChange} autoComplete="email" />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm text-[#334155] font-medium">Email</label>
+            <input 
+              name="email" 
+              type="email"
+              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
+              value={form.email} 
+              onChange={onChange} 
+            />
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm text-[#334155] font-medium">Password</label>
             <input
               type="password"
               name="password"
+              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
               value={form.password}
               onChange={onChange}
-              autoComplete="new-password"
             />
           </div>
 
-          <div className="form-group">
-            <label>Confirm Password</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm text-[#334155] font-medium">Confirm Password</label>
             <input
               type="password"
               name="confirm"
+              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
               value={form.confirm}
               onChange={onChange}
-              autoComplete="new-password"
             />
           </div>
 
-          <button className="btn-primary" type="submit" disabled={loading}>
+          <button 
+            className="w-full mt-2 p-3 bg-[#0ea5e9] border-none rounded-lg text-white font-bold cursor-pointer transition-colors duration-200 hover:bg-[#0284c7] disabled:opacity-50 disabled:cursor-not-allowed" 
+            type="submit" 
+            disabled={loading}
+          >
             {loading ? "Duke u regjistruar..." : "Register"}
           </button>
         </form>
+        
+        <p className="mt-6 text-center text-sm text-[#64748b]">
+          Keni një llogari? <a href="/login" className="text-[#0ea5e9] font-semibold hover:underline">Kyçu këtu</a>
+        </p>
       </div>
     </div>
   );

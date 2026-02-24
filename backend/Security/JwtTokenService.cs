@@ -15,6 +15,7 @@ public class JwtTokenService : IJwtTokenService
     public JwtTokenService(IOptions<JwtOptions> options)
     {
         _opts = options.Value;
+
         if (string.IsNullOrWhiteSpace(_opts.Key) || _opts.Key.Length < 32)
             throw new InvalidOperationException("Jwt:Key must be at least 32 characters long.");
     }
