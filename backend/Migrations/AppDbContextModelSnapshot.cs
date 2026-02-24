@@ -22,6 +22,171 @@ namespace AlbanianQuora.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("AlbanianQuora.Api.Entities.Answer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Votes")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Answers");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Api.Models.Bookmark", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("QuestionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("QuestionId");
+
+                    b.HasIndex("UserId", "QuestionId")
+                        .IsUnique();
+
+                    b.ToTable("Bookmarks");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Api.Models.Notification", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Api.Models.PasswordResetToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("UsedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("PasswordResetTokens");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Api.Models.Question", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Views")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Votes")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CategoryId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Questions");
+                });
+
             modelBuilder.Entity("AlbanianQuora.Api.Models.QuestionTag", b =>
                 {
                     b.Property<int>("QuestionId")
@@ -35,6 +200,40 @@ namespace AlbanianQuora.Migrations
                     b.HasIndex("TagId");
 
                     b.ToTable("QuestionTags");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Api.Models.Report", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ReporterId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TargetId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TargetType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Reports");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.Tag", b =>
@@ -59,6 +258,55 @@ namespace AlbanianQuora.Migrations
                     b.ToTable("Tags");
                 });
 
+            modelBuilder.Entity("AlbanianQuora.Api.Models.User", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<byte[]>("PasswordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("Username")
+                        .IsUnique();
+
+                    b.ToTable("Users");
+                });
+
             modelBuilder.Entity("Category", b =>
                 {
                     b.Property<int>("Id")
@@ -80,40 +328,86 @@ namespace AlbanianQuora.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 2, 22, 13, 16, 53, 367, DateTimeKind.Utc).AddTicks(1846),
+                            IsActive = true,
+                            Name = "General"
+                        });
                 });
 
-            modelBuilder.Entity("Question", b =>
+            modelBuilder.Entity("AlbanianQuora.Api.Entities.Answer", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.HasOne("AlbanianQuora.Api.Models.Question", "Question")
+                        .WithMany("Answers")
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.HasOne("AlbanianQuora.Api.Models.User", "User")
+                        .WithMany("Answers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
-                    b.Property<int>("CategoryId")
-                        .HasColumnType("int");
+                    b.Navigation("Question");
 
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Navigation("User");
+                });
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+            modelBuilder.Entity("AlbanianQuora.Api.Models.Bookmark", b =>
+                {
+                    b.HasOne("AlbanianQuora.Api.Models.Question", "Question")
+                        .WithMany()
+                        .HasForeignKey("QuestionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.HasOne("AlbanianQuora.Api.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.HasKey("Id");
+                    b.Navigation("Question");
+                });
 
-                    b.HasIndex("CategoryId");
+            modelBuilder.Entity("AlbanianQuora.Api.Models.PasswordResetToken", b =>
+                {
+                    b.HasOne("AlbanianQuora.Api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.ToTable("Questions");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Api.Models.Question", b =>
+                {
+                    b.HasOne("Category", "Category")
+                        .WithMany("Questions")
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("AlbanianQuora.Api.Models.User", "User")
+                        .WithMany("Questions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.QuestionTag", b =>
                 {
-                    b.HasOne("Question", "Question")
+                    b.HasOne("AlbanianQuora.Api.Models.Question", "Question")
                         .WithMany("QuestionTags")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -141,15 +435,11 @@ namespace AlbanianQuora.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Question", b =>
+            modelBuilder.Entity("AlbanianQuora.Api.Models.Question", b =>
                 {
-                    b.HasOne("Category", "Category")
-                        .WithMany("Questions")
-                        .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("Answers");
 
-                    b.Navigation("Category");
+                    b.Navigation("QuestionTags");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.Tag", b =>
@@ -157,16 +447,20 @@ namespace AlbanianQuora.Migrations
                     b.Navigation("QuestionTags");
                 });
 
+            modelBuilder.Entity("AlbanianQuora.Api.Models.User", b =>
+                {
+                    b.Navigation("Answers");
+
+                    b.Navigation("Answers");
+
+                    b.Navigation("Questions");
+                });
+
             modelBuilder.Entity("Category", b =>
                 {
                     b.Navigation("Questions");
 
                     b.Navigation("Tags");
-                });
-
-            modelBuilder.Entity("Question", b =>
-                {
-                    b.Navigation("QuestionTags");
                 });
 #pragma warning restore 612, 618
         }

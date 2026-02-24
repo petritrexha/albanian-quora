@@ -1,200 +1,291 @@
-﻿using AlbanianQuora.Api.Data;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AlbanianQuora.Api.Data;
 using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Models;
+using AlbanianQuora.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
-namespace AlbanianQuora.Api.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class QuestionsController : ControllerBase
+namespace AlbanianQuora.Api.Controllers
 {
-    private readonly AppDbContext _context;
-
-    public QuestionsController(AppDbContext context)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class QuestionsController : ControllerBase
     {
-        _context = context;
-    }
+        private readonly AppDbContext _context;
+        private readonly IAnswerService _answerService;
 
-    // GET /api/questions?categoryId=1
-    [HttpGet]
-    public IActionResult GetAll([FromQuery] int? categoryId)
-    {
-        var query = _context.Questions
-            .Include(q => q.Category)
-            .Include(q => q.QuestionTags)
-                .ThenInclude(qt => qt.Tag)
-            .Where(q => q.Category != null && q.Category.IsActive)
-            .AsQueryable();
-
-        if (categoryId.HasValue)
+        public QuestionsController(AppDbContext context, IAnswerService answerService)
         {
-            query = query.Where(q => q.CategoryId == categoryId.Value);
+            _context = context;
+            _answerService = answerService;
         }
 
-        var questions = query
-            .Select(q => new
+        // GET: api/questions?categoryId=1&userId=1
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetQuestions([FromQuery] int? categoryId, [FromQuery] int? userId)
+        {
+            var query = _context.Questions
+                .Include(q => q.Category)
+                .Include(q => q.Answers)
+                .Include(q => q.QuestionTags)
+                    .ThenInclude(qt => qt.Tag)
+                .AsQueryable();
+
+            if (categoryId.HasValue)
+                query = query.Where(q => q.CategoryId == categoryId.Value);
+
+            var questions = await query
+                .OrderByDescending(q => q.CreatedAt)
+                .ToListAsync();
+
+            // bookmark map for provided userId (optional)
+            Dictionary<int, int> bookmarkMap = new();
+            if (userId.HasValue)
+            {
+                bookmarkMap = await _context.Bookmarks
+                    .Where(b => b.UserId == userId.Value)
+                    .ToDictionaryAsync(b => b.QuestionId, b => b.Id);
+            }
+
+            var result = questions.Select(q => new
             {
                 q.Id,
                 q.Title,
-                q.Content,
+                Content = q.Description,
+                q.Votes,
+                q.Views,
+                AnswerCount = q.Answers.Count,
                 q.CreatedAt,
 
                 CategoryId = q.CategoryId,
-                Category = q.Category!.Name,
+                Category = q.Category != null ? q.Category.Name : null,
 
-                Tags = q.QuestionTags
-                    .Select(qt => qt.Tag.Name)
-                    .ToList(),
+                Tags = q.QuestionTags.Select(qt => qt.Tag.Name).ToList(),
+                TagIds = q.QuestionTags.Select(qt => qt.TagId).ToList(),
 
-                TagIds = q.QuestionTags
-                    .Select(qt => qt.TagId)
-                    .ToList()
-            })
-            .ToList();
+                IsBookmarked = bookmarkMap.ContainsKey(q.Id),
+                BookmarkId = bookmarkMap.ContainsKey(q.Id) ? (int?)bookmarkMap[q.Id] : null
+            }).ToList();
 
-        return Ok(questions);
-    }
+            return Ok(result);
+        }
 
-    // POST /api/questions
-    [HttpPost]
-    public IActionResult Create(CreateQuestionDto dto)
-    {
-        var category = _context.Categories
-            .FirstOrDefault(c => c.Id == dto.CategoryId && c.IsActive);
-
-        if (category == null)
-            return BadRequest("Invalid category.");
-
-        var question = new Question
+        // GET: api/questions/5?userId=1
+        [AllowAnonymous]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetQuestion(int id, [FromQuery] int? userId)
         {
-            Title = dto.Title,
-            Content = dto.Content,
-            CategoryId = dto.CategoryId
-        };
+            var question = await _context.Questions
+                .Include(q => q.Category)
+                .Include(q => q.QuestionTags)
+                    .ThenInclude(qt => qt.Tag)
+                .FirstOrDefaultAsync(q => q.Id == id);
 
-        _context.Questions.Add(question);
-        _context.SaveChanges();
+            if (question == null)
+                return NotFound();
 
-        foreach (var tagId in dto.TagIds)
-        {
-            var tagExists = _context.Tags.Any(t => t.Id == tagId);
-            if (!tagExists)
-                continue;
+            // fetch answers from service
+            var answers = await _answerService.GetByQuestionId(id);
 
-            var questionTag = new QuestionTag
+            // increment views
+            question.Views += 1;
+            await _context.SaveChangesAsync();
+
+            int? bookmarkId = null;
+            bool isBookmarked = false;
+
+            if (userId.HasValue)
             {
-                QuestionId = question.Id,
-                TagId = tagId
+                var bk = await _context.Bookmarks
+                    .FirstOrDefaultAsync(b => b.UserId == userId.Value && b.QuestionId == id);
+
+                if (bk != null)
+                {
+                    isBookmarked = true;
+                    bookmarkId = bk.Id;
+                }
+            }
+
+            var result = new
+            {
+                question.Id,
+                question.Title,
+                Content = question.Description,
+                question.Votes,
+                question.Views,
+                Answers = answers,
+                question.CreatedAt,
+
+                CategoryId = question.CategoryId,
+                Category = question.Category != null ? question.Category.Name : null,
+
+                Tags = question.QuestionTags.Select(qt => qt.Tag.Name).ToList(),
+                TagIds = question.QuestionTags.Select(qt => qt.TagId).ToList(),
+
+                IsBookmarked = isBookmarked,
+                BookmarkId = bookmarkId
             };
 
-            _context.QuestionTags.Add(questionTag);
+            return Ok(result);
         }
 
-        _context.SaveChanges();
-
-        return CreatedAtAction(nameof(GetById), new { id = question.Id }, question);
-    }
-
-    // GET /api/questions/5
-    [HttpGet("{id}")]
-    public IActionResult GetById(int id)
-    {
-        var question = _context.Questions
-            .Include(q => q.Category)
-            .Include(q => q.QuestionTags)
-                .ThenInclude(qt => qt.Tag)
-            .Where(q => q.Id == id)
-            .Select(q => new
-            {
-                q.Id,
-                q.Title,
-                q.Content,
-                q.CreatedAt,
-
-                CategoryId = q.CategoryId,
-                Category = q.Category!.Name,
-
-                Tags = q.QuestionTags
-                    .Select(qt => qt.Tag.Name)
-                    .ToList(),
-
-                TagIds = q.QuestionTags
-                    .Select(qt => qt.TagId)
-                    .ToList()
-            })
-            .FirstOrDefault();
-
-        if (question == null)
-            return NotFound();
-
-        return Ok(question);
-    }
-
-    // PUT /api/questions/5
-    [HttpPut("{id}")]
-    public IActionResult Update(int id, CreateQuestionDto dto)
-    {
-        var question = _context.Questions
-            .Include(q => q.QuestionTags)
-            .FirstOrDefault(q => q.Id == id);
-
-        if (question == null)
-            return NotFound();
-
-        var categoryExists = _context.Categories
-            .Any(c => c.Id == dto.CategoryId && c.IsActive);
-
-        if (!categoryExists)
-            return BadRequest("Invalid category.");
-
-        // update basic fields
-        question.Title = dto.Title;
-        question.Content = dto.Content;
-        question.CategoryId = dto.CategoryId;
-
-        // fshij lidhjet e vjetra me tags
-        _context.QuestionTags.RemoveRange(question.QuestionTags);
-
-        // shto tags e reja
-        foreach (var tagId in dto.TagIds)
+        // POST: api/questions (auth required)
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateQuestionDto dto)
         {
-            var tagExists = _context.Tags.Any(t => t.Id == tagId);
-            if (!tagExists)
-                continue;
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == dto.CategoryId && c.IsActive);
 
-            _context.QuestionTags.Add(new QuestionTag
+            if (category == null)
+                return BadRequest("Invalid category.");
+
+            var currentUserId = GetUserIdFromJwt();
+
+            var question = new Question
             {
-                QuestionId = question.Id,
-                TagId = tagId
-            });
+                Title = dto.Title,
+                Description = dto.Content,
+                CategoryId = dto.CategoryId,
+                UserId = currentUserId
+            };
+
+            _context.Questions.Add(question);
+            await _context.SaveChangesAsync();
+
+            foreach (var tagId in dto.TagIds)
+            {
+                var tagExists = await _context.Tags.AnyAsync(t => t.Id == tagId);
+                if (!tagExists) continue;
+
+                _context.QuestionTags.Add(new QuestionTag
+                {
+                    QuestionId = question.Id,
+                    TagId = tagId
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetQuestion), new { id = question.Id }, question);
         }
 
-        _context.SaveChanges();
+        // PUT: api/questions/5 (owner or admin)
+        [Authorize]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(int id, [FromBody] CreateQuestionDto dto)
+        {
+            var question = await _context.Questions
+                .Include(q => q.QuestionTags)
+                .FirstOrDefaultAsync(q => q.Id == id);
 
-        return Ok(question);
-    }
+            if (question == null)
+                return NotFound();
 
-    // DELETE /api/questions/5
-    [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
-    {
-        var question = _context.Questions
-            .Include(q => q.QuestionTags)
-            .FirstOrDefault(q => q.Id == id);
+            var currentUserId = GetUserIdFromJwt();
 
-        if (question == null)
-            return NotFound();
+            if (question.UserId != currentUserId && !User.IsInRole("Admin"))
+                return Forbid();
 
-        // fshij lidhjet me tags
-        _context.QuestionTags.RemoveRange(question.QuestionTags);
+            var categoryExists = await _context.Categories
+                .AnyAsync(c => c.Id == dto.CategoryId && c.IsActive);
 
-        // fshij pyetjen
-        _context.Questions.Remove(question);
+            if (!categoryExists)
+                return BadRequest("Invalid category.");
 
-        _context.SaveChanges();
+            question.Title = dto.Title;
+            question.Description = dto.Content;
+            question.CategoryId = dto.CategoryId;
 
-        return NoContent();
+            _context.QuestionTags.RemoveRange(question.QuestionTags);
+
+            foreach (var tagId in dto.TagIds)
+            {
+                var tagExists = await _context.Tags.AnyAsync(t => t.Id == tagId);
+                if (!tagExists) continue;
+
+                _context.QuestionTags.Add(new QuestionTag
+                {
+                    QuestionId = question.Id,
+                    TagId = tagId
+                });
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(question);
+        }
+
+        // DELETE: api/questions/5 (owner or admin)
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var question = await _context.Questions
+                .Include(q => q.QuestionTags)
+                .FirstOrDefaultAsync(q => q.Id == id);
+
+            if (question == null)
+                return NotFound();
+
+            var currentUserId = GetUserIdFromJwt();
+
+            if (question.UserId != currentUserId && !User.IsInRole("Admin"))
+                return Forbid();
+
+            _context.QuestionTags.RemoveRange(question.QuestionTags);
+            _context.Questions.Remove(question);
+
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        // Votes (auth)
+        [Authorize]
+        [HttpPost("{id}/upvote")]
+        public async Task<IActionResult> Upvote(int id)
+        {
+            var question = await _context.Questions.FindAsync(id);
+            if (question == null) return NotFound();
+
+            question.Votes += 1;
+            await _context.SaveChangesAsync();
+
+            return Ok(question.Votes);
+        }
+
+        [Authorize]
+        [HttpPost("{id}/downvote")]
+        public async Task<IActionResult> Downvote(int id)
+        {
+            var question = await _context.Questions.FindAsync(id);
+            if (question == null) return NotFound();
+
+            question.Votes -= 1;
+            await _context.SaveChangesAsync();
+
+            return Ok(question.Votes);
+        }
+
+        private int GetUserIdFromJwt()
+        {
+            var idStr =
+                User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue("id");
+
+            if (string.IsNullOrWhiteSpace(idStr) || !int.TryParse(idStr, out var id))
+                throw new UnauthorizedAccessException("Invalid token: missing user id.");
+
+            return id;
+        }
     }
 }

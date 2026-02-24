@@ -1,4 +1,5 @@
-﻿using AlbanianQuora.Api.Data;
+using AlbanianQuora.Api.Data;
+using Microsoft.AspNetCore.Authorization;
 using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -17,6 +18,7 @@ public class CategoriesController : ControllerBase
     // ======================
     // CREATE CATEGORY
     // ======================
+    [Authorize]
     [HttpPost]
     public IActionResult Create(CreateCategoryDto dto)
     {
@@ -59,6 +61,7 @@ public class CategoriesController : ControllerBase
     // ======================
     // SOFT DELETE
     // ======================
+    [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
@@ -67,9 +70,7 @@ public class CategoriesController : ControllerBase
         if (category == null)
             return NotFound();
 
-        // Soft delete
         category.IsActive = false;
-
         _context.SaveChanges();
 
         return NoContent();

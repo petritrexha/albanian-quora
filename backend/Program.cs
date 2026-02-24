@@ -1,143 +1,166 @@
-using AlbanianQuora.Api.Data;
-using AlbanianQuora.Api.Models;
-using Microsoft.EntityFrameworkCore;
+import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { BookmarkProvider } from "./context/BookmarkContext";
+import Layout from "./components/Layout";
+import CategoryPage from "./pages/CategoryPage";
+import AskModal from "./components/AskModal";
+import { createQuestion } from "./services/questionService";
 
-var builder = WebApplication.CreateBuilder(args);
+import Home from "./pages/Home";
+import QuestionDetails from "./pages/QuestionDetails";
+import Bookmarks from "./pages/Bookmarks";
+import SearchPage from "./pages/SearchPage";
 
-// =======================
-// SERVICES
-// =======================
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import { useAuth } from "./context/AuthContext";
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.ReferenceHandler =
-            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles;
-    });
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader());
-});
-
-var app = builder.Build();
-
-// =======================
-// PIPELINE
-// =======================
-
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
+function ProtectedRoute({ isAuthenticated, children }) {
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return children;
 }
 
-app.UseHttpsRedirection();
+export default function App() {
+  const [showAskModal, setShowAskModal] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [refreshHome, setRefreshHome] = useState(false);
 
-// =======================
-// SEED DATA
-// =======================
+  const { isAuthenticated, hydrating } = useAuth();
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+  const handlePostQuestion = async () => {
+    if (!newQuestion.trim()) return;
 
-    SeedCategories(context);
-    SeedTags(context);
-}
+    try {
+      await createQuestion({
+        title: newQuestion,
+        description: newQuestion,
+        categoryId: selectedCategory || 1,
+      });
 
-app.UseCors("AllowAll");
-app.UseAuthorization();
-app.MapControllers();
-app.Run();
-
-
-// =======================
-// SEED METHODS
-// =======================
-
-void SeedCategories(AppDbContext context)
-{
-    var defaultCategories = new[]
-    {
-        "Programim",
-        "Teknologji",
-        "Shkencë",
-        "Biznes",
-        "Fe & Religjion",
-        "Shoqëri",
-        "Shëndet"
-    };
-
-    foreach (var name in defaultCategories)
-    {
-        if (!context.Categories.Any(c => c.Name == name))
-        {
-            context.Categories.Add(new Category
-            {
-                Name = name,
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow
-            });
-        }
+      setNewQuestion("");
+      setShowAskModal(false);
+      setRefreshHome((prev) => !prev);
+    } catch (err) {
+      console.error("Failed to create question:", err);
     }
+  };
 
-    context.SaveChanges();
-}
+  if (hydrating) return null;
 
-void SeedTags(AppDbContext context)
-{
-    var tagData = new Dictionary<string, string[]>
-    {
-        {
-            "Programim",
-            new[]
-            {
-                "C#", "Java", "JavaScript", "Python", "C++",
-                "PHP", "Go", "Rust", "TypeScript", "SQL",
-                "React", "Angular", "Node.js", ".NET", "Spring Boot"
+  return (
+    <div className="min-h-screen">
+      <BookmarkProvider>
+        <Routes>
+          {/* Public */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+
+          {/* Protected */}
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <Profile />
+              </ProtectedRoute>
             }
-        },
-        { "Teknologji", new[] { "AI", "Cybersecurity", "Cloud", "Blockchain" } },
-        { "Biznes", new[] { "Marketing", "Startup", "Investim" } },
-        { "Shkencë", new[] { "Matematikë", "Fizikë", "Biologji" } },
-        { "Fe & Religjion", new[] { "Islam", "Teologji", "Hadith" } },
-        { "Shoqëri", new[] { "Politikë", "Media", "Kulturë" } },
-        { "Shëndet", new[] { "Fitness", "Ushqim", "Psikologji" } }
-    };
+          />
 
-    foreach (var entry in tagData)
-    {
-        var category = context.Categories
-            .FirstOrDefault(c => c.Name == entry.Key);
-
-        if (category == null)
-            continue;
-
-        foreach (var tagName in entry.Value)
-        {
-            if (!context.Tags.Any(t => t.Name == tagName))
-            {
-                context.Tags.Add(new Tag
-                {
-                    Name = tagName,
-                    CategoryId = category.Id
-                });
+          {/* App routes with Layout */}
+          <Route
+            path="/"
+            element={
+              <Layout
+                onOpenAskModal={() => setShowAskModal(true)}
+                onCategorySelect={setSelectedCategory}
+              >
+                <Home
+                  selectedCategory={selectedCategory}
+                  refreshTrigger={refreshHome}
+                />
+              </Layout>
             }
-        }
-    }
+          />
 
-    context.SaveChanges();
+          <Route
+            path="/question/:id"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <QuestionDetails />
+              </Layout>
+            }
+          />
+
+          {/* Alias for old links */}
+          <Route
+            path="/questions/:id"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <QuestionDetails />
+              </Layout>
+            }
+          />
+
+          <Route
+            path="/saved"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <Bookmarks />
+              </Layout>
+            }
+          />
+
+          <Route
+            path="/category/:id"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <CategoryPage />
+              </Layout>
+            }
+          />
+
+          <Route
+            path="/search"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <SearchPage />
+              </Layout>
+            }
+          />
+
+          {/* Fallback */}
+          <Route
+            path="*"
+            element={
+              <Navigate to={isAuthenticated ? "/" : "/login"} replace />
+            }
+          />
+        </Routes>
+
+        {/* Ask Modal */}
+        {showAskModal && (
+          <div
+            className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowAskModal(false)}
+          >
+            <div
+              className="relative w-full max-w-2xl mx-4 bg-white rounded-xl shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <AskModal
+                newQuestion={newQuestion}
+                setNewQuestion={setNewQuestion}
+                handlePostQuestion={handlePostQuestion}
+              />
+            </div>
+          </div>
+        )}
+      </BookmarkProvider>
+    </div>
+  );
 }
