@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 @layer base {
-  /* Variables */
   :root {
     --primary: #2563eb;
     --primary-light: #3b82f6;
@@ -15,7 +14,6 @@
     --border: #e5e7eb;
   }
 
-  /* Reset & Base Styles */
   * {
     @apply m-0 p-0 box-border;
   }
@@ -25,7 +23,6 @@
     @apply bg-[var(--bg-light)] text-[var(--text-main)] leading-relaxed;
   }
 
-  /* Links */
   a {
     @apply no-underline transition-all;
     color: inherit;
@@ -35,7 +32,6 @@
     @apply underline;
   }
 
-  /* Buttons */
   button {
     @apply border-none cursor-pointer font-inherit bg-transparent;
   }
@@ -49,4 +45,3 @@
     line-height: inherit;
   }
 }
-
