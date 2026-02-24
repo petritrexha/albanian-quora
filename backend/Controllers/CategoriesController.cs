@@ -1,4 +1,4 @@
-using AlbanianQuora.Api.Data;
+﻿using AlbanianQuora.Api.Data;
 using Microsoft.AspNetCore.Authorization;
 using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Models;
@@ -15,27 +15,13 @@ public class CategoriesController : ControllerBase
         _context = context;
     }
 
-    // ======================
-    // CREATE CATEGORY
-    // ======================
     [Authorize]
     [HttpPost]
     public IActionResult Create(CreateCategoryDto dto)
     {
-        if (string.IsNullOrWhiteSpace(dto.Name))
-            return BadRequest("Category name is required.");
-
-        var exists = _context.Categories
-            .Any(c => c.Name == dto.Name && c.IsActive);
-
-        if (exists)
-            return BadRequest("Category already exists.");
-
         var category = new Category
         {
-            Name = dto.Name,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow
+            Name = dto.Name
         };
 
         _context.Categories.Add(category);
@@ -44,23 +30,16 @@ public class CategoriesController : ControllerBase
         return Ok(category);
     }
 
-    // ======================
-    // GET ALL ACTIVE
-    // ======================
     [HttpGet]
     public IActionResult GetAll()
     {
         var categories = _context.Categories
             .Where(c => c.IsActive)
-            .OrderBy(c => c.Name)
             .ToList();
 
         return Ok(categories);
     }
 
-    // ======================
-    // SOFT DELETE
-    // ======================
     [Authorize(Roles = "Admin")]
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
@@ -70,9 +49,10 @@ public class CategoriesController : ControllerBase
         if (category == null)
             return NotFound();
 
-        category.IsActive = false;
+        _context.Categories.Remove(category);
         _context.SaveChanges();
 
         return NoContent();
     }
+
 }
