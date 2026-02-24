@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AlbanianQuora.Api.Entities;
 using AlbanianQuora.Api.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AlbanianQuora.Api.Data
 {
@@ -13,6 +14,8 @@ namespace AlbanianQuora.Api.Data
         public DbSet<User> Users => Set<User>();
 
         public DbSet<Question> Questions => Set<Question>();
+
+        public DbSet<Answer> Answers => Set<Answer>();
 
         public DbSet<Answer> Answers => Set<Answer>();
 
@@ -100,15 +103,10 @@ namespace AlbanianQuora.Api.Data
                 .HasForeignKey(t => t.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            // Password reset token: unique hash
-            modelBuilder.Entity<PasswordResetToken>()
-                .HasIndex(t => t.TokenHash)
-                .IsUnique();
-
-            modelBuilder.Entity<PasswordResetToken>()
-                .HasOne(t => t.User)
-                .WithMany()
-                .HasForeignKey(t => t.UserId)
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.Question)
+                .WithMany(q => q.Answers)
+                .HasForeignKey(a => a.QuestionId)
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Answer>()
@@ -116,6 +114,16 @@ namespace AlbanianQuora.Api.Data
                 .WithMany(u => u.Answers)
                 .HasForeignKey(a => a.UserId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Category>().HasData(
+        new Category
+        {
+            Id = 1,
+            Name = "General",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow
+        }
+    );
         }
     }
 }

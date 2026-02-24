@@ -1,69 +1,63 @@
-using AlbanianQuora.Api.Data;
-using AlbanianQuora.DTOs;
-using AlbanianQuora.Api.Models;
+using AlbanianQuora.Api.DTOs;
+using AlbanianQuora.Api.Services;
+using AlbanianQuora.Api.Data; // Added for context access
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace AlbanianQuora.Api.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
+    [ApiController]
     public class AnswersController : ControllerBase
     {
-        private readonly AppDbContext _db;
+        private readonly IAnswerService _service;
+        private readonly AppDbContext _context; // Added to access the database directly for simple increments
 
-        public AnswersController(AppDbContext db)
+        public AnswersController(IAnswerService service, AppDbContext context)
         {
-            _db = db;
+            _service = service;
+            _context = context;
         }
 
-        [HttpPost("question/{questionId}")]
-        public async Task<IActionResult> Create(int questionId, [FromBody] CreateAnswerDto dto)
+        [HttpGet("question/{questionId}")]
+        public async Task<IActionResult> GetByQuestion(int questionId)
         {
-            var question = await _db.Questions.FindAsync(questionId);
-            if (question == null) return NotFound(new { error = "Question not found." });
-
-            var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
-            if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
-                return Unauthorized();
-
-            var answer = new Answer
-            {
-                Content = dto.Content,
-                QuestionId = questionId,
-                UserId = currentUserId
-            };
-
-            _db.Answers.Add(answer);
-            question.Answers += 1;
-            await _db.SaveChangesAsync();
-
-            return CreatedAtAction(null, new { id = answer.Id }, answer);
+            var answers = await _service.GetByQuestionId(questionId);
+            return Ok(answers);
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        [HttpPost("{id}/upvote")]
+        public async Task<IActionResult> Upvote(int id)
         {
-            var answer = await _db.Answers.FindAsync(id);
+            var answer = await _context.Answers.FindAsync(id);
             if (answer == null) return NotFound();
+            answer.Votes += 1;
+            await _context.SaveChangesAsync();
+            return Ok(answer.Votes);
+        }
 
-            var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
-            if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
-                return Unauthorized();
+        [HttpPost("{id}/downvote")]
+        public async Task<IActionResult> Downvote(int id)
+        {
+            var answer = await _context.Answers.FindAsync(id);
+            if (answer == null) return NotFound();
+            answer.Votes -= 1;
+            await _context.SaveChangesAsync();
+            return Ok(answer.Votes);
+        }
 
-            if (answer.UserId != currentUserId && !User.IsInRole("Admin"))
-                return Forbid();
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateAnswerDto dto)
+        {
+            var userIdClaim = User.FindFirstValue("sub") ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userIdClaim)) return Unauthorized();
+            if (!int.TryParse(userIdClaim, out int userId)) return BadRequest("Invalid user ID.");
 
-            // decrement question's answer count if present
-            var question = await _db.Questions.FindAsync(answer.QuestionId);
-            if (question != null && question.Answers > 0) question.Answers -= 1;
-
-            _db.Answers.Remove(answer);
-            await _db.SaveChangesAsync();
-
-            return NoContent();
+            await _service.CreateAnswer(userId, dto);
+            return Ok();
         }
     }
 }

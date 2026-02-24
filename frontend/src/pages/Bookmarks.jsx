@@ -4,198 +4,169 @@ import { useBookmarks } from "../context/BookmarkContext";
 import { FaBookmark, FaArrowUp, FaArrowDown, FaTrash } from "react-icons/fa";
 
 const Bookmarks = () => {
-    const {
-        bookmarkedQuestions,
-        bookmarkedAnswers,
-        toggleQuestionBookmark,
-        toggleAnswerBookmark,
-    } = useBookmarks();
+  const {
+    bookmarkedQuestions,
+    bookmarkedAnswers,
+    toggleQuestionBookmark,
+    toggleAnswerBookmark,
+  } = useBookmarks();
 
-    const [activeTab, setActiveTab] = useState("questions");
+  const [activeTab, setActiveTab] = useState("questions");
+  const totalCount = bookmarkedQuestions.length + bookmarkedAnswers.length;
 
-    const totalCount = bookmarkedQuestions.length + bookmarkedAnswers.length;
+  return (
+    <div className="max-w-[950px] mx-auto my-8 px-4">
+      {/* Header */}
+      <div className="flex items-center gap-2.5 mb-6">
+        <FaBookmark className="text-[var(--primary)] text-[22px]" />
+        <h1 className="text-2xl font-bold text-[var(--text-main)]">Bookmark-et e mia</h1>
+        <span className="bg-[var(--accent)] text-[var(--primary)] text-[13px] px-2.5 py-1 rounded-full">
+          {totalCount} gjithsej
+        </span>
+      </div>
 
-    return (
-        <div className="max-w-[900px] mx-auto py-8 px-4">
-            {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
-                <FaBookmark className="text-primary text-xl" />
-                <h1 className="text-2xl font-bold text-text-main">
-                    Bookmark-et e mia
-                </h1>
-                <span className="bg-accent text-primary text-sm font-medium px-3 py-1 rounded-full">
-                    {totalCount} gjithsej
-                </span>
-            </div>
+      {/* Tabs */}
+      <div className="flex gap-1.5 bg-[#f3f4f6] p-1.5 rounded-xl max-w-[420px] mb-6">
+        <button
+          onClick={() => setActiveTab("questions")}
+          className={`flex-1 py-2.5 px-3.5 rounded-lg text-sm transition-all duration-150 ${
+            activeTab === "questions" 
+            ? "bg-white text-[var(--primary)] shadow-[0_2px_6px_rgba(0,0,0,0.08)]" 
+            : "bg-transparent text-[var(--text-light)]"
+          }`}
+        >
+          Pyetjet ({bookmarkedQuestions.length})
+        </button>
+        <button
+          onClick={() => setActiveTab("answers")}
+          className={`flex-1 py-2.5 px-3.5 rounded-lg text-sm transition-all duration-150 ${
+            activeTab === "answers" 
+            ? "bg-white text-[var(--primary)] shadow-[0_2px_6px_rgba(0,0,0,0.08)]" 
+            : "bg-transparent text-[var(--text-light)]"
+          }`}
+        >
+          Përgjigjet ({bookmarkedAnswers.length})
+        </button>
+      </div>
 
-            {/* Tabs */}
-            <div className="flex gap-1 bg-gray-100 p-1 rounded-xl mb-6 max-w-md">
-                <button
-                    onClick={() => setActiveTab("questions")}
-                    className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === "questions"
-                            ? "bg-white text-primary shadow-sm"
-                            : "text-text-light hover:text-text-main"
-                        }`}
-                >
-                    Pyetjet ({bookmarkedQuestions.length})
-                </button>
-                <button
-                    onClick={() => setActiveTab("answers")}
-                    className={`flex-1 py-2.5 px-4 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === "answers"
-                            ? "bg-white text-primary shadow-sm"
-                            : "text-text-light hover:text-text-main"
-                        }`}
-                >
-                    Përgjigjet ({bookmarkedAnswers.length})
-                </button>
-            </div>
-
-            {/* Content */}
-            {activeTab === "questions" && (
-                <div className="flex flex-col gap-4">
-                    {bookmarkedQuestions.length === 0 ? (
-                        <EmptyState
-                            message="Nuk keni pyetje të ruajtura."
-                            sub="Kliko ikonën e bookmark-it në ndonjë pyetje për ta ruajtur këtu."
-                        />
-                    ) : (
-                        bookmarkedQuestions.map((question) => (
-                            <BookmarkedQuestionCard
-                                key={question.id}
-                                question={question}
-                                onRemove={() => toggleQuestionBookmark(question)}
-                            />
-                        ))
-                    )}
-                </div>
-            )}
-
-            {activeTab === "answers" && (
-                <div className="flex flex-col gap-4">
-                    {bookmarkedAnswers.length === 0 ? (
-                        <EmptyState
-                            message="Nuk keni përgjigje të ruajtura."
-                            sub="Kliko ikonën e bookmark-it në ndonjë përgjigje për ta ruajtur këtu."
-                        />
-                    ) : (
-                        bookmarkedAnswers.map((answer) => (
-                            <BookmarkedAnswerCard
-                                key={answer.id}
-                                answer={answer}
-                                onRemove={() => toggleAnswerBookmark(answer)}
-                            />
-                        ))
-                    )}
-                </div>
-            )}
-        </div>
-    );
+      {/* Content */}
+      <div className="flex flex-col gap-3.5">
+        {activeTab === "questions" ? (
+          bookmarkedQuestions.length === 0 ? (
+            <EmptyState
+              message="Nuk keni pyetje të ruajtura."
+              sub="Kliko ikonën e bookmark-it në ndonjë pyetje për ta ruajtur këtu."
+            />
+          ) : (
+            bookmarkedQuestions.map((question) => (
+              <BookmarkedQuestionCard
+                key={question.id}
+                question={question}
+                onRemove={() => toggleQuestionBookmark(question)}
+              />
+            ))
+          )
+        ) : (
+          bookmarkedAnswers.length === 0 ? (
+            <EmptyState
+              message="Nuk keni përgjigje të ruajtura."
+              sub="Kliko ikonën e bookmark-it në ndonjë përgjigje për ta ruajtur këtu."
+            />
+          ) : (
+            bookmarkedAnswers.map((answer) => (
+              <BookmarkedAnswerCard
+                key={answer.id}
+                answer={answer}
+                onRemove={() => toggleAnswerBookmark(answer)}
+              />
+            ))
+          )
+        )}
+      </div>
+    </div>
+  );
 };
 
 /* ── Bookmarked Question Card ── */
-const BookmarkedQuestionCard = ({ question, onRemove }) => {
-    return (
-        <div className="bg-white border border-border rounded-xl p-4 flex gap-4 transition-all duration-200 hover:shadow-md group">
-            {/* Votes */}
-            <div className="flex flex-col items-center min-w-[50px] gap-1.5 text-text-light">
-                <FaArrowUp className="text-lg" />
-                <span className="font-semibold text-text-main text-sm">
-                    {question.votes}
-                </span>
-                <FaArrowDown className="text-lg" />
-            </div>
+const BookmarkedQuestionCard = ({ question, onRemove }) => (
+  <div className="bg-white border border-[var(--border)] rounded-xl p-4 flex gap-4 transition-shadow duration-200 hover:shadow-[0_6px_18px_rgba(0,0,0,0.05)]">
+    <div className="flex flex-col items-center gap-1 min-w-[50px] text-[var(--text-light)]">
+      <FaArrowUp />
+      <span className="font-semibold text-[var(--text-main)]">{question.votes}</span>
+      <FaArrowDown />
+    </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-                <Link
-                    to={`/question/${question.id}`}
-                    className="text-base font-semibold text-text-main hover:text-primary hover:underline transition-colors duration-200 block truncate"
-                >
-                    {question.title}
-                </Link>
-                <p className="text-sm text-text-light mt-1 line-clamp-2">
-                    {question.description}
-                </p>
-                <div className="flex items-center gap-2 mt-2 text-xs text-text-light">
-                    <span>{question.views} shikime</span>
-                    <span>•</span>
-                    <span>{question.answers} përgjigje</span>
-                </div>
-            </div>
+    <div className="flex-1 min-w-0">
+      <Link to={`/question/${question.id}`} className="text-base font-semibold text-[var(--text-main)] no-underline hover:underline">
+        {question.title}
+      </Link>
+      <p className="text-sm text-[var(--text-light)] mt-1 mb-0 leading-relaxed line-clamp-2">
+        {question.content}
+      </p>
+      <div className="text-[12px] text-[var(--text-light)] mt-2">
+        <span>{question.views} shikime</span>
+        <span className="mx-1">•</span>
+        <span>{question.answers} përgjigje</span>
+      </div>
+    </div>
 
-            {/* Remove Button */}
-            <button
-                onClick={onRemove}
-                className="self-start p-2 rounded-lg text-text-light hover:text-red-500 hover:bg-red-50 transition-all duration-200 opacity-0 group-hover:opacity-100"
-                title="Hiq nga bookmark-et"
-            >
-                <FaTrash className="text-sm" />
-            </button>
-        </div>
-    );
-};
+    <button
+      onClick={onRemove}
+      className="p-1.5 rounded-md text-[var(--text-light)] hover:bg-[#fef2f2] hover:text-[#ef4444] transition-colors self-start"
+      title="Hiq nga bookmark-et"
+    >
+      <FaTrash />
+    </button>
+  </div>
+);
 
 /* ── Bookmarked Answer Card ── */
-const BookmarkedAnswerCard = ({ answer, onRemove }) => {
-    return (
-        <div className="bg-white border border-border rounded-xl p-4 flex gap-4 transition-all duration-200 hover:shadow-md group">
-            {/* Votes */}
-            <div className="flex flex-col items-center min-w-[50px] gap-1.5 text-text-light">
-                <FaArrowUp className="text-lg" />
-                <span className="font-semibold text-text-main text-sm">
-                    {answer.votes}
-                </span>
-                <FaArrowDown className="text-lg" />
-            </div>
+const BookmarkedAnswerCard = ({ answer, onRemove }) => (
+  <div className="bg-white border border-[var(--border)] rounded-xl p-4 flex gap-4 transition-shadow duration-200 hover:shadow-[0_6px_18px_rgba(0,0,0,0.05)]">
+    <div className="flex flex-col items-center gap-1 min-w-[50px] text-[var(--text-light)]">
+      <FaArrowUp />
+      <span className="font-semibold text-[var(--text-main)]">{answer.votes}</span>
+      <FaArrowDown />
+    </div>
 
-            {/* Content */}
-            <div className="flex-1 min-w-0">
-                {answer.questionTitle && (
-                    <p className="text-xs text-text-light mb-1.5">
-                        Nga pyetja:{" "}
-                        <span className="font-medium text-primary">
-                            {answer.questionTitle}
-                        </span>
-                    </p>
-                )}
+    <div className="flex-1 min-w-0">
+      {answer.questionTitle && (
+        <p className="text-[12px] text-[var(--text-light)] m-0">
+          Nga pyetja: <span className="text-[var(--primary)] font-medium">{answer.questionTitle}</span>
+        </p>
+      )}
 
-                <div className="flex items-center gap-2.5 mb-2">
-                    <div className="w-7 h-7 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
-                        {answer.author[0]}
-                    </div>
-                    <span className="text-sm font-semibold text-text-main">
-                        {answer.author}
-                    </span>
-                </div>
-
-                <p className="text-sm text-text-light line-clamp-3">
-                    {answer.content}
-                </p>
-            </div>
-
-            {/* Remove Button */}
-            <button
-                onClick={onRemove}
-                className="self-start p-2 rounded-lg text-text-light hover:text-red-500 hover:bg-red-50 transition-all duration-200 opacity-0 group-hover:opacity-100"
-                title="Hiq nga bookmark-et"
-            >
-                <FaTrash className="text-sm" />
-            </button>
+      <div className="flex items-center gap-2 my-1.5">
+        <div className="w-[26px] h-[26px] rounded-full bg-[var(--primary)] text-white flex items-center justify-center text-[11px] font-bold">
+          {answer.author[0]}
         </div>
-    );
-};
+        <span className="text-sm font-medium">{answer.author}</span>
+      </div>
+
+      <p className="text-sm text-[var(--text-light)] m-0 leading-relaxed line-clamp-3">
+        {answer.content}
+      </p>
+    </div>
+
+    <button
+      onClick={onRemove}
+      className="p-1.5 rounded-md text-[var(--text-light)] hover:bg-[#fef2f2] hover:text-[#ef4444] transition-colors self-start"
+      title="Hiq nga bookmark-et"
+    >
+      <FaTrash />
+    </button>
+  </div>
+);
 
 /* ── Empty State ── */
-const EmptyState = ({ message, sub }) => {
-    return (
-        <div className="text-center py-16 px-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-accent flex items-center justify-center">
-                <FaBookmark className="text-2xl text-primary" />
-            </div>
-            <p className="text-lg font-semibold text-text-main mb-1">{message}</p>
-            <p className="text-sm text-text-light">{sub}</p>
-        </div>
-    );
-};
+const EmptyState = ({ message, sub }) => (
+  <div className="text-center py-14 px-5">
+    <div className="w-[60px] h-[60px] mx-auto mb-3.5 rounded-full bg-[var(--accent)] flex items-center justify-center text-[var(--primary)] text-[26px]">
+      <FaBookmark />
+    </div>
+    <p className="font-semibold text-[var(--text-main)] m-0">{message}</p>
+    <p className="text-[13px] text-[var(--text-light)] mt-1 m-0">{sub}</p>
+  </div>
+);
 
 export default Bookmarks;

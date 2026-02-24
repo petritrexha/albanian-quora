@@ -22,7 +22,7 @@ namespace AlbanianQuora.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AlbanianQuora.Api.Models.Answer", b =>
+            modelBuilder.Entity("AlbanianQuora.Api.Entities.Answer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -34,13 +34,16 @@ namespace AlbanianQuora.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAtUtc")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("QuestionId")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Votes")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -151,9 +154,6 @@ namespace AlbanianQuora.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Answers")
-                        .HasColumnType("int");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -328,12 +328,21 @@ namespace AlbanianQuora.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 2, 22, 13, 16, 53, 367, DateTimeKind.Utc).AddTicks(1846),
+                            IsActive = true,
+                            Name = "General"
+                        });
                 });
 
-            modelBuilder.Entity("AlbanianQuora.Api.Models.Answer", b =>
+            modelBuilder.Entity("AlbanianQuora.Api.Entities.Answer", b =>
                 {
                     b.HasOne("AlbanianQuora.Api.Models.Question", "Question")
-                        .WithMany("AnswersList")
+                        .WithMany("Answers")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -428,7 +437,7 @@ namespace AlbanianQuora.Migrations
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.Question", b =>
                 {
-                    b.Navigation("AnswersList");
+                    b.Navigation("Answers");
 
                     b.Navigation("QuestionTags");
                 });
@@ -440,6 +449,8 @@ namespace AlbanianQuora.Migrations
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.User", b =>
                 {
+                    b.Navigation("Answers");
+
                     b.Navigation("Answers");
 
                     b.Navigation("Questions");

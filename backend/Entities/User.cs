@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using AlbanianQuora.Api.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace AlbanianQuora.Api.Models;
 
@@ -33,6 +34,7 @@ public class User
     public UserRole Role { get; set; } = UserRole.User;
 
     public ICollection<Question> Questions { get; set; } = new List<Question>();
+
     public ICollection<Answer> Answers { get; set; } = new List<Answer>();
     public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 }

@@ -1,4 +1,6 @@
-﻿namespace AlbanianQuora.Api.Models
+﻿using AlbanianQuora.Api.Entities;
+
+namespace AlbanianQuora.Api.Models
 {
     public class Question
     {
@@ -14,7 +16,7 @@
 
         public int Views { get; set; } = 0;
 
-        public int Answers { get; set; }
+        public ICollection<Answer> Answers { get; set; } = new List<Answer>();
 
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 

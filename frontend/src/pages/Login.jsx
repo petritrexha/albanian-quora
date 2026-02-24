@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import "../styles/Login.css";
 
 export default function Login() {
   const { login } = useAuth();
@@ -16,14 +15,17 @@ export default function Login() {
     e.preventDefault();
     setError("");
 
-    if (!identifier.trim() || !password.trim()) {
+    const identifierValue = identifier.trim();
+    const passwordValue = password.trim();
+
+    if (!identifierValue || !passwordValue) {
       setError("Plotëso të gjitha fushat.");
       return;
     }
 
     setLoading(true);
     try {
-      await login({ identifier, password });
+      await login({ identifier: identifierValue, password: passwordValue });
       navigate("/", { replace: true });
     } catch (err) {
       const msg =
@@ -37,20 +39,21 @@ export default function Login() {
   };
 
   return (
-    <div className="login-wrapper">
-      <div className="login-card">
-        <h2 className="login-title">Login</h2>
+    <div className="h-screen bg-[#fafafa] flex justify-center items-center p-4">
+      <div className="bg-white p-10 w-full max-w-[360px] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
+        <h2 className="mb-6 text-[#334155] text-2xl font-bold text-center">Login</h2>
 
         {error && (
-          <div style={{ marginBottom: 12, color: "crimson", fontSize: 14 }}>
+          <div className="mb-3.5 text-crimson text-sm text-[#dc143c]">
             {error}
           </div>
         )}
 
-        <form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label>Email / Username</label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-[18px]">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm text-[#334155] font-medium">Email / Username</label>
             <input
+              className="w-full p-2.5 rounded-lg border border-[#e2e8e0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
               placeholder="email ose username"
@@ -58,10 +61,11 @@ export default function Login() {
             />
           </div>
 
-          <div className="form-group">
-            <label>Password</label>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm text-[#334155] font-medium">Password</label>
             <input
               type="password"
+              className="w-full p-2.5 rounded-lg border border-[#e2e8e0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
@@ -69,17 +73,23 @@ export default function Login() {
             />
           </div>
 
-          <button className="btn-primary" type="submit" disabled={loading}>
+          <button 
+            className="w-full p-3 bg-[#0ea5e9] border-none rounded-lg text-white font-bold cursor-pointer transition-colors duration-200 hover:bg-[#0284c7] disabled:opacity-50 disabled:cursor-not-allowed" 
+            type="submit" 
+            disabled={loading}
+          >
             {loading ? "Duke u kyçur..." : "Login"}
           </button>
         </form>
 
-        <div style={{ marginTop: 12, textAlign: "center", fontSize: 14 }}>
-          <Link to="/forgot-password">Forgot password?</Link>
-          <span style={{ margin: "0 8px", opacity: 0.6 }}>•</span>
-          <Link to="/register">Create account</Link>
+        <div className="mt-4 text-center text-sm text-[var(--text-light)]">
+          <Link to="/forgot-password" className="hover:underline">Forgot password?</Link>
+          <span className="mx-2 opacity-60">•</span>
+          <Link to="/register" className="hover:underline">Create account</Link>
         </div>
       </div>
     </div>
   );
 }
+
+

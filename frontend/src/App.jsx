@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { BookmarkProvider } from "./context/BookmarkContext";
-import Navbar from "./components/Navbar";
+import Layout from "./components/Layout";
+import CategoryPage from "./pages/CategoryPage";
+import AskModal from "./components/AskModal";
+import { createQuestion } from "./services/questionService";
 
 import Home from "./pages/Home";
 import QuestionDetails from "./pages/QuestionDetails";
 import Bookmarks from "./pages/Bookmarks";
-import AdminDashboard from "./pages/AdminDashboard";
-import RequireAdmin from "./components/RequireAdmin";
+import SearchPage from "./pages/SearchPage";
 
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -18,14 +20,28 @@ import { useAuth } from "./context/AuthContext";
 
 export default function App() {
   const [showAskModal, setShowAskModal] = useState(false);
-  const { isAuthenticated, hydrating } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [newQuestion, setNewQuestion] = useState("");
+  const [refreshHome, setRefreshHome] = useState(false);
 
-  const withNavbar = (Component) => (
-    <>
-      <Navbar onOpenAskModal={() => setShowAskModal(true)} />
-      {Component}
-    </>
-  );
+  const handlePostQuestion = async () => {
+    if (!newQuestion.trim()) return;
+
+    try {
+      await createQuestion({
+        title: newQuestion,
+        description: newQuestion,
+        categoryId: selectedCategory || 1,
+      });
+
+      setNewQuestion("");
+      setShowAskModal(false);
+      setRefreshHome((prev) => !prev);
+
+    } catch (err) {
+      console.error("Failed to create question:", err);
+    }
+  };
 
   if (hydrating) {
     return null;
@@ -35,56 +51,88 @@ export default function App() {
     isAuthenticated ? element : <Navigate to="/login" replace />;
 
   return (
-    <BookmarkProvider>
-      <Routes>
-        {/* Public routes WITHOUT navbar */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+    // The div below handles the #root { min-height: 100vh } requirement
+    <div className="min-h-screen">
+      <BookmarkProvider>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
 
-        {/* Routes WITH navbar */}
-        <Route
-          path="/"
-          element={withNavbar(
-            <Home
-              showAskModal={showAskModal}
-              setShowAskModal={setShowAskModal}
-            />
-          )}
-        />
+          <Route
+            path="/"
+            element={
+              <Layout
+                onOpenAskModal={() => setShowAskModal(true)}
+                onCategorySelect={setSelectedCategory}
+              >
+                <Home
+                  selectedCategory={selectedCategory}
+                  refreshTrigger={refreshHome}
+                />
+              </Layout>
+            }
+          />
 
-        <Route
-          path="/profile"
-          element={withNavbar(<ProtectedRoute element={<Profile />} />)}
-        />
+          <Route
+            path="/question/:id"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <QuestionDetails />
+              </Layout>
+            }
+          />
 
-        <Route
-          path="/question/:id"
-          element={withNavbar(<QuestionDetails />)}
-        />
+          <Route
+            path="/saved"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <Bookmarks />
+              </Layout>
+            }
+          />
 
-        <Route
-          path="/saved"
-          element={withNavbar(<Bookmarks />)}
-        />
+          <Route
+            path="/category/:id"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <CategoryPage />
+              </Layout>
+            }
+          />
 
-        <Route
-          path="/admin"
-          element={withNavbar(
-            <RequireAdmin>
-              <AdminDashboard />
-            </RequireAdmin>
-          )}
-        />
+          <Route
+            path="/search"
+            element={
+              <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                <SearchPage />
+              </Layout>
+            }
+          />
 
-        <Route 
-          path="/reset-password" 
-          element={<ResetPassword />} 
-        />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
 
-        {/* Fallback */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
-      </Routes>
-    </BookmarkProvider>
+        {/* --- MODAL SECTION CONVERTED TO TAILWIND --- */}
+        {showAskModal && (
+          <div
+            className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+            onClick={() => setShowAskModal(false)}
+          >
+            <div
+              className="relative w-full max-w-2xl mx-4 bg-white rounded-xl shadow-2xl overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <AskModal
+                newQuestion={newQuestion}
+                setNewQuestion={setNewQuestion}
+                handlePostQuestion={handlePostQuestion}
+              />
+            </div>
+          </div>
+        )}
+      </BookmarkProvider>
+    </div>
   );
 }
+
