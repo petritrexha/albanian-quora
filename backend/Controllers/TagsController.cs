@@ -39,6 +39,7 @@ public class TagsController : ControllerBase
     }
 
 
+    [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
     [HttpPost]
     public IActionResult Create(Tag tag)
     {

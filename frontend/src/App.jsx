@@ -14,6 +14,9 @@ import SearchPage from "./pages/SearchPage";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
+import { useAuth } from "./context/AuthContext";
 
 export default function App() {
   const [showAskModal, setShowAskModal] = useState(false);
@@ -39,6 +42,13 @@ export default function App() {
       console.error("Failed to create question:", err);
     }
   };
+
+  if (hydrating) {
+    return null;
+  }
+
+  const ProtectedRoute = ({ element }) =>
+    isAuthenticated ? element : <Navigate to="/login" replace />;
 
   return (
     // The div below handles the #root { min-height: 100vh } requirement

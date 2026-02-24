@@ -16,6 +16,7 @@ namespace AlbanianQuora.Api.Controllers
         }
 
         // POST api/reports
+        [Microsoft.AspNetCore.Authorization.Authorize]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateReportDto dto)
         {
@@ -32,6 +33,7 @@ namespace AlbanianQuora.Api.Controllers
         }
 
         // PATCH api/reports/{id}/status
+        [Microsoft.AspNetCore.Authorization.Authorize(Roles = "Admin")]
         [HttpPatch("{id}/status")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] UpdateStatusRequest request)
         {

@@ -7,11 +7,15 @@ using AlbanianQuora.Api.Models;
 using AlbanianQuora.Api.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace AlbanianQuora.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Microsoft.AspNetCore.Authorization.Authorize]
     public class QuestionsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -150,7 +154,7 @@ namespace AlbanianQuora.Api.Controllers
                 CategoryId = dto.CategoryId,
                 UserId = dto.UserId
             };
-
+ 
             _context.Questions.Add(question);
             await _context.SaveChangesAsync();
 
@@ -163,6 +167,19 @@ namespace AlbanianQuora.Api.Controllers
 
             await _context.SaveChangesAsync();
             return CreatedAtAction(nameof(GetQuestion), new { id = question.Id }, question);
+        }
+
+        private int GetUserIdFromJwt()
+        {
+            var idStr =
+                User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue("id");
+
+            if (string.IsNullOrWhiteSpace(idStr) || !int.TryParse(idStr, out var id))
+                throw new UnauthorizedAccessException("Invalid token: missing user id.");
+
+            return id;
         }
 
         [HttpPut("{id}")]

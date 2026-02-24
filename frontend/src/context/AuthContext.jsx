@@ -8,7 +8,7 @@ export function AuthProvider({ children }) {
   const [hydrating, setHydrating] = useState(true);
 
   const isAuthenticated = !!user;
-  const isAdmin = user?.role === "admin";
+  const isAdmin = (user?.role || "").toLowerCase() === "admin";
 
   // Restore user on refresh if token exists
   useEffect(() => {

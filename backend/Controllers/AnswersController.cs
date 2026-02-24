@@ -1,4 +1,4 @@
-﻿using AlbanianQuora.Api.DTOs;
+using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Services;
 using AlbanianQuora.Api.Data; // Added for context access
 using Microsoft.AspNetCore.Authorization;
@@ -61,52 +61,3 @@ namespace AlbanianQuora.Api.Controllers
         }
     }
 }
-
-//using AlbanianQuora.Api.DTOs;
-//using AlbanianQuora.Api.Services;
-//using Microsoft.AspNetCore.Authorization;
-//using Microsoft.AspNetCore.Mvc;
-//using System.Security.Claims;
-//using System.Threading.Tasks;
-
-//namespace AlbanianQuora.Api.Controllers
-//{
-//    [Route("api/[controller]")]
-//    [ApiController]
-//    public class AnswersController : ControllerBase
-//    {
-//        private readonly IAnswerService _service;
-
-//        public AnswersController(IAnswerService service)
-//        {
-//            _service = service;
-//        }
-
-//        [HttpGet("question/{questionId}")]
-//        public async Task<IActionResult> GetByQuestion(int questionId)
-//        {
-//            var answers = await _service.GetByQuestionId(questionId);
-//            return Ok(answers);
-//        }
-
-//        [Authorize]
-//        [HttpPost]
-//        public async Task<IActionResult> Create([FromBody] CreateAnswerDto dto)
-//        {
-//            // Note: If you cleared the claim map in Program.cs, use "sub"
-//            // If not, keep using ClaimTypes.NameIdentifier
-//            var userIdClaim = User.FindFirstValue("sub") ?? User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-//            if (string.IsNullOrEmpty(userIdClaim))
-//                return Unauthorized();
-
-//            if (!int.TryParse(userIdClaim, out int userId))
-//                return BadRequest("Invalid user ID.");
-
-//            await _service.CreateAnswer(userId, dto);
-//            return Ok();
-//        }
-//    }
-//}
-
-

@@ -91,12 +91,16 @@ builder.Services
             ValidIssuer = jwtSection["Issuer"],
             ValidAudience = jwtSection["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role,
 
             ClockSkew = TimeSpan.FromSeconds(30)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+});
 
 builder.Services.AddCors(options =>
 {
@@ -128,5 +132,35 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// Seed admin user if configured
+using (var scope = app.Services.CreateScope())
+{
+    var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    var adminEmail = cfg["Admin:Email"];
+    var adminPassword = cfg["Admin:Password"];
+
+    if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
+    {
+        var existing = db.Users.FirstOrDefault(u => u.Email == adminEmail);
+        if (existing == null)
+        {
+            PasswordHasher.CreatePasswordHash(adminPassword, out var hash, out var salt);
+            var admin = new AlbanianQuora.Api.Models.User
+            {
+                Name = "Administrator",
+                Username = adminEmail.Split('@')[0],
+                Email = adminEmail.ToLowerInvariant(),
+                PasswordHash = hash,
+                PasswordSalt = salt,
+                Role = AlbanianQuora.Api.Models.UserRole.Admin
+            };
+            db.Users.Add(admin);
+            db.SaveChanges();
+        }
+    }
+}
 
 app.Run();

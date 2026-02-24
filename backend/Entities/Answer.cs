@@ -1,4 +1,4 @@
-﻿using AlbanianQuora.Api.Models;
+using AlbanianQuora.Api.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 

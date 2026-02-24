@@ -17,6 +17,8 @@ namespace AlbanianQuora.Api.Data
 
         public DbSet<Answer> Answers => Set<Answer>();
 
+        public DbSet<Answer> Answers => Set<Answer>();
+
         // Bookmark/notification/report entities (HEAD)
         public DbSet<Bookmark> Bookmarks => Set<Bookmark>();
         public DbSet<Notification> Notifications => Set<Notification>();
@@ -26,6 +28,9 @@ namespace AlbanianQuora.Api.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<QuestionTag> QuestionTags => Set<QuestionTag>();
+
+        // Password reset tokens
+        public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -68,6 +73,18 @@ namespace AlbanianQuora.Api.Data
                 .WithMany(u => u.Questions)
                 .HasForeignKey(q => q.UserId) 
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.Question)
+                .WithMany()
+                .HasForeignKey(a => a.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.User)
+                .WithMany()
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
 
             modelBuilder.Entity<QuestionTag>()
