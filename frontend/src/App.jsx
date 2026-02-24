@@ -24,8 +24,6 @@ export default function App() {
   const [newQuestion, setNewQuestion] = useState("");
   const [refreshHome, setRefreshHome] = useState(false);
 
-  const { isAuthenticated, hydrating } = useAuth();
-
   const handlePostQuestion = async () => {
     if (!newQuestion.trim()) return;
 
@@ -39,30 +37,28 @@ export default function App() {
       setNewQuestion("");
       setShowAskModal(false);
       setRefreshHome((prev) => !prev);
+
     } catch (err) {
       console.error("Failed to create question:", err);
     }
   };
 
-  if (hydrating) return null;
+  if (hydrating) {
+    return null;
+  }
 
   const ProtectedRoute = ({ element }) =>
     isAuthenticated ? element : <Navigate to="/login" replace />;
 
   return (
+    // The div below handles the #root { min-height: 100vh } requirement
     <div className="min-h-screen">
       <BookmarkProvider>
         <Routes>
-          {/* Public */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Protected example */}
-          <Route path="/profile" element={<ProtectedRoute element={<Profile />} />} />
-
-          {/* App routes with Layout */}
           <Route
             path="/"
             element={
@@ -70,23 +66,16 @@ export default function App() {
                 onOpenAskModal={() => setShowAskModal(true)}
                 onCategorySelect={setSelectedCategory}
               >
-                <Home selectedCategory={selectedCategory} refreshTrigger={refreshHome} />
+                <Home
+                  selectedCategory={selectedCategory}
+                  refreshTrigger={refreshHome}
+                />
               </Layout>
             }
           />
 
           <Route
             path="/question/:id"
-            element={
-              <Layout onOpenAskModal={() => setShowAskModal(true)}>
-                <QuestionDetails />
-              </Layout>
-            }
-          />
-
-          {/* Optional alias for old links */}
-          <Route
-            path="/questions/:id"
             element={
               <Layout onOpenAskModal={() => setShowAskModal(true)}>
                 <QuestionDetails />
@@ -124,7 +113,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
 
-        {/* Ask Modal */}
+        {/* --- MODAL SECTION CONVERTED TO TAILWIND --- */}
         {showAskModal && (
           <div
             className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
@@ -146,3 +135,4 @@ export default function App() {
     </div>
   );
 }
+
