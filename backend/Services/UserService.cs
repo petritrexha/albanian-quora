@@ -22,8 +22,7 @@ namespace AlbanianQuora.Services
                     .ThenInclude(a => a.Question)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            if (user == null)
-                return null;
+            if (user == null) return null;
 
             return new UserProfileDto
             {
@@ -32,31 +31,6 @@ namespace AlbanianQuora.Services
                 Email = user.Email,
                 FullName = user.Name,
                 Bio = user.Bio,
-<<<<<<< HEAD
-                JoinedAt = user.CreatedAtUtc,
-
-                Questions = user.Questions
-                    .OrderByDescending(q => q.CreatedAt)
-                    .Select(q => new UserQuestionDto
-                    {
-                        Id = q.Id,
-                        Title = q.Title,
-                        CreatedAt = q.CreatedAt
-                    })
-                    .ToList(),
-
-                Answers = user.Answers
-                    .OrderByDescending(a => a.CreatedAtUtc)
-                    .Select(a => new UserAnswerDto
-                    {
-                        Id = a.Id,
-                        Content = a.Content,
-                        QuestionId = a.QuestionId,
-                        QuestionTitle = a.Question?.Title ?? string.Empty,
-                        CreatedAt = a.CreatedAtUtc
-                    })
-                    .ToList()
-=======
 
                 // 1. FOR USER: Use the name from User.cs (CreatedAtUtc)
                 JoinedAt = user.CreatedAtUtc,
@@ -84,15 +58,13 @@ namespace AlbanianQuora.Services
             CreatedAt = a.CreatedAtUtc
         })
         .ToList()
->>>>>>> origin/develop
             };
         }
 
         public async Task<bool> UpdateProfileAsync(int id, UpdateUserDto dto)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null)
-                return false;
+            if (user == null) return false;
 
             if (!string.IsNullOrWhiteSpace(dto.Username))
                 user.Username = dto.Username.Trim();

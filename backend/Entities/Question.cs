@@ -6,19 +6,12 @@ namespace AlbanianQuora.Api.Models
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
-<<<<<<< HEAD
-
-=======
->>>>>>> origin/develop
         public string Description { get; set; } = string.Empty;
         public int Votes { get; set; }
         public int Views { get; set; } = 0;
 
-<<<<<<< HEAD
-=======
         // REMOVED the "Answers" property to avoid the QuestionId1 ghost column
 
->>>>>>> origin/develop
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public int CategoryId { get; set; }
@@ -26,19 +19,12 @@ namespace AlbanianQuora.Api.Models
 
         public List<QuestionTag> QuestionTags { get; set; } = new();
 
-<<<<<<< HEAD
-        public ICollection<Answer> Answers { get; set; } = new List<Answer>();
-=======
         // KEEP THIS ONE - it matches your Database Snapshot
         public List<Answer> AnswersList { get; set; } = new();
->>>>>>> origin/develop
 
         public User User { get; set; } = null!;
         public int UserId { get; set; }
     }
-<<<<<<< HEAD
-}
-=======
 }
 
 //using AlbanianQuora.Api.Entities;
@@ -73,4 +59,3 @@ namespace AlbanianQuora.Api.Models
 //        public int UserId { get; set; }
 //    }
 //}
->>>>>>> origin/develop

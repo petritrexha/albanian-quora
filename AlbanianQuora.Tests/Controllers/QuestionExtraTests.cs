@@ -1,12 +1,10 @@
-﻿using AlbanianQuora.Api.Controllers;
-using AlbanianQuora.Api.Data;
-using AlbanianQuora.Api.Interfaces;
-using AlbanianQuora.Api.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Xunit;
 using Microsoft.EntityFrameworkCore;
-using Moq;
+using AlbanianQuora.Api.Controllers;
+using AlbanianQuora.Api.Data;
+using AlbanianQuora.Api.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using Xunit;
 
 namespace AlbanianQuora.Tests.Controllers
 {
@@ -25,9 +23,7 @@ namespace AlbanianQuora.Tests.Controllers
         public async Task GetQuestion_ReturnsNotFound_WhenMissing()
         {
             var context = GetDbContext();
-            var mockAnswerService = new Mock<IAnswerService>();
-
-            var controller = new QuestionsController(context, mockAnswerService.Object);
+            var controller = new QuestionsController(context);
 
             var result = await controller.GetQuestion(999, null);
 
@@ -38,9 +34,7 @@ namespace AlbanianQuora.Tests.Controllers
         public async Task DeleteQuestion_ReturnsNotFound_WhenMissing()
         {
             var context = GetDbContext();
-            var mockAnswerService = new Mock<IAnswerService>();
-
-            var controller = new QuestionsController(context, mockAnswerService.Object);
+            var controller = new QuestionsController(context);
 
             var result = await controller.Delete(999);
 

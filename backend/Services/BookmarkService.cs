@@ -48,20 +48,16 @@ namespace AlbanianQuora.Api.Services
             };
         }
 
-        public async Task<bool> DeleteBookmarkAsync(int id, int? currentUserId)
+        public async Task<bool> DeleteBookmarkAsync(int id, int? currentUserId = null)
         {
             var bookmark = await _context.Bookmarks.FindAsync(id);
+            if (bookmark == null) return false;
 
-            if (bookmark == null)
-                return false;
-
-            // Nëse përdorim currentUserId për validim
             if (currentUserId.HasValue && bookmark.UserId != currentUserId.Value)
                 return false;
 
             _context.Bookmarks.Remove(bookmark);
             await _context.SaveChangesAsync();
-
             return true;
         }
 
