@@ -83,7 +83,7 @@ const Home = ({ selectedCategory, refreshTrigger }) => {
             ))}
           </div>
         ) : (
-          <p className="text-[#777] italic text-sm">No questions available.</p>
+          <p className="text-[var(--text-light)] italic text-sm">No questions available.</p>
         )}
       </div>
     </div>

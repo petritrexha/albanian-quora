@@ -39,7 +39,7 @@ const QuestionDetails = () => {
           setQuestion({
             id: questionId,
             title: `Error loading question`,
-            content: "Nuk u gjet asgjë.",
+            content: "Nuk u gjet asnjë.",
             votes: 0,
             views: 0,
           });
@@ -96,25 +96,25 @@ const QuestionDetails = () => {
     } catch (err) { console.error("Downvote failed", err); }
   };
 
-  if (!question) return <div className="p-10 text-center text-gray-500">Duke ngarkuar...</div>;
+  if (!question) return <div className="p-10 text-center text-[var(--text-light)]">Duke ngarkuar...</div>;
 
   return (
-    <div className="min-h-screen bg-[#f0f2f7] py-10 px-4 font-sans">
+    <div className="min-h-screen bg-[var(--bg-light)] py-10 px-4 font-sans transition-colors duration-300">
       <div className="max-w-[900px] mx-auto flex flex-col gap-8">
         
         {/* Question Section */}
-        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex gap-4 transition-transform duration-200 hover:-translate-y-0.5">
+        <div className="bg-[var(--card-bg)] p-8 rounded-xl shadow-sm border border-[var(--border)] flex gap-4 transition-transform duration-200 hover:-translate-y-0.5">
           {/* Voting Column */}
           <div className="flex flex-col items-center gap-1 min-w-[40px]">
             <button 
-              className="w-9 h-9 flex items-center justify-center rounded-full text-xl text-gray-500 hover:bg-gray-100 hover:text-[#2e69ff] transition-all"
+              className="w-9 h-9 flex items-center justify-center rounded-full text-xl text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-[var(--primary)] transition-all"
               onClick={() => handleQuestionVote('up')}
             >
               <FaArrowUp />
             </button>
-            <span className="font-bold text-lg text-gray-800">{question.votes}</span>
+            <span className="font-bold text-lg text-[var(--text-main)]">{question.votes}</span>
             <button 
-              className="w-9 h-9 flex items-center justify-center rounded-full text-xl text-gray-500 hover:bg-gray-100 hover:text-[#cb4b10] transition-all"
+              className="w-9 h-9 flex items-center justify-center rounded-full text-xl text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-red-500 transition-all"
               onClick={() => handleQuestionVote('down')}
             >
               <FaArrowDown />
@@ -123,13 +123,13 @@ const QuestionDetails = () => {
 
           {/* Question Body */}
           <div className="flex-1">
-            <h1 className="text-3xl font-extrabold text-[#282829] mb-3 leading-tight">
+            <h1 className="text-3xl font-extrabold text-[var(--text-main)] mb-3 leading-tight">
               {question.title}
             </h1>
-            <p className="text-[1.05rem] leading-relaxed text-[#3e4143] mb-5 whitespace-pre-wrap">
+            <p className="text-[1.05rem] leading-relaxed text-[var(--text-main)] opacity-90 mb-5 whitespace-pre-wrap">
               {question.content}
             </p>
-            <div className="flex items-center gap-2 text-sm text-[#939598]">
+            <div className="flex items-center gap-2 text-sm text-[var(--text-light)]">
               <span>{question.views} shikime</span>
               <span>•</span>
               <span>{answers.length} përgjigje</span>
@@ -139,19 +139,19 @@ const QuestionDetails = () => {
 
         {/* Answers Panel */}
         <div className="flex flex-col gap-4">
-          <h2 className="text-xl font-bold text-[#2e69ff] px-2">Përgjigjet</h2>
+          <h2 className="text-xl font-bold text-[var(--primary)] px-2">Përgjigjet</h2>
           
           {loadingAnswers ? (
-            <div className="bg-white p-6 rounded-lg border border-dashed border-gray-300 text-center text-gray-500 italic">
+            <div className="bg-[var(--card-bg)] p-6 rounded-lg border border-dashed border-[var(--border)] text-center text-[var(--text-light)] italic">
               Duke ngarkuar përgjigjet...
             </div>
           ) : answers.length === 0 ? (
-            <div className="bg-white p-6 rounded-lg border border-dashed border-gray-300 text-center text-gray-500 italic">
+            <div className="bg-[var(--card-bg)] p-6 rounded-lg border border-dashed border-[var(--border)] text-center text-[var(--text-light)] italic">
               Ende nuk ka përgjigje.
             </div>
           ) : (
             answers.map((answer) => (
-              <div key={answer.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-1 transition-all duration-150 hover:shadow-md hover:-translate-y-0.5">
+              <div key={answer.id} className="bg-[var(--card-bg)] rounded-xl shadow-sm border border-[var(--border)] p-1 transition-all duration-150 hover:shadow-md hover:-translate-y-0.5">
                 <AnswerCard
                   answer={answer}
                   onUpvote={handleUpvote}
@@ -164,25 +164,25 @@ const QuestionDetails = () => {
 
           {/* Add Answer Box */}
           {user ? (
-            <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 flex flex-col gap-4 mt-4">
-              <h3 className="text-lg font-semibold text-gray-900">Shto përgjigje</h3>
+            <div className="bg-[var(--card-bg)] p-8 rounded-xl shadow-sm border border-[var(--border)] flex flex-col gap-4 mt-4">
+              <h3 className="text-lg font-semibold text-[var(--text-main)]">Shto përgjigje</h3>
               <textarea
-                className="w-full min-h-[120px] p-4 rounded-lg border border-gray-300 text-base focus:outline-none focus:border-[#2e69ff] focus:ring-2 focus:ring-[#2e69ff]/20 transition-all"
+                className="w-full min-h-[120px] p-4 rounded-lg border border-[var(--border)] bg-[var(--accent)] text-[var(--text-main)] text-base focus:outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20 transition-all"
                 placeholder="Shkruaj përgjigjen tënde..."
                 value={newAnswer}
                 onChange={(e) => setNewAnswer(e.target.value)}
               />
               <button 
-                className="bg-[#2e69ff] text-white px-6 py-3 rounded-lg font-bold self-start hover:bg-[#2350cc] hover:-translate-y-0.5 active:translate-y-0 transition-all"
+                className="bg-[var(--primary)] text-white px-6 py-3 rounded-lg font-bold self-start hover:opacity-90 hover:-translate-y-0.5 active:translate-y-0 transition-all"
                 onClick={handleAddAnswer}
               >
                 Dërgo përgjigjen
               </button>
             </div>
           ) : (
-            <div className="bg-white p-6 rounded-lg border border-dashed border-gray-300 text-center text-gray-600 mt-4">
+            <div className="bg-[var(--card-bg)] p-6 rounded-lg border border-dashed border-[var(--border)] text-center text-[var(--text-light)] mt-4">
               Duhet të jesh i kyçur për të shtuar përgjigje. 
-              <Link to="/login" className="text-[#2e69ff] font-semibold ml-1 hover:underline">Kyçu këtu</Link>
+              <Link to="/login" className="text-[var(--primary)] font-semibold ml-1 hover:underline">Kyçu këtu</Link>
             </div>
           )}
         </div>
