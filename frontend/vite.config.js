@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
@@ -8,3 +9,19 @@ export default defineConfig({
     tailwindcss()
   ],
 })
+=======
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+
+export default defineConfig({
+  plugins: [react()],
+  server: {
+    proxy: {
+      "/api": {
+        target: "http://127.0.0.1:5170", // ✅ jo localhost
+        changeOrigin: true,
+      },
+    },
+  },
+});
+>>>>>>> origin/develop

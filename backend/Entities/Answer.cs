@@ -1,6 +1,7 @@
 using AlbanianQuora.Api.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema; // 1. ADD THIS
 
 namespace AlbanianQuora.Api.Entities
 {
@@ -15,11 +16,13 @@ namespace AlbanianQuora.Api.Entities
 
         public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
-        // Foreign Key
+        // 2. LINK QuestionId to the Question object
+        [ForeignKey("Question")]
         public int QuestionId { get; set; }
         public Question? Question { get; set; }
 
-        // Foreign Key
+        // 3. LINK UserId to the User object
+        [ForeignKey("User")]
         public int UserId { get; set; }
         public User? User { get; set; }
     }

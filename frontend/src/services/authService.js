@@ -9,13 +9,18 @@ export async function login({ identifier, password }) {
     Password: password.trim(),
   };
 
-  console.log("authService sending login payload:", payload);
-
   const res = await api.post("/api/auth/login", payload);
 
-  if (res.data.token) {
-    localStorage.setItem("accessToken", res.data.token);
-    localStorage.setItem("user", JSON.stringify(res.data.user));
+  // C# returns PascalCase (AccessToken, User)
+  // We check for both just in case
+  const token = res.data.accessToken || res.data.AccessToken;
+  const userData = res.data.user || res.data.User;
+
+  if (token) {
+    localStorage.setItem("accessToken", token);
+    if (userData) {
+      localStorage.setItem("user", JSON.stringify(userData));
+    }
   }
 
   return res.data;
@@ -25,8 +30,14 @@ export async function login({ identifier, password }) {
 export async function register(payload) {
   const res = await api.post("/api/auth/register", payload);
 
-  if (res.data.token) {
-    localStorage.setItem("accessToken", res.data.token);
+  const token = res.data.accessToken || res.data.AccessToken;
+  const userData = res.data.user || res.data.User;
+
+  if (token) {
+    localStorage.setItem("accessToken", token);
+    if (userData) {
+      localStorage.setItem("user", JSON.stringify(userData));
+    }
   }
 
   return res.data;
@@ -57,11 +68,15 @@ export async function logout() {
   } catch {
     // ignore errors
   }
-
   localStorage.removeItem("accessToken");
   localStorage.removeItem("user");
 }
 
+// RESET PASSWORD
+export async function resetPassword(payload) {
+  const res = await api.post("/api/auth/reset-password", payload);
+  return res.data;
+}
 
 /*export async function login(payload) {
   const res = await api.post("api/auth/login", payload);

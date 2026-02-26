@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // Added Link here
 import { useAuth } from "../context/AuthContext";
 
 const passwordPolicy = (pw) => {
@@ -72,72 +72,72 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fafafa] flex justify-center items-center p-6">
-      <div className="bg-white p-10 w-full max-w-[400px] rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.05)]">
-        <h2 className="mb-6 text-[#334155] text-2xl font-bold text-center">Register</h2>
+    <div className="min-h-screen bg-[var(--bg-light)] flex justify-center items-center p-6 transition-colors duration-300">
+      <div className="bg-[var(--card-bg)] p-10 w-full max-w-[400px] rounded-xl shadow-lg border border-[var(--border)]">
+        <h2 className="mb-6 text-[var(--text-main)] text-2xl font-bold text-center">Register</h2>
 
         {error && (
-          <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-[#dc143c] text-sm leading-relaxed">
+          <div className="mb-4 p-3 bg-red-500/10 border-l-4 border-red-500 text-red-500 text-sm leading-relaxed">
             {error}
           </div>
         )}
 
         <form onSubmit={onSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-[#334155] font-medium">Name</label>
+            <label className="text-sm text-[var(--text-main)] font-medium">Name</label>
             <input 
               name="name" 
-              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
+              className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--accent)] text-[var(--text-main)] text-sm focus:outline-none focus:border-[var(--primary)] transition-all"
               value={form.name} 
               onChange={onChange} 
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-[#334155] font-medium">Username</label>
+            <label className="text-sm text-[var(--text-main)] font-medium">Username</label>
             <input 
               name="username" 
-              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
+              className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--accent)] text-[var(--text-main)] text-sm focus:outline-none focus:border-[var(--primary)] transition-all"
               value={form.username} 
               onChange={onChange} 
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-[#334155] font-medium">Email</label>
+            <label className="text-sm text-[var(--text-main)] font-medium">Email</label>
             <input 
               name="email" 
               type="email"
-              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
+              className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--accent)] text-[var(--text-main)] text-sm focus:outline-none focus:border-[var(--primary)] transition-all"
               value={form.email} 
               onChange={onChange} 
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-[#334155] font-medium">Password</label>
+            <label className="text-sm text-[var(--text-main)] font-medium">Password</label>
             <input
               type="password"
               name="password"
-              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
+              className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--accent)] text-[var(--text-main)] text-sm focus:outline-none focus:border-[var(--primary)] transition-all"
               value={form.password}
               onChange={onChange}
             />
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm text-[#334155] font-medium">Confirm Password</label>
+            <label className="text-sm text-[var(--text-main)] font-medium">Confirm Password</label>
             <input
               type="password"
               name="confirm"
-              className="w-full p-2.5 rounded-lg border border-[#e2e8f0] text-sm focus:outline-none focus:border-[#0ea5e9] transition-all"
+              className="w-full p-2.5 rounded-lg border border-[var(--border)] bg-[var(--accent)] text-[var(--text-main)] text-sm focus:outline-none focus:border-[var(--primary)] transition-all"
               value={form.confirm}
               onChange={onChange}
             />
           </div>
 
           <button 
-            className="w-full mt-2 p-3 bg-[#0ea5e9] border-none rounded-lg text-white font-bold cursor-pointer transition-colors duration-200 hover:bg-[#0284c7] disabled:opacity-50 disabled:cursor-not-allowed" 
+            className="w-full mt-2 p-3 bg-[var(--primary)] border-none rounded-lg text-white font-bold cursor-pointer transition-all duration-200 hover:opacity-90 disabled:opacity-50" 
             type="submit" 
             disabled={loading}
           >
@@ -145,8 +145,8 @@ export default function Register() {
           </button>
         </form>
         
-        <p className="mt-6 text-center text-sm text-[#64748b]">
-          Keni një llogari? <a href="/login" className="text-[#0ea5e9] font-semibold hover:underline">Kyçu këtu</a>
+        <p className="mt-6 text-center text-sm text-[var(--text-light)]">
+          Keni një llogari? <Link to="/login" className="text-[var(--primary)] font-semibold hover:underline">Kyçu këtu</Link>
         </p>
       </div>
     </div>

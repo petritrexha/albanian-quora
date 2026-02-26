@@ -18,7 +18,7 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
   const avatarLetter = authorName.charAt(0).toUpperCase();
 
   return (
-    <div className="flex gap-4 p-4 bg-white rounded-lg border border-[#e4e6eb]">
+    <div className="flex gap-4 p-4 bg-[var(--card-bg)] rounded-lg border border-[var(--border)] transition-colors duration-300">
       {/* Votes Column */}
       <div className="flex flex-col items-center gap-[6px] text-[var(--text-light)]">
         <button
@@ -42,14 +42,14 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
 
       {/* Main Content Column */}
       <div className="flex-1">
-        <div className="flex items-center gap-[10px] mb-2 font-semibold">
-          <div className="w-8 h-8 bg-[#e5e7eb] rounded-full flex items-center justify-center">
+        <div className="flex items-center gap-[10px] mb-2 font-semibold text-[var(--text-main)]">
+          <div className="w-8 h-8 bg-[var(--accent)] text-[var(--text-main)] rounded-full flex items-center justify-center border border-[var(--border)]">
             {avatarLetter}
           </div>
           <span>{authorName}</span>
         </div>
 
-        <p className="leading-relaxed">{answer.content}</p>
+        <p className="leading-relaxed text-[var(--text-main)]">{answer.content}</p>
       </div>
 
       {/* Actions Column */}
@@ -67,7 +67,7 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
         </button>
 
         <button
-          className="p-[6px] rounded-md text-[15px] text-[var(--text-light)] transition-all cursor-pointer bg-transparent border-none hover:bg-[#fee2e2] hover:text-[#dc2626]"
+          className="p-[6px] rounded-md text-[15px] text-[var(--text-light)] transition-all cursor-pointer bg-transparent border-none hover:bg-red-500/10 hover:text-[#dc2626]"
           onClick={() => setShowReport(true)}
           title="Raporto përgjigjen"
         >

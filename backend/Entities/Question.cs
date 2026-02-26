@@ -5,15 +5,20 @@ namespace AlbanianQuora.Api.Models
     public class Question
     {
         public int Id { get; set; }
-
         public string Title { get; set; } = string.Empty;
+<<<<<<< HEAD
 
+=======
+>>>>>>> origin/develop
         public string Description { get; set; } = string.Empty;
-
         public int Votes { get; set; }
-
         public int Views { get; set; } = 0;
 
+<<<<<<< HEAD
+=======
+        // REMOVED the "Answers" property to avoid the QuestionId1 ghost column
+
+>>>>>>> origin/develop
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public int CategoryId { get; set; }
@@ -21,9 +26,51 @@ namespace AlbanianQuora.Api.Models
 
         public List<QuestionTag> QuestionTags { get; set; } = new();
 
+<<<<<<< HEAD
         public ICollection<Answer> Answers { get; set; } = new List<Answer>();
+=======
+        // KEEP THIS ONE - it matches your Database Snapshot
+        public List<Answer> AnswersList { get; set; } = new();
+>>>>>>> origin/develop
 
         public User User { get; set; } = null!;
         public int UserId { get; set; }
     }
+<<<<<<< HEAD
 }
+=======
+}
+
+//using AlbanianQuora.Api.Entities;
+
+//namespace AlbanianQuora.Api.Models
+//{
+//    public class Question
+//    {
+//        public int Id { get; set; }
+
+//        public string Title { get; set; } = string.Empty;
+
+//        // Persisted content for the question. Older code used "Description"; newer code used "Content".
+//        // We keep Description as the canonical field and map DTOs' Content to it.
+//        public string Description { get; set; } = string.Empty;
+
+//        public int Votes { get; set; }
+
+//        public int Views { get; set; } = 0;
+
+//        public ICollection<Answer> Answers { get; set; } = new List<Answer>();
+
+//        public DateTime CreatedAt { get; set; } = DateTime.Now;
+
+//        // Optional categorization / tagging support
+//        public int CategoryId { get; set; }      // NOT nullable
+//        public Category Category { get; set; } = null!;
+
+//        public List<QuestionTag> QuestionTags { get; set; } = new();
+//        public List<Answer> AnswersList { get; set; } = new();
+//        public User User { get; set; } = null!;
+//        public int UserId { get; set; }
+//    }
+//}
+>>>>>>> origin/develop

@@ -60,10 +60,10 @@ const NotificationDropdown = () => {
           />
 
           {/* Dropdown Card */}
-          <div className="absolute right-0 top-full mt-2 w-80 bg-white border border-[var(--border)] rounded-xl shadow-[0_8px_24px_rgba(0,0,0,0.08)] z-50 overflow-hidden">
+          <div className="absolute right-0 top-full mt-2 w-80 bg-[var(--card-bg)] border border-[var(--border)] rounded-xl shadow-xl z-50 overflow-hidden">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)]">
-              <h3 className="text-sm font-semibold m-0">Njoftimet</h3>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--border)] bg-[var(--card-bg)]">
+              <h3 className="text-sm font-semibold m-0 text-[var(--text-main)]">Njoftimet</h3>
               {unreadCount > 0 && (
                 <button 
                   onClick={markAllRead} 
@@ -75,7 +75,7 @@ const NotificationDropdown = () => {
             </div>
 
             {/* List Wrapper */}
-            <div className="max-h-[260px] overflow-y-auto">
+            <div className="max-h-[260px] overflow-y-auto bg-[var(--card-bg)]">
               {notifications.length === 0 ? (
                 <div className="p-7 text-center text-[13px] text-[var(--text-light)]">
                   Nuk ka njoftime.
@@ -85,7 +85,7 @@ const NotificationDropdown = () => {
                   <div
                     key={n.id}
                     className={`flex items-start gap-3 px-4 py-3 border-b border-[var(--border)] last:border-b-0 transition-colors duration-150 ${
-                      n.isRead ? "bg-white" : "bg-[#f0f6ff]"
+                      n.isRead ? "bg-[var(--card-bg)]" : "bg-[var(--accent)]"
                     }`}
                   >
                     <div className="text-[var(--primary)] text-sm mt-0.5">

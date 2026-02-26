@@ -26,7 +26,11 @@ namespace AlbanianQuora.Api.Data
         {
             base.OnModelCreating(modelBuilder);
 
+<<<<<<< HEAD
             // Unique constraints
+=======
+            // User Constraints
+>>>>>>> origin/develop
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
@@ -35,15 +39,36 @@ namespace AlbanianQuora.Api.Data
                 .HasIndex(u => u.Username)
                 .IsUnique();
 
+<<<<<<< HEAD
+=======
+            // Bookmark Relationships
+>>>>>>> origin/develop
             modelBuilder.Entity<Bookmark>()
                 .HasIndex(b => new { b.UserId, b.QuestionId })
                 .IsUnique();
 
+<<<<<<< HEAD
             // Question -> User
+=======
+            modelBuilder.Entity<Bookmark>()
+                .HasOne(b => b.Question)
+                .WithMany()
+                .HasForeignKey(b => b.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Bookmark>()
+                .HasOne<User>()
+                .WithMany()
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Question -> User Relationship
+>>>>>>> origin/develop
             modelBuilder.Entity<Question>()
                 .HasOne(q => q.User)
                 .WithMany(u => u.Questions)
                 .HasForeignKey(q => q.UserId)
+<<<<<<< HEAD
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Answer relationships (vetëm një konfigurim, i saktë)
@@ -94,6 +119,45 @@ namespace AlbanianQuora.Api.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             // Seed Category
+=======
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Answer Relationships (Fixed to use AnswersList)
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.Question)
+                .WithMany(q => q.AnswersList)
+                .HasForeignKey(a => a.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Answer>()
+                .HasOne(a => a.User)
+                .WithMany(u => u.Answers)
+                .HasForeignKey(a => a.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Many-to-Many: Question <-> Tag
+            modelBuilder.Entity<QuestionTag>()
+                .HasKey(qt => new { qt.QuestionId, qt.TagId });
+
+            modelBuilder.Entity<QuestionTag>()
+                .HasOne(qt => qt.Question)
+                .WithMany(q => q.QuestionTags)
+                .HasForeignKey(qt => qt.QuestionId);
+
+            modelBuilder.Entity<QuestionTag>()
+                .HasOne(qt => qt.Tag)
+                .WithMany(t => t.QuestionTags)
+                .HasForeignKey(qt => qt.TagId);
+
+            // Tag -> Category Relationship
+            modelBuilder.Entity<Tag>()
+                .HasOne(t => t.Category)
+                .WithMany(c => c.Tags)
+                .HasForeignKey(t => t.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // Seed Data
+>>>>>>> origin/develop
             modelBuilder.Entity<Category>().HasData(
                 new Category
                 {
