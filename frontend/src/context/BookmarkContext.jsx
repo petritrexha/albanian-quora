@@ -12,10 +12,11 @@ export function BookmarkProvider({ children }) {
   const [bookmarkedAnswers, setBookmarkedAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // Load bookmarks when user logs in
+  // ✅ Load bookmarks when user logs in
   useEffect(() => {
     if (!isAuthenticated || !userId) {
       setBookmarkedQuestions([]);
+      setBookmarkedAnswers([]); // ✅ FIXED
       return;
     }
 
@@ -60,6 +61,7 @@ export function BookmarkProvider({ children }) {
     };
   }, [isAuthenticated, userId]);
 
+  // ✅ FIXED VERSION (NO STALE STATE)
   const toggleQuestionBookmark = useCallback(
     async (question) => {
       if (!isAuthenticated) {
@@ -67,44 +69,47 @@ export function BookmarkProvider({ children }) {
         return { success: false };
       }
 
-      const existing = bookmarkedQuestions.find((q) => q.id === question.id);
+      setBookmarkedQuestions((prev) => {
+        const existing = prev.find((q) => q.id === question.id);
 
-      if (existing) {
-        // Remove bookmark
-        setBookmarkedQuestions((prev) =>
-          prev.filter((q) => q.id !== question.id)
-        );
+        if (existing) {
+          // Remove locally (optimistic)
+          api
+            .delete(`/api/bookmarks/${existing._bookmarkId}`)
+            .catch((err) =>
+              console.error("Failed to remove bookmark", err)
+            );
 
-        try {
-          await api.delete(`/api/bookmarks/${existing._bookmarkId}`);
-          return { success: true };
-        } catch (error) {
-          console.error("Failed to remove bookmark", error);
-          return { success: false };
+          return prev.filter((q) => q.id !== question.id);
+        } else {
+          // Add locally (optimistic)
+          api
+            .post(`/api/bookmarks`, {
+              userId,
+              questionId: question.id,
+            })
+            .then((res) => {
+              const bookmark = res.data;
+
+              setBookmarkedQuestions((current) =>
+                current.map((q) =>
+                  q.id === question.id
+                    ? { ...q, _bookmarkId: bookmark.id }
+                    : q
+                )
+              );
+            })
+            .catch((err) =>
+              console.error("Failed to add bookmark", err)
+            );
+
+          return [{ ...question }, ...prev];
         }
-      } else {
-        // Add bookmark
-        try {
-          const res = await api.post(`/api/bookmarks`, {
-            userId,
-            questionId: question.id,
-          });
+      });
 
-          const bookmark = res.data;
-
-          setBookmarkedQuestions((prev) => [
-            { ...question, _bookmarkId: bookmark.id },
-            ...prev,
-          ]);
-
-          return { success: true };
-        } catch (error) {
-          console.error("Failed to add bookmark", error);
-          return { success: false };
-        }
-      }
+      return { success: true };
     },
-    [bookmarkedQuestions, isAuthenticated, userId]
+    [isAuthenticated, userId]
   );
 
   const toggleAnswerBookmark = useCallback((answer, questionTitle) => {

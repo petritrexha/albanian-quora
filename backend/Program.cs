@@ -33,7 +33,6 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "AlbanianQuora API", Version = "v1" });
 
-    // Bearer auth in Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",
@@ -60,11 +59,14 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// App services
+// --- APP SERVICES SECTION ---
 builder.Services.AddScoped<IBookmarkService, BookmarkService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
+
+// FIXED: Correctly mapping the Interface to the SmtpEmailSender class
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
 // JWT Options + Token Service
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
@@ -121,19 +123,14 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-// Rate limiting middleware (custom)
 app.UseRateLimiting();
-
 app.UseHttpsRedirection();
-
 app.UseCors("AllowFrontend");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
-// Seed admin user if configured
+// Seed admin user
 using (var scope = app.Services.CreateScope())
 {
     var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();

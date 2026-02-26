@@ -62,11 +62,11 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
 
   return (
     <div 
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-[50]" 
+      className="fixed inset-0 bg-black/60 flex items-center justify-center z-[50] backdrop-blur-sm" 
       onClick={handleClose}
     >
       <div
-        className="bg-white w-full max-w-[480px] rounded-xl overflow-hidden shadow-[0_12px_24px_rgba(0,0,0,0.12)]"
+        className="bg-[var(--card-bg)] w-full max-w-[480px] rounded-xl overflow-hidden shadow-2xl border border-[var(--border)]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -79,7 +79,7 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
           </div>
 
           <button
-            className="border-none bg-transparent cursor-pointer p-1.5 rounded-md text-[var(--text-light)] hover:bg-[#f3f4f6] hover:text-[var(--text-main)] transition-colors"
+            className="border-none bg-transparent cursor-pointer p-1.5 rounded-md text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-[var(--text-main)] transition-colors"
             onClick={handleClose}
           >
             <FaTimes />
@@ -87,10 +87,10 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
         </div>
 
         {/* Body */}
-        <div className="p-[18px] px-5">
+        <div className="p-[18px] px-5 bg-[var(--card-bg)]">
           {submitted ? (
             <div className="text-center py-6">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#dcfce7] text-[#16a34a] flex items-center justify-center text-[22px]">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500/20 text-[#16a34a] flex items-center justify-center text-[22px]">
                 ✓
               </div>
               <p className="font-semibold text-[var(--text-main)] m-0">
@@ -113,7 +113,7 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
                     className={`flex items-center gap-2.5 p-2.5 border rounded-lg cursor-pointer transition-all duration-150 ${
                       selectedReason === reason 
                       ? "border-[var(--primary)] bg-[var(--accent)]" 
-                      : "border-[var(--border)]"
+                      : "border-[var(--border)] hover:bg-[var(--accent)]"
                     }`}
                   >
                     <input
@@ -134,7 +134,7 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
                   value={customReason}
                   onChange={(e) => setCustomReason(e.target.value)}
                   placeholder="Përshkruaj arsyen..."
-                  className="w-full mt-3 p-2.5 border border-[var(--border)] rounded-lg resize-y focus:outline-none focus:border-[var(--primary)]"
+                  className="w-full mt-3 p-2.5 border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-main)] rounded-lg resize-y focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--text-light)]"
                   rows={3}
                 />
               )}
@@ -144,10 +144,10 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
 
         {/* Footer */}
         {!submitted && (
-          <div className="flex justify-end gap-2.5 p-3.5 px-5 border-t border-[var(--border)]">
+          <div className="flex justify-end gap-2.5 p-3.5 px-5 border-t border-[var(--border)] bg-[var(--card-bg)]">
             <button
               onClick={handleClose}
-              className="px-3.5 py-2 rounded-md border-none bg-[#f3f4f6] text-[var(--text-main)] cursor-pointer hover:bg-[#e5e7eb] transition-colors"
+              className="px-3.5 py-2 rounded-md border-none bg-[var(--accent)] text-[var(--text-main)] cursor-pointer hover:opacity-80 transition-colors"
             >
               Anulo
             </button>

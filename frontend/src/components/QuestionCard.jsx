@@ -15,12 +15,15 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
   const { isQuestionBookmarked, toggleQuestionBookmark } = useBookmarks();
   const [showReport, setShowReport] = useState(false);
 
-  const bookmarked = isQuestionBookmarked(question.id) || Boolean(question.isBookmarked);
+  // ✅ SINGLE SOURCE OF TRUTH
+  const bookmarked = isQuestionBookmarked(question.id);
 
   return (
     <div
       className="bg-[var(--card-bg)] border border-[var(--border)] rounded-[14px] p-4 flex gap-[18px] transition-shadow duration-200 ease-in hover:shadow-[0_8px_22px_rgba(0,0,0,0.06)] cursor-pointer group"
-      onClick={() => navigate(`/question/${question.id}`, { state: { question } })}
+      onClick={() =>
+        navigate(`/question/${question.id}`, { state: { question } })
+      }
     >
       {/* Votes Section */}
       <div className="flex flex-col items-center min-w-[50px] gap-1.5 text-[var(--text-light)]">
@@ -65,7 +68,7 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
         </div>
       </div>
 
-      {/* Actions Section */}
+      {/* Actions */}
       <div className="flex flex-col gap-2.5">
         <button
           onClick={(e) => {
@@ -73,9 +76,10 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
             toggleQuestionBookmark(question);
           }}
           className={`bg-transparent border-none cursor-pointer p-1.5 rounded-lg transition-all duration-150 
-            ${bookmarked 
-              ? "text-[var(--primary)]" 
-              : "text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-[var(--primary)]"
+            ${
+              bookmarked
+                ? "text-[var(--primary)]"
+                : "text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-[var(--primary)]"
             }`}
           title={bookmarked ? "Hiq nga bookmark" : "Shto në bookmark"}
         >

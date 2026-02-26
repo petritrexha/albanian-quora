@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260222224318_AddAnswers")]
-    partial class AddAnswers
+    [Migration("20260225150930_InitialFullSchema")]
+    partial class InitialFullSchema
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace AlbanianQuora.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("AlbanianQuora.Api.Models.Answer", b =>
+            modelBuilder.Entity("AlbanianQuora.Api.Entities.Answer", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -44,6 +44,9 @@ namespace AlbanianQuora.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Votes")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -139,9 +142,6 @@ namespace AlbanianQuora.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
-
                     b.HasIndex("UserId");
 
                     b.ToTable("PasswordResetTokens");
@@ -154,9 +154,6 @@ namespace AlbanianQuora.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Answers")
-                        .HasColumnType("int");
 
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
@@ -294,6 +291,9 @@ namespace AlbanianQuora.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -331,9 +331,18 @@ namespace AlbanianQuora.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2026, 2, 25, 15, 9, 29, 973, DateTimeKind.Utc).AddTicks(8312),
+                            IsActive = true,
+                            Name = "General"
+                        });
                 });
 
-            modelBuilder.Entity("AlbanianQuora.Api.Models.Answer", b =>
+            modelBuilder.Entity("AlbanianQuora.Api.Entities.Answer", b =>
                 {
                     b.HasOne("AlbanianQuora.Api.Models.Question", "Question")
                         .WithMany("AnswersList")

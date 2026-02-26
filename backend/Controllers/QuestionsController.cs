@@ -32,7 +32,7 @@ namespace AlbanianQuora.Api.Controllers
         {
             var query = _context.Questions
                 .Include(q => q.Category)
-                .Include(q => q.Answers)
+                .Include(q => q.AnswersList)
                 .Include(q => q.QuestionTags)
                     .ThenInclude(qt => qt.Tag)
                 .AsQueryable();
@@ -61,7 +61,7 @@ namespace AlbanianQuora.Api.Controllers
                 Content = q.Description,
                 q.Votes,
                 q.Views,
-                AnswerCount = q.Answers.Count,
+                AnswerCount = q.AnswersList.Count,
                 q.CreatedAt,
                 Category = q.Category != null ? q.Category.Name : null,
                 Tags = q.QuestionTags.Select(qt => qt.Tag.Name).ToList(),

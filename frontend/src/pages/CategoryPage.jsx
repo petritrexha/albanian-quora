@@ -90,7 +90,7 @@ const CategoryPage = () => {
             ))}
           </div>
         ) : (
-          <p className="text-[#777] italic text-sm mt-4">
+          <p className="text-[var(--text-light)] italic text-sm mt-4">
             Nuk ka pyetje në këtë kategori aktualisht...
           </p>
         )}

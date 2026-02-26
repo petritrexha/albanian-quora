@@ -61,8 +61,8 @@ const SearchPage = () => {
             ))}
           </div>
         ) : (
-          <div className="bg-white p-10 rounded-xl border border-dashed border-gray-300 text-center">
-            <p className="text-gray-500 italic">
+          <div className="bg-[var(--card-bg)] p-10 rounded-xl border border-dashed border-[var(--border)] text-center">
+            <p className="text-[var(--text-light)] italic">
               {searchTerm
                 ? "Nuk u gjet asnjë pyetje."
                 : "Shkruaj diçka për të kërkuar."}

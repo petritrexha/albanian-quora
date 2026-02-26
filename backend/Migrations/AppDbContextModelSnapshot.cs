@@ -34,7 +34,7 @@ namespace AlbanianQuora.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("QuestionId")
@@ -138,9 +138,6 @@ namespace AlbanianQuora.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TokenHash")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -291,6 +288,9 @@ namespace AlbanianQuora.Migrations
                         .IsRequired()
                         .HasColumnType("varbinary(max)");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
                     b.Property<string>("Username")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -333,7 +333,7 @@ namespace AlbanianQuora.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 2, 22, 13, 16, 53, 367, DateTimeKind.Utc).AddTicks(1846),
+                            CreatedAt = new DateTime(2026, 2, 25, 15, 9, 29, 973, DateTimeKind.Utc).AddTicks(8312),
                             IsActive = true,
                             Name = "General"
                         });
@@ -342,7 +342,7 @@ namespace AlbanianQuora.Migrations
             modelBuilder.Entity("AlbanianQuora.Api.Entities.Answer", b =>
                 {
                     b.HasOne("AlbanianQuora.Api.Models.Question", "Question")
-                        .WithMany("Answers")
+                        .WithMany("AnswersList")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -437,7 +437,7 @@ namespace AlbanianQuora.Migrations
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.Question", b =>
                 {
-                    b.Navigation("Answers");
+                    b.Navigation("AnswersList");
 
                     b.Navigation("QuestionTags");
                 });
@@ -449,8 +449,6 @@ namespace AlbanianQuora.Migrations
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.User", b =>
                 {
-                    b.Navigation("Answers");
-
                     b.Navigation("Answers");
 
                     b.Navigation("Questions");
