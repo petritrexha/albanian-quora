@@ -22,7 +22,8 @@ namespace AlbanianQuora.Services
                     .ThenInclude(a => a.Question)
                 .FirstOrDefaultAsync(u => u.Id == id);
 
-            if (user == null) return null;
+            if (user == null)
+                return null;
 
             return new UserProfileDto
             {
@@ -30,8 +31,9 @@ namespace AlbanianQuora.Services
                 Username = user.Username,
                 Email = user.Email,
                 FullName = user.Name,
-                    Bio = user.Bio,
-                    JoinedAt = user.CreatedAtUtc,
+                Bio = user.Bio,
+                JoinedAt = user.CreatedAtUtc,
+
                 Questions = user.Questions
                     .OrderByDescending(q => q.CreatedAt)
                     .Select(q => new UserQuestionDto
@@ -41,24 +43,26 @@ namespace AlbanianQuora.Services
                         CreatedAt = q.CreatedAt
                     })
                     .ToList(),
-                    Answers = user.Answers
-                        .OrderByDescending(a => a.CreatedAtUtc)
-                        .Select(a => new UserAnswerDto
-                        {
-                            Id = a.Id,
-                            Content = a.Content,
-                            QuestionId = a.QuestionId,
-                            QuestionTitle = a.Question.Title,
-                            CreatedAt = a.CreatedAtUtc
-                        })
-                        .ToList()
+
+                Answers = user.Answers
+                    .OrderByDescending(a => a.CreatedAtUtc)
+                    .Select(a => new UserAnswerDto
+                    {
+                        Id = a.Id,
+                        Content = a.Content,
+                        QuestionId = a.QuestionId,
+                        QuestionTitle = a.Question?.Title ?? string.Empty,
+                        CreatedAt = a.CreatedAtUtc
+                    })
+                    .ToList()
             };
         }
 
         public async Task<bool> UpdateProfileAsync(int id, UpdateUserDto dto)
         {
             var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
-            if (user == null) return false;
+            if (user == null)
+                return false;
 
             if (!string.IsNullOrWhiteSpace(dto.Username))
                 user.Username = dto.Username.Trim();

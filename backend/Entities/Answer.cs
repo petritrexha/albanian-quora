@@ -13,16 +13,14 @@ namespace AlbanianQuora.Api.Entities
 
         public int Votes { get; set; } = 0;
 
-        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime CreatedAtUtc { get; set; } = DateTime.UtcNow;
 
         // Foreign Key
         public int QuestionId { get; set; }
-
         public Question? Question { get; set; }
 
         // Foreign Key
         public int UserId { get; set; }
-
         public User? User { get; set; }
     }
 }

@@ -10,7 +10,6 @@ import {
 } from "react-icons/fa";
 import { useBookmarks } from "../context/BookmarkContext";
 import { useAuth } from "../context/AuthContext";
-import { useAuth } from "../context/AuthContext";
 import NotificationDropdown from "./NotificationDropdown";
 
 const Navbar = ({ onOpenAskModal }) => {

@@ -22,14 +22,14 @@ namespace AlbanianQuora.Api.Services
             return await _context.Answers
                 .Where(a => a.QuestionId == questionId)
                 .Include(a => a.User)
-                .OrderByDescending(a => a.CreatedAt)
+                .OrderByDescending(a => a.CreatedAtUtc)
                 .Select(a => new AnswerResponseDto
                 {
                     Id = a.Id,
                     Content = a.Content,
                     Votes = a.Votes,
                     AuthorName = a.User != null ? a.User.Name : "Unknown",
-                    CreatedAt = a.CreatedAt
+                    CreatedAt = a.CreatedAtUtc
                 })
                 .ToListAsync();
         }
@@ -40,7 +40,8 @@ namespace AlbanianQuora.Api.Services
             {
                 Content = dto.Content ?? string.Empty,
                 QuestionId = dto.QuestionId,
-                UserId = userId
+                UserId = userId,
+                CreatedAtUtc = DateTime.UtcNow
             };
 
             _context.Answers.Add(answer);

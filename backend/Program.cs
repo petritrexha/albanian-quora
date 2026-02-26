@@ -1,166 +1,107 @@
-import { useState } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
-import { BookmarkProvider } from "./context/BookmarkContext";
-import Layout from "./components/Layout";
-import CategoryPage from "./pages/CategoryPage";
-import AskModal from "./components/AskModal";
-import { createQuestion } from "./services/questionService";
+using AlbanianQuora.Api.Data;
+using AlbanianQuora.Api.Interfaces;
+using AlbanianQuora.Api.Security;
+using AlbanianQuora.Api.Services; // 👈 për EmailSender
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
-import Home from "./pages/Home";
-import QuestionDetails from "./pages/QuestionDetails";
-import Bookmarks from "./pages/Bookmarks";
-import SearchPage from "./pages/SearchPage";
+var builder = WebApplication.CreateBuilder(args);
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
-import Profile from "./pages/Profile";
-import { useAuth } from "./context/AuthContext";
+// =====================
+// Database
+// =====================
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection")
+    ));
 
-function ProtectedRoute({ isAuthenticated, children }) {
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return children;
+// =====================
+// JWT Options + Services
+// =====================
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection("Jwt"));
+
+builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
+builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+// =====================
+// JWT Authentication
+// =====================
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var key = builder.Configuration["Jwt:Key"];
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(key!))
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+// =====================
+// Controllers
+// =====================
+builder.Services.AddControllers();
+
+// =====================
+// Swagger + Bearer Support
+// =====================
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Enter: Bearer {your token}"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
+
+var app = builder.Build();
+
+// =====================
+// Middleware
+// =====================
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
-export default function App() {
-  const [showAskModal, setShowAskModal] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [newQuestion, setNewQuestion] = useState("");
-  const [refreshHome, setRefreshHome] = useState(false);
+app.UseHttpsRedirection();
 
-  const { isAuthenticated, hydrating } = useAuth();
+app.UseAuthentication(); // 👈 duhet para Authorization
+app.UseAuthorization();
 
-  const handlePostQuestion = async () => {
-    if (!newQuestion.trim()) return;
+app.MapControllers();
 
-    try {
-      await createQuestion({
-        title: newQuestion,
-        description: newQuestion,
-        categoryId: selectedCategory || 1,
-      });
-
-      setNewQuestion("");
-      setShowAskModal(false);
-      setRefreshHome((prev) => !prev);
-    } catch (err) {
-      console.error("Failed to create question:", err);
-    }
-  };
-
-  if (hydrating) return null;
-
-  return (
-    <div className="min-h-screen">
-      <BookmarkProvider>
-        <Routes>
-          {/* Public */}
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
-
-          {/* Protected */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* App routes with Layout */}
-          <Route
-            path="/"
-            element={
-              <Layout
-                onOpenAskModal={() => setShowAskModal(true)}
-                onCategorySelect={setSelectedCategory}
-              >
-                <Home
-                  selectedCategory={selectedCategory}
-                  refreshTrigger={refreshHome}
-                />
-              </Layout>
-            }
-          />
-
-          <Route
-            path="/question/:id"
-            element={
-              <Layout onOpenAskModal={() => setShowAskModal(true)}>
-                <QuestionDetails />
-              </Layout>
-            }
-          />
-
-          {/* Alias for old links */}
-          <Route
-            path="/questions/:id"
-            element={
-              <Layout onOpenAskModal={() => setShowAskModal(true)}>
-                <QuestionDetails />
-              </Layout>
-            }
-          />
-
-          <Route
-            path="/saved"
-            element={
-              <Layout onOpenAskModal={() => setShowAskModal(true)}>
-                <Bookmarks />
-              </Layout>
-            }
-          />
-
-          <Route
-            path="/category/:id"
-            element={
-              <Layout onOpenAskModal={() => setShowAskModal(true)}>
-                <CategoryPage />
-              </Layout>
-            }
-          />
-
-          <Route
-            path="/search"
-            element={
-              <Layout onOpenAskModal={() => setShowAskModal(true)}>
-                <SearchPage />
-              </Layout>
-            }
-          />
-
-          {/* Fallback */}
-          <Route
-            path="*"
-            element={
-              <Navigate to={isAuthenticated ? "/" : "/login"} replace />
-            }
-          />
-        </Routes>
-
-        {/* Ask Modal */}
-        {showAskModal && (
-          <div
-            className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 backdrop-blur-sm"
-            onClick={() => setShowAskModal(false)}
-          >
-            <div
-              className="relative w-full max-w-2xl mx-4 bg-white rounded-xl shadow-2xl overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <AskModal
-                newQuestion={newQuestion}
-                setNewQuestion={setNewQuestion}
-                handlePostQuestion={handlePostQuestion}
-              />
-            </div>
-          </div>
-        )}
-      </BookmarkProvider>
-    </div>
-  );
-}
+app.Run();

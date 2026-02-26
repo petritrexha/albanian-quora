@@ -1,47 +1,47 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-@layer base {
-  :root {
-    --primary: #2563eb;
-    --primary-light: #3b82f6;
-    --accent: #e0e7ff;
-    --text-main: #1f2937;
-    --text-light: #6b7280;
-    --bg-light: #f9fafb;
-    --card-bg: #ffffff;
-    --border: #e5e7eb;
-  }
-
-  * {
-    @apply m-0 p-0 box-border;
-  }
-
-  body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    @apply bg-[var(--bg-light)] text-[var(--text-main)] leading-relaxed;
-  }
-
-  a {
-    @apply no-underline transition-all;
-    color: inherit;
-  }
-
-  a:hover {
-    @apply underline;
-  }
-
-  button {
-    @apply border-none cursor-pointer font-inherit bg-transparent;
-  }
+/* ===== RESET ===== */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-@layer utilities {
-  .font-inherit {
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    line-height: inherit;
-  }
+/* ===== ROOT VARIABLES ===== */
+:root {
+  --primary: #2563eb;
+  --primary-light: #3b82f6;
+  --accent: #e0e7ff;
+  --text-main: #1f2937;
+  --text-light: #6b7280;
+  --bg-light: #f9fafb;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+}
+
+/* ===== BASE STYLES ===== */
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: var(--bg-light);
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: 0.2s ease;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  background: transparent;
+  font: inherit;
 }

@@ -1,14 +1,17 @@
-﻿using Xunit;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Mvc;
-using AlbanianQuora.Api.Controllers;
+﻿using AlbanianQuora.Api.Controllers;
 using AlbanianQuora.Api.Data;
-using AlbanianQuora.Api.Models;
 using AlbanianQuora.Api.DTOs;
+using AlbanianQuora.Api.Interfaces;
+using AlbanianQuora.Api.Models;
+using AlbanianQuora.Api.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Moq;
 using System;
-using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace AlbanianQuora.Tests
 {
@@ -19,6 +22,12 @@ namespace AlbanianQuora.Tests
             return new DbContextOptionsBuilder<AppDbContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
                 .Options;
+        }
+
+        private QuestionsController GetController(AppDbContext context)
+        {
+            var mockAnswerService = new Mock<IAnswerService>();
+            return new QuestionsController(context, mockAnswerService.Object);
         }
 
         [Fact]
@@ -36,7 +45,7 @@ namespace AlbanianQuora.Tests
 
             await context.SaveChangesAsync();
 
-            var controller = new QuestionsController(context);
+            var controller = GetController(context);
 
             var result = await controller.GetQuestions(null, null);
 
@@ -60,7 +69,7 @@ namespace AlbanianQuora.Tests
 
             await context.SaveChangesAsync();
 
-            var controller = new QuestionsController(context);
+            var controller = GetController(context);
 
             await controller.GetQuestion(1, null);
 
@@ -75,7 +84,7 @@ namespace AlbanianQuora.Tests
 
             using var context = new AppDbContext(options);
 
-            var controller = new QuestionsController(context);
+            var controller = GetController(context);
 
             var result = await controller.GetQuestion(999, null);
 
@@ -89,7 +98,7 @@ namespace AlbanianQuora.Tests
 
             using var context = new AppDbContext(options);
 
-            var controller = new QuestionsController(context);
+            var controller = GetController(context);
 
             var dto = new CreateQuestionDto
             {
@@ -120,7 +129,7 @@ namespace AlbanianQuora.Tests
 
             await context.SaveChangesAsync();
 
-            var controller = new QuestionsController(context);
+            var controller = GetController(context);
 
             var dto = new CreateQuestionDto
             {
@@ -143,7 +152,7 @@ namespace AlbanianQuora.Tests
 
             using var context = new AppDbContext(options);
 
-            var controller = new QuestionsController(context);
+            var controller = GetController(context);
 
             var dto = new CreateQuestionDto
             {
@@ -174,7 +183,7 @@ namespace AlbanianQuora.Tests
 
             await context.SaveChangesAsync();
 
-            var controller = new QuestionsController(context);
+            var controller = GetController(context);
 
             var result = await controller.Delete(1);
 
@@ -183,4 +192,3 @@ namespace AlbanianQuora.Tests
         }
     }
 }
-
