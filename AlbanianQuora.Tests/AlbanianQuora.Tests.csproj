@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\backend\AlbanianQuora.csproj" />
+	  <ProjectReference Include="C:\Users\Bajram\albanian-quora\backend\AlbanianQuora.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -17,7 +17,7 @@ namespace AlbanianQuora.Tests.Controllers
             var mockService = new Mock<IBookmarkService>();
 
             mockService
-                .Setup(x => x.GetBookmarksByUserAsync(It.IsAny<int>()))
+                .Setup(s => s.GetBookmarksByUserAsync(1))
                 .ReturnsAsync(new List<BookmarkResponseDto>());
 
             var controller = new BookmarksController(mockService.Object);
@@ -33,7 +33,7 @@ namespace AlbanianQuora.Tests.Controllers
             var mockService = new Mock<IBookmarkService>();
 
             mockService
-                .Setup(x => x.DeleteBookmarkAsync(It.IsAny<int>(), It.IsAny<int?>()))
+                .Setup(s => s.DeleteBookmarkAsync(1))
                 .ReturnsAsync(false);
 
             var controller = new BookmarksController(mockService.Object);

@@ -55,12 +55,6 @@ export async function forgotPassword(payload) {
   return res.data;
 }
 
-// RESET PASSWORD
-export async function resetPassword(payload) {
-  const res = await api.post("/api/auth/reset-password", payload);
-  return res.data;
-}
-
 // LOGOUT
 export async function logout() {
   try {
@@ -78,13 +72,12 @@ export async function resetPassword(payload) {
   return res.data;
 }
 
-/*export async function login(payload) {
-  const res = await api.post("api/auth/login", payload);
+// export async function login(payload) {
+//   const res = await api.post("api/auth/login", payload);
 
-  if (res.data.token) {
-     localStorage.setItem("accessToken", res.data.token);
-   }
+//   if (res.data.token) {
+//     localStorage.setItem("accessToken", res.data.token);
+//   }
 
-   return res.data;
- }
-*/
+//   return res.data;
+// }
