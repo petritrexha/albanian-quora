@@ -333,7 +333,11 @@ namespace AlbanianQuora.Migrations
                         new
                         {
                             Id = 1,
+<<<<<<< HEAD
+                            CreatedAt = new DateTime(2026, 2, 26, 1, 52, 49, 117, DateTimeKind.Utc).AddTicks(5405),
+=======
                             CreatedAt = new DateTime(2026, 2, 25, 15, 9, 29, 973, DateTimeKind.Utc).AddTicks(8312),
+>>>>>>> origin/develop
                             IsActive = true,
                             Name = "General"
                         });

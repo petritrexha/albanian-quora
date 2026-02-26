@@ -12,8 +12,13 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(AppDbContext))]
+<<<<<<<< HEAD:backend/Migrations/20260226015249_InitialCreate.Designer.cs
+    [Migration("20260226015249_InitialCreate")]
+    partial class InitialCreate
+========
     [Migration("20260225150930_InitialFullSchema")]
     partial class InitialFullSchema
+>>>>>>>> origin/develop:backend/Migrations/20260225150930_InitialFullSchema.Designer.cs
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -336,7 +341,11 @@ namespace AlbanianQuora.Migrations
                         new
                         {
                             Id = 1,
+<<<<<<<< HEAD:backend/Migrations/20260226015249_InitialCreate.Designer.cs
+                            CreatedAt = new DateTime(2026, 2, 26, 1, 52, 49, 117, DateTimeKind.Utc).AddTicks(5405),
+========
                             CreatedAt = new DateTime(2026, 2, 25, 15, 9, 29, 973, DateTimeKind.Utc).AddTicks(8312),
+>>>>>>>> origin/develop:backend/Migrations/20260225150930_InitialFullSchema.Designer.cs
                             IsActive = true,
                             Name = "General"
                         });
@@ -345,7 +354,7 @@ namespace AlbanianQuora.Migrations
             modelBuilder.Entity("AlbanianQuora.Api.Entities.Answer", b =>
                 {
                     b.HasOne("AlbanianQuora.Api.Models.Question", "Question")
-                        .WithMany("AnswersList")
+                        .WithMany("Answers")
                         .HasForeignKey("QuestionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -440,7 +449,7 @@ namespace AlbanianQuora.Migrations
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.Question", b =>
                 {
-                    b.Navigation("AnswersList");
+                    b.Navigation("Answers");
 
                     b.Navigation("QuestionTags");
                 });

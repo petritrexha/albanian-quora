@@ -40,7 +40,8 @@ namespace AlbanianQuora.Api.Services
             {
                 Content = dto.Content ?? string.Empty,
                 QuestionId = dto.QuestionId,
-                UserId = userId
+                UserId = userId,
+                CreatedAtUtc = DateTime.UtcNow
             };
 
             _context.Answers.Add(answer);

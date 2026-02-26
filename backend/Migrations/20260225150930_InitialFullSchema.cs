@@ -238,7 +238,11 @@ namespace AlbanianQuora.Migrations
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "CreatedAt", "IsActive", "Name" },
+<<<<<<<< HEAD:backend/Migrations/20260226015249_InitialCreate.cs
+                values: new object[] { 1, new DateTime(2026, 2, 26, 1, 52, 49, 117, DateTimeKind.Utc).AddTicks(5405), true, "General" });
+========
                 values: new object[] { 1, new DateTime(2026, 2, 25, 15, 9, 29, 973, DateTimeKind.Utc).AddTicks(8312), true, "General" });
+>>>>>>>> origin/develop:backend/Migrations/20260225150930_InitialFullSchema.cs
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_QuestionId",
