@@ -69,34 +69,52 @@ const CategoryPage = () => {
       console.error("Failed to create question:", err);
     }
   };
+return (
+  <div className="w-full max-w-4xl mx-auto px-4 py-6">
 
-  return (
-    <div className="flex flex-col gap-4 w-full pt-0">
-      <div className="w-full max-w-[900px] flex flex-col gap-4">
-        <AskBox
-          newQuestion={newQuestion}
-          setNewQuestion={setNewQuestion}
-          handlePostQuestion={handlePostQuestion}
-        />
+    {/* Category Header */}
+    <div className="mb-6 p-6 rounded-2xl bg-gradient-to-br from-white to-slate-50 border border-slate-200 shadow-sm">
+      <h1 className="text-2xl font-bold text-slate-800">
+        {categoryName}
+      </h1>
 
-        <h2 className="text-xl font-bold text-[var(--text-main)] mb-3">
-          {categoryName}
-        </h2>
+      <p className="text-sm text-slate-500 mt-1">
+        Diskutime dhe pyetje rreth {categoryName.toLowerCase()}.
+      </p>
 
-        {questions.length > 0 ? (
-          <div className="flex flex-col gap-4">
-            {questions.map((question) => (
-              <QuestionCard key={question.id} question={question} />
-            ))}
-          </div>
-        ) : (
-          <p className="text-[var(--text-light)] italic text-sm mt-4">
-            Nuk ka pyetje në këtë kategori aktualisht...
-          </p>
-        )}
+      <div className="mt-3 text-xs text-slate-400">
+        {questions.length} pyetje
       </div>
     </div>
-  );
+
+    {/* Ask Box */}
+    <div className="mb-8">
+      <AskBox
+        newQuestion={newQuestion}
+        setNewQuestion={setNewQuestion}
+        handlePostQuestion={handlePostQuestion}
+      />
+    </div>
+
+    {/* Questions */}
+    {questions.length > 0 ? (
+      <div className="flex flex-col gap-4">
+        {questions.map((question) => (
+          <QuestionCard key={question.id} question={question} />
+        ))}
+      </div>
+    ) : (
+      <div className="p-8 text-center border border-dashed border-slate-200 rounded-xl bg-white/50">
+        <p className="text-slate-500 mb-2">
+          Ende nuk ka pyetje në këtë kategori.
+        </p>
+        <p className="text-xs text-slate-400">
+          Bëhu i pari që fillon një diskutim.
+        </p>
+      </div>
+    )}
+  </div>
+);
 };
 
 export default CategoryPage;

@@ -1,7 +1,6 @@
 using AlbanianQuora.Api.Data;
-using AlbanianQuora.Api.DTOs;
-using AlbanianQuora.Api.Models;
 using AlbanianQuora.Api.Interfaces;
+using AlbanianQuora.Api.Models;
 using AlbanianQuora.Api.Security;
 using AlbanianQuora.DTOs;
 using Microsoft.AspNetCore.Authorization;
@@ -81,7 +80,7 @@ public class AuthController : ControllerBase
         });
     }
 
-    // Login
+    // Login (STEP 1: password OK -> send OTP, return LoginAttemptId; NO JWT here)
 
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest req)
@@ -93,7 +92,7 @@ public class AuthController : ControllerBase
         var inputLower = input.ToLowerInvariant();
 
         var user = await _db.Users.FirstOrDefaultAsync(u =>
-            u.Email == inputLower || u.Username == input);
+            u.Email == inputLower || u.Username.ToLower() == inputLower);
 
         if (user == null)
             return Unauthorized(new { message = "Invalid credentials." });
@@ -102,19 +101,158 @@ public class AuthController : ControllerBase
         if (!ok)
             return Unauthorized(new { message = "Invalid credentials." });
 
-        var token = _jwt.CreateToken(user);
+        // Generate OTP (6-digit)
+        var code = OtpService.GenerateCode(); // "123456"
+        var salt = OtpService.GenerateSalt(); // byte[]
+        var codeHash = OtpService.Hash(code, salt); // byte[]
+
+        var now = DateTime.UtcNow;
+
+        // Invalidate old active OTPs for this user (recommended)
+        var active = await _db.LoginOtpTokens
+            .Where(t => t.UserId == user.Id &&
+                        !t.IsUsed &&
+                        !t.IsInvalidated &&
+                        t.ExpiresAtUtc > now)
+            .ToListAsync();
+
+        foreach (var t in active)
+        {
+            t.IsInvalidated = true;
+            t.InvalidatedAtUtc = now;
+        }
+
+        var otpToken = new LoginOtpToken
+        {
+            UserId = user.Id,
+            CodeHash = codeHash,
+            Salt = salt,
+            ExpiresAtUtc = now.AddMinutes(5),
+            IsUsed = false,
+            LastSentAtUtc = now,
+            ResendCount = 0,
+            CreatedAtUtc = now
+        };
+
+        _db.LoginOtpTokens.Add(otpToken);
+        await _db.SaveChangesAsync();
+
+        // Send OTP via existing SMTP (same style as forgot password)
+        var subject = "Your login verification code";
+        var body = $@"
+            <p>Your verification code is:</p>
+            <h2 style=""letter-spacing:2px"">{code}</h2>
+            <p>This code expires in <b>5 minutes</b>.</p>
+        ";
+
+        await _email.SendAsync(user.Email, subject, body);
+
+        // IMPORTANT: no JWT returned here
+        return Ok(new Login2FaStartResponse
+        {
+            OtpRequired = true,
+            LoginAttemptId = otpToken.Id
+        });
+    }
+
+    // STEP 2: verify OTP -> issue JWT
+
+    [HttpPost("verify-2fa")]
+    public async Task<IActionResult> Verify2Fa([FromBody] Verify2FaRequest req)
+    {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        var attempt = await _db.LoginOtpTokens
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Id == req.LoginAttemptId);
+
+        if (attempt == null)
+            return Unauthorized(new { message = "Invalid or expired code." });
+
+        var now = DateTime.UtcNow;
+
+        if (attempt.IsUsed || attempt.IsInvalidated || attempt.ExpiresAtUtc <= now)
+            return Unauthorized(new { message = "Invalid or expired code." });
+
+        var code = req.Code.Trim();
+
+        // verify
+        var valid = OtpService.Verify(code, attempt.Salt, attempt.CodeHash);
+        if (!valid)
+            return Unauthorized(new { message = "Invalid or expired code." });
+
+        // mark used
+        attempt.IsUsed = true;
+        attempt.UsedAtUtc = now;
+
+        await _db.SaveChangesAsync();
+
+        var token = _jwt.CreateToken(attempt.User);
+
         return Ok(new AuthResponse
         {
             AccessToken = token,
             User = new UserMeResponse
             {
-                Id = user.Id,
-                Name = user.Name,
-                Username = user.Username,
-                Email = user.Email,
-                Role = user.Role.ToString()
+                Id = attempt.User.Id,
+                Name = attempt.User.Name,
+                Username = attempt.User.Username,
+                Email = attempt.User.Email,
+                Role = attempt.User.Role.ToString()
             }
         });
+    }
+
+    // Resend OTP (rate-limited)
+
+    [HttpPost("resend-2fa")]
+    public async Task<IActionResult> Resend2Fa([FromBody] Resend2FaRequest req)
+    {
+        if (!ModelState.IsValid)
+            return ValidationProblem(ModelState);
+
+        var attempt = await _db.LoginOtpTokens
+            .Include(t => t.User)
+            .FirstOrDefaultAsync(t => t.Id == req.LoginAttemptId);
+
+        if (attempt == null)
+            return Unauthorized(new { message = "Unable to resend." });
+
+        var now = DateTime.UtcNow;
+
+        if (attempt.IsUsed || attempt.IsInvalidated || attempt.ExpiresAtUtc <= now)
+            return Unauthorized(new { message = "Unable to resend." });
+
+        // rate limit: 30s cooldown, max 5 resends
+        if ((now - attempt.LastSentAtUtc).TotalSeconds < 30)
+            return StatusCode(429, new { message = "Please wait before resending." });
+
+        if (attempt.ResendCount >= 5)
+            return StatusCode(429, new { message = "Resend limit reached." });
+
+        var newCode = OtpService.GenerateCode();
+        var newSalt = OtpService.GenerateSalt();
+        var newHash = OtpService.Hash(newCode, newSalt);
+
+        attempt.Salt = newSalt;
+        attempt.CodeHash = newHash;
+        attempt.ExpiresAtUtc = now.AddMinutes(5);
+        attempt.LastSentAtUtc = now;
+        attempt.ResendCount += 1;
+
+        await _db.SaveChangesAsync();
+
+        var subject = "Your login verification code";
+        var body = $@"
+            <p>Your verification code is:</p>
+            <h2 style=""letter-spacing:2px"">{newCode}</h2>
+            <p>This code expires in <b>5 minutes</b>.</p>
+        ";
+
+        await _email.SendAsync(attempt.User.Email, subject, body);
+
+        return Ok(new { message = "Verification code sent." });
     }
 
     // Me
@@ -248,7 +386,7 @@ public class AuthController : ControllerBase
             throw new UnauthorizedAccessException("Invalid token.");
 
         return id;
-    }   
+    }
 
     private static string CreateSecureToken()
     {
