@@ -5,6 +5,7 @@ import {
   FaBookmark,
   FaRegBookmark,
   FaFlag,
+  FaStar
 } from "react-icons/fa";
 import { useBookmarks } from "../context/BookmarkContext";
 import ReportModal from "./ReportModal";
@@ -17,59 +18,109 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
   const authorName = answer.authorName || "Unknown";
   const avatarLetter = authorName.charAt(0).toUpperCase();
 
+  // 🔥 Highlight logic (vetëm stil)
+  const isTopAnswer = answer.votes >= 5; 
+
   return (
-    <div className="flex gap-4 p-4 bg-[var(--card-bg)] rounded-lg border border-[var(--border)] transition-colors duration-300">
-      {/* Votes Column */}
-      <div className="flex flex-col items-center gap-[6px] text-[var(--text-light)]">
+    <div
+      className={`relative flex gap-5 p-6 rounded-2xl border transition-all duration-300
+        ${
+          isTopAnswer
+            ? "bg-gradient-to-br from-blue-50 to-white dark:from-slate-800 dark:to-slate-900 border-blue-400 shadow-md"
+            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg hover:-translate-y-1"
+        }`}
+    >
+
+      {/* ⭐ Top badge */}
+      {isTopAnswer && (
+        <div className="absolute top-3 right-3 text-yellow-500 text-xs flex items-center gap-1 font-semibold">
+          <FaStar />
+          Top
+        </div>
+      )}
+
+      {/* Votes */}
+      <div className="flex flex-col items-center justify-center gap-2 
+                      bg-slate-50 dark:bg-slate-800 
+                      rounded-xl px-3 py-4 min-w-[60px]
+                      text-slate-500 dark:text-slate-400">
+
         <button
-          className="bg-transparent border-none cursor-pointer text-base text-[var(--text-light)] hover:text-[#16a34a] transition-colors"
+          className="text-lg hover:text-green-600 transition transform hover:scale-110"
           onClick={() => onUpvote(answer.id)}
         >
           <FaArrowUp />
         </button>
 
-        <span className="font-semibold text-[var(--text-main)]">
+        <span
+          className={`font-bold ${
+            isTopAnswer
+              ? "text-blue-600 dark:text-blue-400"
+              : "text-slate-800 dark:text-white"
+          }`}
+        >
           {answer.votes}
         </span>
 
         <button
-          className="bg-transparent border-none cursor-pointer text-base text-[var(--text-light)] hover:text-[#dc2626] transition-colors"
+          className="text-lg hover:text-red-600 transition transform hover:scale-110"
           onClick={() => onDownvote(answer.id)}
         >
           <FaArrowDown />
         </button>
       </div>
 
-      {/* Main Content Column */}
+      {/* Main */}
       <div className="flex-1">
-        <div className="flex items-center gap-[10px] mb-2 font-semibold text-[var(--text-main)]">
-          <div className="w-8 h-8 bg-[var(--accent)] text-[var(--text-main)] rounded-full flex items-center justify-center border border-[var(--border)]">
+
+        {/* Author */}
+        <div className="flex items-center gap-3 mb-3">
+          <div
+            className={`w-9 h-9 rounded-full flex items-center justify-center
+              ${
+                isTopAnswer
+                  ? "bg-gradient-to-br from-blue-600 to-indigo-600"
+                  : "bg-gradient-to-br from-slate-500 to-slate-700"
+              }
+              text-white font-semibold shadow-sm`}
+          >
             {avatarLetter}
           </div>
-          <span>{authorName}</span>
+
+          <span className="font-semibold text-slate-800 dark:text-white text-sm">
+            {authorName}
+          </span>
         </div>
 
-        <p className="leading-relaxed text-[var(--text-main)]">{answer.content}</p>
+        {/* Content */}
+        <p
+          className={`leading-relaxed text-sm ${
+            isTopAnswer
+              ? "text-slate-800 dark:text-slate-200"
+              : "text-slate-600 dark:text-slate-300"
+          }`}
+        >
+          {answer.content}
+        </p>
       </div>
 
-      {/* Actions Column */}
-      <div className="flex flex-col gap-2">
+      {/* Actions */}
+      <div className="flex flex-col gap-3 items-center">
+
         <button
-          className={`p-[6px] rounded-md text-[15px] transition-all cursor-pointer bg-transparent border-none 
-            ${bookmarked 
-              ? "text-[var(--primary)]" 
-              : "text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-[var(--primary)]"
-            }`}
           onClick={() => toggleAnswerBookmark(answer, questionTitle)}
-          title={bookmarked ? "Hiq nga bookmark-et" : "Shto në bookmark-et"}
+          className={`p-2 rounded-lg transition-all duration-200 transform hover:scale-110 ${
+            bookmarked
+              ? "text-blue-600"
+              : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600"
+          }`}
         >
           {bookmarked ? <FaBookmark /> : <FaRegBookmark />}
         </button>
 
         <button
-          className="p-[6px] rounded-md text-[15px] text-[var(--text-light)] transition-all cursor-pointer bg-transparent border-none hover:bg-red-500/10 hover:text-[#dc2626]"
           onClick={() => setShowReport(true)}
-          title="Raporto përgjigjen"
+          className="p-2 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition transform hover:scale-110"
         >
           <FaFlag />
         </button>

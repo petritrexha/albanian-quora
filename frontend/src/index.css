@@ -2,36 +2,46 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================
+   BASE LAYER
+========================= */
 @layer base {
   :root {
     --primary: #2563eb;
     --primary-light: #3b82f6;
-    --accent: #f3f4f6;
-    --text-main: #1f2937;
+
+    --accent: #f8fafc;
+    --text-main: #111827;
     --text-light: #6b7280;
-    --bg-light: #f3f4f6;
+
+    --bg-light: #ffffff;
     --card-bg: #ffffff;
+
     --border: #e5e7eb;
   }
 
   .dark {
     --primary: #3b82f6;
     --primary-light: #60a5fa;
-    --accent: #2d2f31;
+
+    --accent: #1f2937;
     --text-main: #f9fafb;
     --text-light: #9ca3af;
-    --bg-light: #111827;
-    --card-bg: #1f2937;
-    --border: #374151;
+
+    --bg-light: #0f172a;
+    --card-bg: #1e293b;
+
+    --border: #334155;
   }
 
   * {
-    @apply m-0 p-0 box-border border-[var(--border)];
+    @apply m-0 p-0 box-border;
   }
 
   body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    @apply bg-[var(--bg-light)] text-[var(--text-main)] leading-relaxed transition-colors duration-300;
+    @apply font-sans leading-relaxed transition-colors duration-300;
+    background-color: var(--bg-light);
+    color: var(--text-main);
   }
 
   a {
@@ -44,6 +54,9 @@
   }
 }
 
+/* =========================
+   UTILITIES
+========================= */
 @layer utilities {
   .font-inherit {
     font-family: inherit;
@@ -51,4 +64,25 @@
     font-weight: inherit;
     line-height: inherit;
   }
+}
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn 0.2s ease-out;
 }
