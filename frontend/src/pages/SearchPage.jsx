@@ -3,58 +3,45 @@ import { useLocation } from "react-router-dom";
 import { getQuestions } from "../services/questionService";
 import QuestionCard from "../components/QuestionCard";
 
-const useQuery = () => {
-  return new URLSearchParams(useLocation().search);
-};
+const useQuery = () => new URLSearchParams(useLocation().search);
 
 const SearchPage = () => {
   const query = useQuery();
-  const searchTerm = query.get("q")?.toLowerCase() || "";
+  const searchTerm = query.get("q")?.trim() || "";
+  const tagFilter = query.get("tag")?.trim() || null;
 
-  const [questions, setQuestions] = useState([]);
   const [results, setResults] = useState([]);
 
-  /* Load all questions then filter by title */
   useEffect(() => {
-    let mounted = true;
-
-    getQuestions()
-      .then((data) => {
-        if (mounted) {
-          setQuestions(data || []);
-        }
-      })
-      .catch(() => {
-        if (mounted) setQuestions([]);
-      });
-
-    return () => {
-      mounted = false;
-    };
-  }, []);
-
-  /* Filter by title */
-  useEffect(() => {
-    if (!searchTerm) {
+    if (!searchTerm && !tagFilter) {
       setResults([]);
       return;
     }
+    let mounted = true;
+    getQuestions(null, null, tagFilter || undefined, searchTerm || undefined)
+      .then((data) => {
+        if (mounted) setResults(data || []);
+      })
+      .catch(() => {
+        if (mounted) setResults([]);
+      });
+    return () => { mounted = false; };
+  }, [searchTerm, tagFilter]);
 
-    const filtered = questions.filter((q) =>
-      q.title?.toLowerCase().includes(searchTerm)
-    );
-
-    setResults(filtered);
-  }, [questions, searchTerm]);
+  const hasFilter = searchTerm || tagFilter;
 
   return (
     <div className="w-full max-w-[900px]">
       <div className="flex flex-col gap-4">
         <h2 className="text-xl font-semibold text-[var(--text-main)] mb-2">
-          Rezultatet e kërkimit për: <span className="text-[var(--primary)]">"{searchTerm}"</span>
+          {hasFilter ? (
+            <>Rezultatet: {searchTerm && <span className="text-[var(--primary)]">"{searchTerm}"</span>}{tagFilter && <> {" "} tag: <span className="text-[var(--primary)]">{tagFilter}</span></>}</>
+          ) : (
+            "Shkruaj diçka për të kërkuar."
+          )}
         </h2>
 
-        {searchTerm && results.length > 0 ? (
+        {hasFilter && results.length > 0 ? (
           <div className="flex flex-col gap-4">
             {results.map((question) => (
               <QuestionCard key={question.id} question={question} />
@@ -63,9 +50,7 @@ const SearchPage = () => {
         ) : (
           <div className="bg-[var(--card-bg)] p-10 rounded-xl border border-dashed border-[var(--border)] text-center">
             <p className="text-[var(--text-light)] italic">
-              {searchTerm
-                ? "Nuk u gjet asnjë pyetje."
-                : "Shkruaj diçka për të kërkuar."}
+              {hasFilter ? "Nuk u gjet asnjë pyetje." : "Shkruaj diçka për të kërkuar."}
             </p>
           </div>
         )}

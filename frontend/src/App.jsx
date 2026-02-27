@@ -28,6 +28,7 @@ export default function App() {
   const [showAskModal, setShowAskModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newQuestion, setNewQuestion] = useState("");
+  const [selectedTagIds, setSelectedTagIds] = useState([]);
   const [refreshHome, setRefreshHome] = useState(false);
 
   const handlePostQuestion = async () => {
@@ -37,8 +38,10 @@ export default function App() {
         title: newQuestion,
         description: newQuestion,
         categoryId: selectedCategory || 1,
+        tagIds: selectedTagIds,
       });
       setNewQuestion("");
+      setSelectedTagIds([]);
       setShowAskModal(false);
       setRefreshHome((prev) => !prev);
     } catch (err) {
@@ -122,14 +125,16 @@ export default function App() {
               {showAskModal && (
                 <div 
                   className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/70 backdrop-blur-sm px-4" 
-                  onClick={() => setShowAskModal(false)}
+                  onClick={() => { setShowAskModal(false); setSelectedTagIds([]); }}
                 >
                   <div className="relative w-full max-w-2xl bg-[var(--card-bg)] border border-[var(--border)] rounded-xl shadow-2xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
                     <AskModal
                       newQuestion={newQuestion}
                       setNewQuestion={setNewQuestion}
+                      selectedTagIds={selectedTagIds}
+                      setSelectedTagIds={setSelectedTagIds}
                       handlePostQuestion={handlePostQuestion}
-                      onClose={() => setShowAskModal(false)}
+                      onClose={() => { setShowAskModal(false); setSelectedTagIds([]); }}
                     />
                   </div>
                 </div>
