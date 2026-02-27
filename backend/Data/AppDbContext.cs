@@ -21,6 +21,7 @@ namespace AlbanianQuora.Api.Data
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<QuestionTag> QuestionTags => Set<QuestionTag>();
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
+        public DbSet<LoginOtpToken> LoginOtpTokens => Set<LoginOtpToken>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -93,15 +94,25 @@ namespace AlbanianQuora.Api.Data
                 .HasForeignKey(t => t.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            // Login OTP (2FA) Relationships + Index
+            modelBuilder.Entity<LoginOtpToken>()
+                .HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<LoginOtpToken>()
+                .HasIndex(x => new { x.UserId, x.ExpiresAtUtc });
+
             // Seed Data
             modelBuilder.Entity<Category>().HasData(
-                new Category
-                {
-                    Id = 1,
-                    Name = "General",
-                    IsActive = true,
-                    CreatedAt = DateTime.UtcNow
-                }
+                 new Category { Id = 1, Name = "General", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 2, Name = "Programim", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 3, Name = "Teknologji", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 4, Name = "Shkence", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 5, Name = "Arsim", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 6, Name = "Biznes", IsActive = true, CreatedAt = DateTime.UtcNow }
+
             );
         }
     }

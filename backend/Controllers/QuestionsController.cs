@@ -28,7 +28,11 @@ namespace AlbanianQuora.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetQuestions([FromQuery] int? categoryId, [FromQuery] int? userId)
+        public async Task<IActionResult> GetQuestions(
+            [FromQuery] int? categoryId,
+            [FromQuery] int? userId,
+            [FromQuery] string? tag,
+            [FromQuery] string? search)
         {
             var query = _context.Questions
                 .Include(q => q.Category)
@@ -38,8 +42,20 @@ namespace AlbanianQuora.Api.Controllers
                 .AsQueryable();
 
             if (categoryId.HasValue)
-            {
                 query = query.Where(q => q.CategoryId == categoryId.Value);
+
+            if (!string.IsNullOrWhiteSpace(tag))
+            {
+                var tagLower = tag.Trim().ToLowerInvariant();
+                query = query.Where(q => q.QuestionTags.Any(qt => qt.Tag.Name.ToLower() == tagLower));
+            }
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var searchLower = search.Trim().ToLowerInvariant();
+                query = query.Where(q =>
+                    (q.Title != null && q.Title.ToLower().Contains(searchLower)) ||
+                    (q.Description != null && q.Description.ToLower().Contains(searchLower)));
             }
 
             var questions = await query

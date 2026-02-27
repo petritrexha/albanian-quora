@@ -134,6 +134,19 @@ const QuestionDetails = () => {
               <span>•</span>
               <span>{answers.length} përgjigje</span>
             </div>
+            {question.tags && question.tags.length > 0 && (
+              <div className="flex flex-wrap gap-2 mt-3">
+                {question.tags.map((tagName) => (
+                  <Link
+                    key={tagName}
+                    to={`/?tag=${encodeURIComponent(tagName)}`}
+                    className="text-sm px-2.5 py-1 rounded-full bg-[var(--accent)] text-[var(--primary)] hover:underline"
+                  >
+                    {tagName}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
