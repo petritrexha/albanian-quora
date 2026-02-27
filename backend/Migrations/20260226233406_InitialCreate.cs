@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AlbanianQuora.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialFullSchema : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -99,6 +99,35 @@ namespace AlbanianQuora.Migrations
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "LoginOtpTokens",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    CodeHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    Salt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    ExpiresAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    UsedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    IsInvalidated = table.Column<bool>(type: "bit", nullable: false),
+                    InvalidatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    LastSentAtUtc = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ResendCount = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_LoginOtpTokens", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_LoginOtpTokens_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -238,7 +267,7 @@ namespace AlbanianQuora.Migrations
             migrationBuilder.InsertData(
                 table: "Categories",
                 columns: new[] { "Id", "CreatedAt", "IsActive", "Name" },
-                values: new object[] { 1, new DateTime(2026, 2, 25, 15, 9, 29, 973, DateTimeKind.Utc).AddTicks(8312), true, "General" });
+                values: new object[] { 1, new DateTime(2026, 2, 26, 23, 34, 4, 611, DateTimeKind.Utc).AddTicks(6505), true, "General" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Answers_QuestionId",
@@ -260,6 +289,11 @@ namespace AlbanianQuora.Migrations
                 table: "Bookmarks",
                 columns: new[] { "UserId", "QuestionId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LoginOtpTokens_UserId_ExpiresAtUtc",
+                table: "LoginOtpTokens",
+                columns: new[] { "UserId", "ExpiresAtUtc" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_PasswordResetTokens_UserId",
@@ -307,6 +341,9 @@ namespace AlbanianQuora.Migrations
 
             migrationBuilder.DropTable(
                 name: "Bookmarks");
+
+            migrationBuilder.DropTable(
+                name: "LoginOtpTokens");
 
             migrationBuilder.DropTable(
                 name: "Notifications");

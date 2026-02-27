@@ -10,7 +10,6 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!user;
   const isAdmin = (user?.role || "").toLowerCase() === "admin";
 
-  // Restore user on refresh if token exists
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
 
@@ -24,9 +23,10 @@ export function AuthProvider({ children }) {
         const currentUser = await auth.me();
         setUser(currentUser);
         localStorage.setItem("userId", currentUser.id);
-      } catch (error) {
+      } catch {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("userId");
+        localStorage.removeItem("user");
         setUser(null);
       } finally {
         setHydrating(false);
@@ -34,33 +34,38 @@ export function AuthProvider({ children }) {
     })();
   }, []);
 
+  //Login
   const login = async ({ identifier, password }) => {
-  const data = await auth.login({
-    identifier,
-    password,
-  });
+    return await auth.login({ identifier, password });
+  };
 
-  const token = data?.accessToken || data?.token;
+//Verify 2fa
+  const verify2fa = async ({ loginAttemptId, code }) => {
+    const data = await auth.verify2fa({ loginAttemptId, code });
 
-  if (token) {
-    localStorage.setItem("accessToken", token);
-  }
+    const token = data?.accessToken || data?.AccessToken;
+    const userData = data?.user || data?.User;
 
-  if (data?.user) {
-    setUser(data.user);
-    localStorage.setItem("userId", data.user.id);
-  }
+    if (token) localStorage.setItem("accessToken", token);
 
-  return data?.user;
-};
+    if (userData) {
+      setUser(userData);
+      localStorage.setItem("userId", userData.id);
+      localStorage.setItem("user", JSON.stringify(userData));
+    }
 
-  const register = async ({
-    name,
-    username,
-    email,
-    password,
-    confirmPassword,
-  }) => {
+    localStorage.removeItem("loginAttemptId");
+
+    return data;
+  };
+
+  // Resend 2FA
+  const resend2fa = async ({ loginAttemptId }) => {
+    return await auth.resend2fa({ loginAttemptId });
+  };
+
+  // Register
+  const register = async ({ name, username, email, password, confirmPassword }) => {
     const data = await auth.register({
       name,
       username,
@@ -69,35 +74,45 @@ export function AuthProvider({ children }) {
       confirmPassword,
     });
 
-    if (data?.accessToken && data?.user) {
-      localStorage.setItem("accessToken", data.accessToken);
-      localStorage.setItem("userId", data.user.id);
-      setUser(data.user);
+    const token = data?.accessToken || data?.AccessToken;
+    const userData = data?.user || data?.User;
+
+    if (token && userData) {
+      localStorage.setItem("accessToken", token);
+      localStorage.setItem("userId", userData.id);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
       return { autoLoggedIn: true };
     }
 
     return { autoLoggedIn: false };
   };
 
+  // Logout
   const logout = async () => {
     try {
       await auth.logout();
     } catch {
-      // ignore errors
+      // ignore
     }
 
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
+    localStorage.removeItem("user");
+    localStorage.removeItem("loginAttemptId");
     setUser(null);
   };
 
   const value = useMemo(
     () => ({
       user,
+      setUser,
       hydrating,
       isAuthenticated,
       isAdmin,
       login,
+      verify2fa,
+      resend2fa,
       register,
       logout,
     }),
@@ -109,10 +124,6 @@ export function AuthProvider({ children }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-
-  if (!context) {
-    throw new Error("useAuth must be used within AuthProvider");
-  }
-
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
   return context;
 }

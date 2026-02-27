@@ -82,6 +82,56 @@ namespace AlbanianQuora.Migrations
                     b.ToTable("Bookmarks");
                 });
 
+            modelBuilder.Entity("AlbanianQuora.Api.Models.LoginOtpToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<byte[]>("CodeHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime>("CreatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("InvalidatedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsInvalidated")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("LastSentAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("ResendCount")
+                        .HasColumnType("int");
+
+                    b.Property<byte[]>("Salt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<DateTime?>("UsedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "ExpiresAtUtc");
+
+                    b.ToTable("LoginOtpTokens");
+                });
+
             modelBuilder.Entity("AlbanianQuora.Api.Models.Notification", b =>
                 {
                     b.Property<int>("Id")
@@ -333,7 +383,7 @@ namespace AlbanianQuora.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 2, 25, 15, 9, 29, 973, DateTimeKind.Utc).AddTicks(8312),
+                            CreatedAt = new DateTime(2026, 2, 26, 23, 34, 4, 611, DateTimeKind.Utc).AddTicks(6505),
                             IsActive = true,
                             Name = "General"
                         });
@@ -373,6 +423,17 @@ namespace AlbanianQuora.Migrations
                         .IsRequired();
 
                     b.Navigation("Question");
+                });
+
+            modelBuilder.Entity("AlbanianQuora.Api.Models.LoginOtpToken", b =>
+                {
+                    b.HasOne("AlbanianQuora.Api.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.PasswordResetToken", b =>

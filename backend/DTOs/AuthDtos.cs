@@ -46,3 +46,25 @@ public class AuthResponse
     public string AccessToken { get; set; } = string.Empty;
     public UserMeResponse User { get; set; } = new();
 }
+
+public class Login2FaStartResponse
+{
+    public bool OtpRequired { get; set; } = true;
+    public int LoginAttemptId { get; set; }
+}
+
+public class Verify2FaRequest
+{
+    [Required]
+    public int LoginAttemptId { get; set; }
+
+    // 6 digits
+    [Required, RegularExpression(@"^\d{6}$", ErrorMessage = "Code must be 6 digits.")]
+    public string Code { get; set; } = string.Empty;
+}
+
+public class Resend2FaRequest
+{
+    [Required]
+    public int LoginAttemptId { get; set; }
+}
