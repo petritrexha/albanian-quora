@@ -6,7 +6,7 @@ import {
   FaRegBookmark,
   FaFlag,
 } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useBookmarks } from "../context/BookmarkContext";
 import ReportModal from "./ReportModal";
 
@@ -31,7 +31,7 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
           className="bg-transparent border-none cursor-pointer text-[18px] text-[var(--text-light)] transition-colors duration-150 hover:text-[#16a34a]"
           onClick={(e) => {
             e.stopPropagation();
-            onUpvote(question.id);
+            onUpvote?.(question.id);
           }}
         >
           <FaArrowUp />
@@ -45,7 +45,7 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
           className="bg-transparent border-none cursor-pointer text-[18px] text-[var(--text-light)] transition-colors duration-150 hover:text-[#dc2626]"
           onClick={(e) => {
             e.stopPropagation();
-            onDownvote(question.id);
+            onDownvote?.(question.id);
           }}
         >
           <FaArrowDown />
@@ -66,6 +66,20 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
           <span>•</span>
           <span>{question.answerCount || 0} përgjigje</span>
         </div>
+        {question.tags && question.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {question.tags.map((tagName) => (
+              <Link
+                key={tagName}
+                to={`/?tag=${encodeURIComponent(tagName)}`}
+                onClick={(e) => e.stopPropagation()}
+                className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent)] text-[var(--primary)] hover:underline"
+              >
+                {tagName}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Actions */}

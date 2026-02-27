@@ -1,17 +1,20 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import AskBox from "../components/AskBox";
 import QuestionCard from "../components/QuestionCard";
 import { getQuestions, createQuestion, upvoteQuestion, downvoteQuestion } from "../services/questionService";
 
 const Home = ({ selectedCategory, refreshTrigger }) => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tagFilter = searchParams.get("tag") || null;
   const [questions, setQuestions] = useState([]);
   const [newQuestion, setNewQuestion] = useState("");
   const { user } = useAuth();
 
   useEffect(() => {
     let mounted = true;
-    getQuestions(user?.id, selectedCategory)
+    getQuestions(user?.id, selectedCategory, tagFilter, null)
       .then((data) => {
         if (mounted && data) setQuestions(data);
       })
@@ -19,7 +22,7 @@ const Home = ({ selectedCategory, refreshTrigger }) => {
         if (mounted) setQuestions([]);
       });
     return () => { mounted = false; };
-  }, [user, selectedCategory, refreshTrigger]);
+  }, [user, selectedCategory, tagFilter, refreshTrigger]);
 
   const handlePostQuestion = async () => {
     if (!newQuestion.trim()) return;
@@ -67,6 +70,15 @@ const Home = ({ selectedCategory, refreshTrigger }) => {
           handlePostQuestion={handlePostQuestion}
         />
         
+        {tagFilter && (
+          <p className="text-sm text-[var(--text-light)] mb-2">
+            Duke filtruar sipas tag: <strong className="text-[var(--primary)]">{tagFilter}</strong>
+            {" "}
+            <button type="button" onClick={() => setSearchParams({})} className="text-[var(--primary)] hover:underline">
+              Hiq filtrim
+            </button>
+          </p>
+        )}
         <h2 className="my-1.5 mb-3 text-[20px] font-semibold text-[var(--text-main)]">
           Trending Questions
         </h2>

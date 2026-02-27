@@ -1,11 +1,13 @@
 import api from "./api";
 
-export const getQuestions = async (userId, categoryId) => {
+export const getQuestions = async (userId, categoryId, tag, search) => {
   try {
     let url = "/api/questions";
     const params = [];
     if (userId) params.push(`userId=${userId}`);
     if (categoryId) params.push(`categoryId=${categoryId}`);
+    if (tag) params.push(`tag=${encodeURIComponent(tag)}`);
+    if (search) params.push(`search=${encodeURIComponent(search)}`);
     if (params.length > 0) url += `?${params.join("&")}`;
 
     const res = await api.get(url);

@@ -106,13 +106,13 @@ namespace AlbanianQuora.Api.Data
 
             // Seed Data
             modelBuilder.Entity<Category>().HasData(
-                new Category
-                {
-                    Id = 1,
-                    Name = "General",
-                    IsActive = true,
-                    CreatedAt = DateTime.UtcNow
-                }
+                 new Category { Id = 1, Name = "General", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 2, Name = "Programim", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 3, Name = "Teknologji", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 4, Name = "Shkence", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 5, Name = "Arsim", IsActive = true, CreatedAt = DateTime.UtcNow },
+                 new Category { Id = 6, Name = "Biznes", IsActive = true, CreatedAt = DateTime.UtcNow }
+
             );
         }
     }
