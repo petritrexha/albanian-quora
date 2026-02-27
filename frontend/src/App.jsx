@@ -21,6 +21,7 @@ import Profile from "./pages/Profile";
 import RequireAuth from "./components/RequireAuth";
 import RequireAdmin from "./components/RequireAdmin";
 import AdminDashboard from "./pages/AdminDashboard";
+import Verify2FA from "./pages/Verify2FA";
 
 export default function App() {
   const { loading } = useAuth();
@@ -108,6 +109,11 @@ export default function App() {
                     <AdminDashboard />
                   </RequireAdmin>
                 } />
+
+                <Route 
+                  path="/verify-2fa" 
+                  element={<Verify2FA />} 
+                />
 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

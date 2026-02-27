@@ -1,6 +1,6 @@
 import api from "./api";
 
-// LOGIN
+// Login
 export async function login({ identifier, password }) {
   if (!identifier || !password) throw new Error("Identifier and password required");
 
@@ -11,22 +11,61 @@ export async function login({ identifier, password }) {
 
   const res = await api.post("/api/auth/login", payload);
 
-  // C# returns PascalCase (AccessToken, User)
-  // We check for both just in case
+  const otpRequired = res.data.otpRequired ?? res.data.OtpRequired;
+  const loginAttemptId = res.data.loginAttemptId ?? res.data.LoginAttemptId;
+
+  if (otpRequired && loginAttemptId) {
+    localStorage.setItem("loginAttemptId", String(loginAttemptId));
+  }
+
+  return {
+    otpRequired: !!otpRequired,
+    loginAttemptId: loginAttemptId ?? null,
+    raw: res.data,
+  };
+}
+
+// Verify 2FA
+export async function verify2fa({ loginAttemptId, code }) {
+  if (!loginAttemptId) throw new Error("loginAttemptId required");
+  if (!code) throw new Error("code required");
+
+  const payload = {
+    LoginAttemptId: Number(loginAttemptId),
+    Code: String(code).trim(),
+  };
+
+  const res = await api.post("/api/auth/verify-2fa", payload);
+
   const token = res.data.accessToken || res.data.AccessToken;
   const userData = res.data.user || res.data.User;
 
   if (token) {
     localStorage.setItem("accessToken", token);
-    if (userData) {
-      localStorage.setItem("user", JSON.stringify(userData));
-    }
   }
+  if (userData) {
+    localStorage.setItem("user", JSON.stringify(userData));
+  }
+
+  localStorage.removeItem("loginAttemptId");
 
   return res.data;
 }
 
-// REGISTER
+//Resend 2FA Code
+ 
+export async function resend2fa({ loginAttemptId }) {
+  if (!loginAttemptId) throw new Error("loginAttemptId required");
+
+  const payload = {
+    LoginAttemptId: Number(loginAttemptId),
+  };
+
+  const res = await api.post("/api/auth/resend-2fa", payload);
+  return res.data;
+}
+
+// Register
 export async function register(payload) {
   const res = await api.post("/api/auth/register", payload);
 
@@ -43,19 +82,25 @@ export async function register(payload) {
   return res.data;
 }
 
-// GET CURRENT USER
+// Get current user
 export async function me() {
   const res = await api.get("/api/auth/me");
   return res.data;
 }
 
-// FORGOT PASSWORD
+//Forgot password
 export async function forgotPassword(payload) {
   const res = await api.post("/api/auth/forgot-password", payload);
   return res.data;
 }
 
-// LOGOUT
+//reset password
+export async function resetPassword(payload) {
+  const res = await api.post("/api/auth/reset-password", payload);
+  return res.data;
+}
+
+//Logout
 export async function logout() {
   try {
     await api.post("/api/auth/logout");
@@ -64,20 +109,5 @@ export async function logout() {
   }
   localStorage.removeItem("accessToken");
   localStorage.removeItem("user");
+  localStorage.removeItem("loginAttemptId");
 }
-
-// RESET PASSWORD
-export async function resetPassword(payload) {
-  const res = await api.post("/api/auth/reset-password", payload);
-  return res.data;
-}
-
-// export async function login(payload) {
-//   const res = await api.post("api/auth/login", payload);
-
-//   if (res.data.token) {
-//     localStorage.setItem("accessToken", res.data.token);
-//   }
-
-//   return res.data;
-// }

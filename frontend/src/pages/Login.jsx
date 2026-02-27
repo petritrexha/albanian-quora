@@ -25,10 +25,19 @@ export default function Login() {
 
     setLoading(true);
     try {
-      await login({ identifier: identifierValue, password: passwordValue });
-      setTimeout(() => {
-        navigate("/", { replace: true });
-      }, 100);
+      const result = await login({ identifier: identifierValue, password: passwordValue });
+
+      //redirect to 2FA 
+      if (result?.otpRequired && result?.loginAttemptId) {
+        navigate("/verify-2fa", {
+          replace: true,
+          state: { loginAttemptId: result.loginAttemptId },
+        });
+        return;
+      }
+
+      // fallback
+      setError("Login dështoi. Provo prapë.");
     } catch (err) {
       console.error("Login Error:", err);
       const msg =
@@ -76,9 +85,9 @@ export default function Login() {
             />
           </div>
 
-          <button 
-            className="w-full p-3 bg-[var(--primary)] border-none rounded-lg text-white font-bold cursor-pointer transition-colors duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed" 
-            type="submit" 
+          <button
+            className="w-full p-3 bg-[var(--primary)] border-none rounded-lg text-white font-bold cursor-pointer transition-colors duration-200 hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            type="submit"
             disabled={loading}
           >
             {loading ? "Duke u kyçur..." : "Login"}
@@ -86,9 +95,13 @@ export default function Login() {
         </form>
 
         <div className="mt-4 text-center text-sm text-[var(--text-light)]">
-          <Link to="/forgot-password" size="sm" className="hover:underline text-[var(--primary)]">Forgot password?</Link>
+          <Link to="/forgot-password" size="sm" className="hover:underline text-[var(--primary)]">
+            Forgot password?
+          </Link>
           <span className="mx-2 opacity-60">•</span>
-          <Link to="/register" className="hover:underline text-[var(--primary)]">Create account</Link>
+          <Link to="/register" className="hover:underline text-[var(--primary)]">
+            Create account
+          </Link>
         </div>
       </div>
     </div>
