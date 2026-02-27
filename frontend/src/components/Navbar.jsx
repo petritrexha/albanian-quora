@@ -31,24 +31,35 @@ const Navbar = ({ onOpenAskModal }) => {
     }
   };
 
-  const isAdmin = user?.role === 1 || user?.role === "Admin" || user?.role?.toString().toLowerCase() === "admin";
+  const isAdmin =
+    user?.role === 1 ||
+    user?.role === "Admin" ||
+    user?.role?.toString().toLowerCase() === "admin";
 
   return (
-    <nav className="sticky top-0 z-[1000] w-full bg-[var(--card-bg)] border-b border-[var(--border)] shadow-sm transition-colors duration-300">
-      <div className="max-w-[1180px] mx-auto px-4 lg:px-0 py-4 flex items-center justify-between gap-4">
-        
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 shrink-0 no-underline">
-          <FaComments className="text-[22px] text-[var(--primary)]" />
-          <span className="text-[22px] font-bold bg-gradient-to-r from-[var(--primary)] to-[#7c3aed] bg-clip-text text-transparent">
+    <nav className="sticky top-0 z-50 w-full backdrop-blur-md bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 transition-all duration-300">
+      <div className="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between gap-4">
+
+        {/* LOGO */}
+        <Link
+          to="/"
+          className="flex items-center gap-2 no-underline group"
+        >
+          <div className="w-9 h-9 flex items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 text-white shadow-md group-hover:scale-105 transition">
+            <FaComments />
+          </div>
+          <span className="text-xl font-bold text-slate-800 dark:text-white">
             AlbanianQuora
           </span>
         </Link>
 
-        {/* Search Bar */}
-        <div className="hidden md:flex flex-1 justify-center max-w-[380px]">
+        {/* SEARCH */}
+        <div className="hidden md:flex flex-1 justify-center max-w-md">
           <input
-            className="w-full px-[18px] py-2.5 rounded-xl border border-[var(--border)] bg-[var(--accent)] text-[var(--text-main)] text-sm focus:outline-none placeholder:text-[var(--text-light)]"
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700
+                       bg-slate-50 dark:bg-slate-800
+                       text-sm text-slate-800 dark:text-slate-200
+                       focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             placeholder="Kërko pyetje..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -56,38 +67,70 @@ const Navbar = ({ onOpenAskModal }) => {
           />
         </div>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-1 lg:gap-[12px]">
-          
-          {/* Home Link */}
-          <Link to="/" className="flex items-center gap-1.5 text-[12px] font-medium text-[var(--text-light)] px-3 py-2 rounded-lg hover:bg-[var(--accent)] no-underline transition-colors">
-            <FaHome className="text-[18px]" />
-            <span className="hidden lg:inline">Ballina</span>
+        {/* RIGHT SIDE */}
+        <div className="flex items-center gap-2">
+
+          {/* Home */}
+          <Link
+            to="/"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium
+                       text-slate-600 dark:text-slate-300
+                       hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+          >
+            <FaHome />
           </Link>
 
-          {/* THE RESTORED PYET BUTTON */}
-          <button 
+          {/* Ask */}
+          <button
             onClick={onOpenAskModal}
-            className="flex items-center gap-1.5 text-[12px] font-medium text-[var(--text-light)] px-3 py-2 rounded-lg hover:bg-[var(--accent)] transition-colors"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
+                       bg-blue-600 text-white hover:bg-blue-700
+                       shadow-sm hover:shadow-md transition-all"
           >
-            <FaQuestionCircle className="text-[18px]" />
+            <FaQuestionCircle />
             <span className="hidden lg:inline">Pyet</span>
           </button>
 
-          {/* Dark Mode Toggle */}
-          <button 
-            onClick={toggleTheme} 
-            className="p-2 rounded-lg hover:bg-[var(--accent)] text-[var(--text-light)] transition-all"
-            title={isDarkMode ? "Light Mode" : "Dark Mode"}
+          {/* DARK MODE TOGGLE WITH ANIMATION */}
+          <button
+            onClick={toggleTheme}
+            className="relative w-10 h-10 flex items-center justify-center rounded-full
+                       bg-slate-100 dark:bg-slate-800
+                       hover:scale-110 active:scale-95
+                       transition-all duration-300"
           >
-            {isDarkMode ? <FaSun className="text-[18px] text-yellow-400" /> : <FaMoon className="text-[18px]" />}
+            <div
+              className={`absolute transition-all duration-500 ${
+                isDarkMode
+                  ? "rotate-0 opacity-100 scale-100"
+                  : "rotate-180 opacity-0 scale-50"
+              }`}
+            >
+              <FaSun className="text-yellow-400 text-lg" />
+            </div>
+
+            <div
+              className={`absolute transition-all duration-500 ${
+                isDarkMode
+                  ? "-rotate-180 opacity-0 scale-50"
+                  : "rotate-0 opacity-100 scale-100"
+              }`}
+            >
+              <FaMoon className="text-slate-600 dark:text-slate-300 text-lg" />
+            </div>
           </button>
 
-          {/* Bookmarks */}
-          <Link to="/saved" className="relative flex items-center gap-1.5 text-[12px] font-medium text-[var(--text-light)] px-3 py-2 rounded-lg hover:bg-[var(--accent)] no-underline">
-            <FaBookmark className="text-[18px]" />
+          {/* BOOKMARKS */}
+          <Link
+            to="/saved"
+            className="relative flex items-center justify-center w-10 h-10 rounded-lg
+                       text-slate-600 dark:text-slate-300
+                       hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+          >
+            <FaBookmark />
             {totalBookmarks > 0 && (
-              <span className="absolute -top-1 -right-1.5 bg-[var(--primary)] text-white text-[11px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px]
+                               w-5 h-5 rounded-full flex items-center justify-center font-bold animate-pulse">
                 {totalBookmarks}
               </span>
             )}
@@ -95,26 +138,51 @@ const Navbar = ({ onOpenAskModal }) => {
 
           <NotificationDropdown />
 
-          {/* Auth Section */}
+          {/* AUTH */}
           {isAuthenticated ? (
-            <div className="flex items-center gap-2 lg:gap-[12px] ml-1 border-l pl-3 border-[var(--border)]">
+            <div className="flex items-center gap-3 ml-2 pl-3 border-l border-slate-200 dark:border-slate-700">
+
               {isAdmin && (
-                <Link to="/admin" className="flex items-center gap-1.5 text-[11px] font-bold text-red-500 bg-red-500/10 px-2.5 py-2 rounded-lg hover:bg-red-500 hover:text-white transition-all no-underline">
+                <Link
+                  to="/admin"
+                  className="p-2 rounded-lg bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition"
+                >
                   <FaShieldAlt />
                 </Link>
               )}
-              <Link to="/profile" className="flex items-center gap-2 text-[12px] font-semibold text-[var(--text-main)] no-underline hover:text-[var(--primary)]">
+
+              <Link
+                to="/profile"
+                className="flex items-center gap-2 text-sm font-medium
+                           text-slate-700 dark:text-slate-200
+                           hover:text-blue-600 transition"
+              >
                 <FaUserCircle className="text-lg" />
                 <span className="hidden md:inline">{user?.username}</span>
               </Link>
-              <button onClick={logout} className="text-[12px] font-medium text-red-500 px-3 py-2 rounded-lg hover:bg-red-500/10 transition-colors">
+
+              <button
+                onClick={logout}
+                className="text-sm font-medium text-red-500 hover:underline"
+              >
                 Dil
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login" className="no-underline text-[12px] font-medium text-[var(--text-light)] px-3 py-2">Kyçu</Link>
-              <Link to="/register" className="no-underline bg-[var(--primary)] text-white px-5 py-2 rounded-[10px] font-medium text-[13px]">Regjistrohu</Link>
+            <div className="flex items-center gap-3">
+              <Link
+                to="/login"
+                className="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-blue-600 transition"
+              >
+                Kyçu
+              </Link>
+              <Link
+                to="/register"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold
+                           hover:bg-blue-700 shadow-sm hover:shadow-md transition"
+              >
+                Regjistrohu
+              </Link>
             </div>
           )}
         </div>
@@ -124,128 +192,3 @@ const Navbar = ({ onOpenAskModal }) => {
 };
 
 export default Navbar;
-
-// import { Link, useNavigate } from "react-router-dom";
-// import { useState } from "react";
-// import {
-//   FaComments,
-//   FaHome,
-//   FaQuestionCircle,
-//   FaBookmark,
-//   FaSignInAlt,
-//   FaUserPlus,
-//   FaShieldAlt,
-//   FaUserCircle,
-// } from "react-icons/fa";
-// import { useBookmarks } from "../context/BookmarkContext";
-// import { useAuth } from "../context/AuthContext";
-// import NotificationDropdown from "./NotificationDropdown";
-
-// const Navbar = ({ onOpenAskModal }) => {
-//   const { bookmarkedQuestions, bookmarkedAnswers } = useBookmarks();
-//   const { isAuthenticated, logout, user } = useAuth();
-//   const navigate = useNavigate();
-//   const [searchTerm, setSearchTerm] = useState("");
-
-//   const totalBookmarks = bookmarkedQuestions.length + bookmarkedAnswers.length;
-
-//   const handleSearchKeyDown = (e) => {
-//     if (e.key === "Enter" && searchTerm.trim()) {
-//       navigate(`/search?q=${encodeURIComponent(searchTerm.trim())}`);
-//       setSearchTerm("");
-//     }
-//   };
-
-//   const isAdmin = user?.role === 1 || 
-//                   user?.role === "Admin" || 
-//                   user?.role?.toString().toLowerCase() === "admin";
-
-//   return (
-//     <nav className="sticky top-0 z-[1000] w-full bg-white border-b border-[var(--border)] shadow-sm">
-//       <div className="max-w-[1180px] mx-auto px-4 lg:px-0 py-4 flex items-center justify-between gap-4">
-        
-//         {/* Logo */}
-//         <Link to="/" className="flex items-center gap-2 shrink-0 no-underline">
-//           <FaComments className="text-[22px] text-[var(--primary)]" />
-//           <span className="text-[22px] font-bold bg-gradient-to-r from-[var(--primary)] to-[#7c3aed] bg-clip-text text-transparent">
-//             AlbanianQuora
-//           </span>
-//         </Link>
-
-//         {/* Search */}
-//         <div className="hidden md:flex flex-1 justify-center max-w-[380px]">
-//           <input
-//             className="w-full px-[18px] py-2.5 rounded-xl border border-[var(--border)] bg-[#f9fafb] text-sm focus:outline-none"
-//             placeholder="Kërko pyetje..."
-//             value={searchTerm}
-//             onChange={(e) => setSearchTerm(e.target.value)}
-//             onKeyDown={handleSearchKeyDown}
-//           />
-//         </div>
-
-//         {/* Right side */}
-//         <div className="flex items-center gap-2 lg:gap-[12px]">
-//           <Link to="/" className="flex items-center gap-1.5 text-[12px] font-medium text-[var(--text-light)] px-3 py-2 rounded-lg hover:bg-[var(--accent)] no-underline">
-//             <FaHome className="text-[18px]" />
-//             <span className="hidden lg:inline">Ballina</span>
-//           </Link>
-
-//           <button className="flex items-center gap-1.5 text-[12px] font-medium text-[var(--text-light)] px-3 py-2 rounded-lg hover:bg-[var(--accent)]" onClick={onOpenAskModal}>
-//             <FaQuestionCircle className="text-[18px]" />
-//             <span className="hidden lg:inline">Pyet</span>
-//           </button>
-
-//           <Link to="/saved" className="relative flex items-center gap-1.5 text-[12px] font-medium text-[var(--text-light)] px-3 py-2 rounded-lg hover:bg-[var(--accent)] no-underline">
-//             <FaBookmark className="text-[18px]" />
-//             <span className="hidden lg:inline">Bookmark-et</span>
-//             {totalBookmarks > 0 && (
-//               <span className="absolute -top-1 -right-1.5 bg-[var(--primary)] text-white text-[11px] font-bold w-[18px] h-[18px] rounded-full flex items-center justify-center">
-//                 {totalBookmarks}
-//               </span>
-//             )}
-//           </Link>
-
-//           <NotificationDropdown />
-
-//           {isAuthenticated ? (
-//             <div className="flex items-center gap-2 lg:gap-[12px] ml-2 border-l pl-4 border-gray-200">
-              
-//               {isAdmin && (
-//                 <Link 
-//                   to="/admin" 
-//                   className="flex items-center gap-1.5 text-[12px] font-bold text-red-600 bg-red-50 px-3 py-2 rounded-lg hover:bg-red-600 hover:text-white no-underline border border-red-100 transition-all"
-//                 >
-//                   <FaShieldAlt />
-//                   <span className="hidden xl:inline">Admin Panel</span>
-//                 </Link>
-//               )}
-
-//               {/* PROFILE LINK */}
-//               <Link 
-//                 to="/profile" 
-//                 className="flex items-center gap-2 text-[12px] font-semibold text-[var(--text-main)] hover:text-[var(--primary)] transition-colors no-underline"
-//               >
-//                 <FaUserCircle className="text-lg" />
-//                 <span className="hidden md:inline">{user?.username}</span>
-//               </Link>
-
-//               <button
-//                 className="text-[12px] font-medium text-[var(--text-light)] px-3 py-2 rounded-lg hover:bg-red-50 hover:text-red-600 transition-colors"
-//                 onClick={logout}
-//               >
-//                 Dil
-//               </button>
-//             </div>
-//           ) : (
-//             <div className="flex items-center gap-2">
-//               <Link to="/login" className="no-underline text-[12px] font-medium text-[var(--text-light)] px-3 py-2">Kyçu</Link>
-//               <Link to="/register" className="no-underline bg-[var(--primary)] text-white px-5 py-2 rounded-[10px] font-medium text-[13px]">Regjistrohu</Link>
-//             </div>
-//           )}
-//         </div>
-//       </div>
-//     </nav>
-//   );
-// };
-
-// export default Navbar;

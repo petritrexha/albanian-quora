@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { FaFlag, FaTimes } from "react-icons/fa";
+import { FaFlag, FaTimes, FaCheck } from "react-icons/fa";
 
 const reportReasons = [
   "Përmbajtje e papërshtatshme",
@@ -17,6 +17,22 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
   const [customReason, setCustomReason] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEsc = (e) => {
+      if (e.key === "Escape") handleClose();
+    };
+
+    document.addEventListener("keydown", handleEsc);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "auto";
+    };
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
@@ -46,10 +62,7 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
     setSubmitted(true);
 
     setTimeout(() => {
-      setSubmitted(false);
-      setSelectedReason("");
-      setCustomReason("");
-      onClose();
+      handleClose();
     }, 1500);
   };
 
@@ -60,71 +73,85 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
     onClose();
   };
 
+  const disabled =
+    !selectedReason ||
+    (selectedReason === "Tjetër" && !customReason.trim()) ||
+    loading;
+
   return (
-    <div 
-      className="fixed inset-0 bg-black/60 flex items-center justify-center z-[50] backdrop-blur-sm" 
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center
+                 bg-black/40 backdrop-blur-sm px-4
+                 animate-fadeIn"
       onClick={handleClose}
     >
       <div
-        className="bg-[var(--card-bg)] w-full max-w-[480px] rounded-xl overflow-hidden shadow-2xl border border-[var(--border)]"
+        className="w-full max-w-md bg-white dark:bg-slate-900
+                   rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800
+                   animate-scaleIn"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between p-4 px-5 border-b border-[var(--border)]">
-          <div className="flex items-center gap-2">
-            <FaFlag className="text-[#ef4444]" />
-            <h2 className="m-0 text-lg font-semibold text-[var(--text-main)]">
+        {/* HEADER */}
+        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-2 text-red-500">
+            <FaFlag />
+            <h2 className="font-semibold text-slate-800 dark:text-white">
               Raporto {targetType === "Question" ? "pyetjen" : "përgjigjen"}
             </h2>
           </div>
 
           <button
-            className="border-none bg-transparent cursor-pointer p-1.5 rounded-md text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-[var(--text-main)] transition-colors"
             onClick={handleClose}
+            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
           >
             <FaTimes />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-[18px] px-5 bg-[var(--card-bg)]">
+        {/* BODY */}
+        <div className="p-5">
           {submitted ? (
             <div className="text-center py-6">
-              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-500/20 text-[#16a34a] flex items-center justify-center text-[22px]">
-                ✓
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full
+                              bg-green-100 dark:bg-green-500/20
+                              text-green-600 flex items-center justify-center text-xl">
+                <FaCheck />
               </div>
-              <p className="font-semibold text-[var(--text-main)] m-0">
-                Raporti u dërgua me sukses!
+              <p className="font-semibold text-slate-800 dark:text-white">
+                Raporti u dërgua!
               </p>
-              <p className="text-sm text-[var(--text-light)] mt-1 m-0">
+              <p className="text-sm text-slate-400 mt-1">
                 Faleminderit për kontributin tuaj.
               </p>
             </div>
           ) : (
             <>
-              <p className="text-sm text-[var(--text-light)] mb-3 m-0">
-                Zgjedh arsyen e raportimit:
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                Zgjidh arsyen e raportimit:
               </p>
 
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-3">
                 {reportReasons.map((reason) => (
                   <label
                     key={reason}
-                    className={`flex items-center gap-2.5 p-2.5 border rounded-lg cursor-pointer transition-all duration-150 ${
-                      selectedReason === reason 
-                      ? "border-[var(--primary)] bg-[var(--accent)]" 
-                      : "border-[var(--border)] hover:bg-[var(--accent)]"
-                    }`}
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all
+                      ${
+                        selectedReason === reason
+                          ? "border-red-500 bg-red-50 dark:bg-red-500/10"
+                          : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      }`}
                   >
                     <input
                       type="radio"
                       name="report-reason"
-                      className="accent-[var(--primary)]"
+                      className="accent-red-500"
                       value={reason}
                       checked={selectedReason === reason}
                       onChange={() => setSelectedReason(reason)}
                     />
-                    <span className="text-sm text-[var(--text-main)]">{reason}</span>
+                    <span className="text-sm text-slate-800 dark:text-slate-200">
+                      {reason}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -134,7 +161,12 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
                   value={customReason}
                   onChange={(e) => setCustomReason(e.target.value)}
                   placeholder="Përshkruaj arsyen..."
-                  className="w-full mt-3 p-2.5 border border-[var(--border)] bg-[var(--card-bg)] text-[var(--text-main)] rounded-lg resize-y focus:outline-none focus:border-[var(--primary)] placeholder:text-[var(--text-light)]"
+                  className="w-full mt-4 p-3 rounded-xl
+                             border border-slate-200 dark:border-slate-700
+                             bg-slate-50 dark:bg-slate-800
+                             text-sm text-slate-800 dark:text-slate-200
+                             focus:outline-none focus:ring-2 focus:ring-red-500
+                             transition"
                   rows={3}
                 />
               )}
@@ -142,24 +174,28 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
           )}
         </div>
 
-        {/* Footer */}
+        {/* FOOTER */}
         {!submitted && (
-          <div className="flex justify-end gap-2.5 p-3.5 px-5 border-t border-[var(--border)] bg-[var(--card-bg)]">
+          <div className="flex justify-end gap-3 p-5 border-t border-slate-200 dark:border-slate-800">
             <button
               onClick={handleClose}
-              className="px-3.5 py-2 rounded-md border-none bg-[var(--accent)] text-[var(--text-main)] cursor-pointer hover:opacity-80 transition-colors"
+              className="px-4 py-2 rounded-lg text-sm font-medium
+                         bg-slate-100 dark:bg-slate-800
+                         text-slate-700 dark:text-slate-300
+                         hover:bg-slate-200 dark:hover:bg-slate-700 transition"
             >
               Anulo
             </button>
 
             <button
               onClick={handleSubmit}
-              disabled={
-                !selectedReason ||
-                (selectedReason === "Tjetër" && !customReason.trim()) ||
-                loading
-              }
-              className="px-3.5 py-2 rounded-md border-none bg-[#ef4444] text-white cursor-pointer hover:bg-[#dc2626] disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+              disabled={disabled}
+              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all
+                ${
+                  disabled
+                    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                    : "bg-red-600 text-white hover:bg-red-700 active:scale-95"
+                }`}
             >
               {loading ? "Duke dërguar..." : "Dërgo raportin"}
             </button>

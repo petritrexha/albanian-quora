@@ -5,6 +5,7 @@ import {
   FaBookmark,
   FaRegBookmark,
   FaFlag,
+  FaStar
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { useBookmarks } from "../context/BookmarkContext";
@@ -15,20 +16,40 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
   const { isQuestionBookmarked, toggleQuestionBookmark } = useBookmarks();
   const [showReport, setShowReport] = useState(false);
 
-  // ✅ SINGLE SOURCE OF TRUTH
   const bookmarked = isQuestionBookmarked(question.id);
+
+  // 🔥 Highlight nëse ka shumë vota
+  const isHot = question.votes >= 10;
 
   return (
     <div
-      className="bg-[var(--card-bg)] border border-[var(--border)] rounded-[14px] p-4 flex gap-[18px] transition-shadow duration-200 ease-in hover:shadow-[0_8px_22px_rgba(0,0,0,0.06)] cursor-pointer group"
+      className={`relative flex gap-6 p-6 rounded-2xl border transition-all duration-300 cursor-pointer
+        ${
+          isHot
+            ? "bg-gradient-to-br from-orange-50 to-white dark:from-slate-800 dark:to-slate-900 border-orange-300 shadow-md"
+            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:shadow-lg hover:-translate-y-1"
+        }`}
       onClick={() =>
         navigate(`/question/${question.id}`, { state: { question } })
       }
     >
-      {/* Votes Section */}
-      <div className="flex flex-col items-center min-w-[50px] gap-1.5 text-[var(--text-light)]">
+
+      {/* 🔥 HOT Badge */}
+      {isHot && (
+        <div className="absolute top-4 right-4 text-xs font-semibold text-orange-600 flex items-center gap-1">
+          <FaStar />
+          Hot
+        </div>
+      )}
+
+      {/* Votes */}
+      <div className="flex flex-col items-center justify-center gap-2 
+                      bg-slate-50 dark:bg-slate-800 
+                      rounded-xl px-3 py-4 min-w-[60px]
+                      text-slate-500 dark:text-slate-400">
+
         <button
-          className="bg-transparent border-none cursor-pointer text-[18px] text-[var(--text-light)] transition-colors duration-150 hover:text-[#16a34a]"
+          className="text-lg hover:text-green-600 transition transform hover:scale-110"
           onClick={(e) => {
             e.stopPropagation();
             onUpvote(question.id);
@@ -37,12 +58,18 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
           <FaArrowUp />
         </button>
 
-        <span className="font-semibold text-[var(--text-main)] text-[15px]">
+        <span
+          className={`font-bold ${
+            isHot
+              ? "text-orange-600"
+              : "text-slate-800 dark:text-white"
+          }`}
+        >
           {question.votes}
         </span>
 
         <button
-          className="bg-transparent border-none cursor-pointer text-[18px] text-[var(--text-light)] transition-colors duration-150 hover:text-[#dc2626]"
+          className="text-lg hover:text-red-600 transition transform hover:scale-110"
           onClick={(e) => {
             e.stopPropagation();
             onDownvote(question.id);
@@ -52,16 +79,20 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
         </button>
       </div>
 
-      {/* Content Section */}
+      {/* Content */}
       <div className="flex-1 min-w-0">
-        <h3 className="text-[17px] mb-1.5 leading-[1.3] font-bold group-hover:underline">
+
+        <h3 className="text-lg font-semibold mb-2 
+                       text-slate-800 dark:text-white
+                       transition group-hover:text-blue-600">
           {question.title}
         </h3>
-        <p className="text-[14px] text-[var(--text-light)] mb-2.5 leading-[1.4] line-clamp-3">
+
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-3">
           {question.content || question.description}
         </p>
 
-        <div className="flex items-center gap-2 text-[13px] text-[var(--text-light)]">
+        <div className="flex items-center gap-3 text-xs text-slate-400">
           <span>{question.views} shikime</span>
           <span>•</span>
           <span>{question.answerCount || 0} përgjigje</span>
@@ -69,19 +100,18 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
       </div>
 
       {/* Actions */}
-      <div className="flex flex-col gap-2.5">
+      <div className="flex flex-col gap-3 items-center">
+
         <button
           onClick={(e) => {
             e.stopPropagation();
             toggleQuestionBookmark(question);
           }}
-          className={`bg-transparent border-none cursor-pointer p-1.5 rounded-lg transition-all duration-150 
-            ${
-              bookmarked
-                ? "text-[var(--primary)]"
-                : "text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-[var(--primary)]"
-            }`}
-          title={bookmarked ? "Hiq nga bookmark" : "Shto në bookmark"}
+          className={`p-2 rounded-lg transition-all duration-200 transform hover:scale-110 ${
+            bookmarked
+              ? "text-blue-600"
+              : "text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-blue-600"
+          }`}
         >
           {bookmarked ? <FaBookmark /> : <FaRegBookmark />}
         </button>
@@ -91,8 +121,7 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
             e.stopPropagation();
             setShowReport(true);
           }}
-          className="bg-transparent border-none cursor-pointer p-1.5 rounded-lg text-[var(--text-light)] transition-all duration-150 hover:bg-[var(--accent)] hover:text-[var(--primary)]"
-          title="Raporto pyetjen"
+          className="p-2 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition transform hover:scale-110"
         >
           <FaFlag />
         </button>
@@ -109,5 +138,3 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
 };
 
 export default QuestionCard;
-
-

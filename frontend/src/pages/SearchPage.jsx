@@ -47,31 +47,44 @@ const SearchPage = () => {
     setResults(filtered);
   }, [questions, searchTerm]);
 
-  return (
-    <div className="w-full max-w-[900px]">
-      <div className="flex flex-col gap-4">
-        <h2 className="text-xl font-semibold text-[var(--text-main)] mb-2">
-          Rezultatet e kërkimit për: <span className="text-[var(--primary)]">"{searchTerm}"</span>
+ return (
+  <div className="w-full max-w-[900px] mx-auto px-4 py-6">
+    <div className="flex flex-col gap-4">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] px-6 py-5 shadow-sm">
+        <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-main)]">
+          Rezultatet për{" "}
+          <span className="text-[var(--primary)] font-bold">
+            {searchTerm ? `"${searchTerm}"` : "…"}
+          </span>
         </h2>
-
-        {searchTerm && results.length > 0 ? (
-          <div className="flex flex-col gap-4">
-            {results.map((question) => (
-              <QuestionCard key={question.id} question={question} />
-            ))}
-          </div>
-        ) : (
-          <div className="bg-[var(--card-bg)] p-10 rounded-xl border border-dashed border-[var(--border)] text-center">
-            <p className="text-[var(--text-light)] italic">
-              {searchTerm
-                ? "Nuk u gjet asnjë pyetje."
-                : "Shkruaj diçka për të kërkuar."}
-            </p>
-          </div>
-        )}
+        <p className="mt-1 text-sm text-[var(--text-muted)]">
+          {searchTerm
+            ? `U gjetën ${results.length} rezultate.`
+            : "Shkruaj diçka në search për të parë rezultatet."}
+        </p>
       </div>
+
+      {searchTerm && results.length > 0 ? (
+        <div className="flex flex-col gap-4">
+          {results.map((question) => (
+            <div
+              key={question.id}
+              className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-sm"
+            >
+              <QuestionCard question={question} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--card-bg)] p-10 text-center">
+          <p className="text-sm text-[var(--text-muted)]">
+            {searchTerm ? "Nuk u gjet asnjë pyetje." : "Shkruaj diçka për të kërkuar."}
+          </p>
+        </div>
+      )}
     </div>
-  );
+  </div>
+);
 };
 
 export default SearchPage;
