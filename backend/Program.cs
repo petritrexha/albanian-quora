@@ -130,6 +130,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
+app.MapGet("/health", () => Results.Ok("Healthy"));
+
 // Seed admin user
 using (var scope = app.Services.CreateScope())
 {
