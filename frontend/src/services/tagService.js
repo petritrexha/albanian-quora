@@ -10,3 +10,16 @@ export const getTags = async (categoryId) => {
     return [];
   }
 };
+
+export const createTag = async (name, categoryId = null) => {
+  try {
+    const res = await api.post("/api/tags", {
+      name: name.trim(),
+      categoryId: categoryId ? Number(categoryId) : null
+    });
+    return res.data;
+  } catch (error) {
+    console.error("Failed to create tag", error);
+    throw error;
+  }
+};

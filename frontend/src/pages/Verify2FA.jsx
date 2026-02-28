@@ -81,15 +81,15 @@ export default function Verify2FA() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white rounded-xl shadow p-6">
-        <h1 className="text-xl font-semibold mb-2">Verify code</h1>
-        <p className="text-sm text-slate-600 mb-6">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-slate-100 via-white to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-blue-950 transition-colors duration-300">
+      <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-xl shadow-lg dark:shadow-slate-900/50 border border-slate-200 dark:border-slate-700 p-6">
+        <h1 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">Verify code</h1>
+        <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">
           We sent a 6-digit code to your email. It expires in 5 minutes.
         </p>
 
         {error && (
-          <div className="mb-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded p-3">
+          <div className="mb-4 text-sm text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-500/20 border border-red-200 dark:border-red-800/40 rounded p-3">
             {error}
           </div>
         )}
@@ -100,7 +100,7 @@ export default function Verify2FA() {
             onChange={(e) =>
               setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
             }
-            className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring"
+            className="w-full border border-gray-200 dark:border-slate-600 rounded-lg px-3 py-2 bg-white dark:bg-slate-700 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             placeholder="Enter 6-digit code"
             inputMode="numeric"
             autoFocus
@@ -108,7 +108,7 @@ export default function Verify2FA() {
 
           <button
             disabled={!canSubmit || loading}
-            className="w-full rounded-lg py-2 font-medium bg-slate-900 text-white disabled:opacity-60"
+            className="w-full rounded-lg py-2 font-medium bg-slate-900 dark:bg-blue-600 text-white hover:bg-slate-800 dark:hover:bg-blue-700 disabled:opacity-60 transition-colors"
           >
             {loading ? "Verifying..." : "Verify"}
           </button>
@@ -118,7 +118,7 @@ export default function Verify2FA() {
           <button
             onClick={onResend}
             disabled={resendLoading || cooldown > 0}
-            className="text-sm font-medium text-slate-900 disabled:opacity-60"
+            className="text-sm font-medium text-slate-900 dark:text-slate-200 hover:text-blue-600 dark:hover:text-blue-400 disabled:opacity-60 transition-colors"
             type="button"
           >
             {cooldown > 0
@@ -133,7 +133,7 @@ export default function Verify2FA() {
               localStorage.removeItem("loginAttemptId");
               navigate("/login");
             }}
-            className="text-sm text-slate-600"
+            className="text-sm text-slate-600 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition-colors"
             type="button"
           >
             Back to login

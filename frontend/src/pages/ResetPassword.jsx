@@ -67,24 +67,24 @@ export default function ResetPassword() {
   };
 
   return (
-  <div className="min-h-screen bg-[var(--bg-light)] flex items-center justify-center p-4 font-sans transition-colors">
-    <div className="w-full max-w-[420px] rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] p-8 shadow-lg">
-      <h2 className="text-center text-2xl font-bold text-[var(--text-main)]">
+  <div className="min-h-screen bg-gradient-to-br from-slate-100 via-white to-blue-100 dark:from-slate-900 dark:via-slate-800 dark:to-blue-950 flex items-center justify-center p-4 font-sans transition-colors duration-300">
+    <div className="w-full max-w-[420px] rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-8 shadow-lg">
+      <h2 className="text-center text-2xl font-bold text-gray-800 dark:text-white">
         Reset Password
       </h2>
-      <p className="mt-2 text-center text-sm text-[var(--text-muted)]">
+      <p className="mt-2 text-center text-sm text-slate-600 dark:text-slate-400">
         Create a new password for your account.
       </p>
 
       {(error || message) && (
         <div className="mt-5 space-y-3">
           {error && (
-            <div className="rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-600">
+            <div className="rounded-lg border border-red-500/30 dark:border-red-800/40 bg-red-500/10 dark:bg-red-500/20 px-3 py-2 text-sm text-red-600 dark:text-red-400">
               {error}
             </div>
           )}
           {message && (
-            <div className="rounded-lg border border-green-500/30 bg-green-500/10 px-3 py-2 text-sm text-green-700">
+            <div className="rounded-lg border border-green-500/30 dark:border-green-800/40 bg-green-500/10 dark:bg-green-500/20 px-3 py-2 text-sm text-green-700 dark:text-green-400">
               {message}
             </div>
           )}
@@ -93,14 +93,14 @@ export default function ResetPassword() {
 
       <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[var(--text-main)]">
+          <label className="text-sm font-medium text-gray-800 dark:text-gray-200">
             New Password
           </label>
           <input
             type="password"
-            className="w-full rounded-lg border border-[var(--border)] bg-[var(--accent)] px-3 py-2.5 text-[var(--text-main)]
-                       placeholder:text-[var(--text-muted)] outline-none transition
-                       focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-3 py-2.5 text-gray-800 dark:text-white
+                       placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition
+                       focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="new-password"
@@ -109,14 +109,14 @@ export default function ResetPassword() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-[var(--text-main)]">
+          <label className="text-sm font-medium text-gray-800 dark:text-gray-200">
             Confirm Password
           </label>
           <input
             type="password"
-            className="w-full rounded-lg border border-[var(--border)] bg-[var(--accent)] px-3 py-2.5 text-[var(--text-main)]
-                       placeholder:text-[var(--text-muted)] outline-none transition
-                       focus:border-[var(--primary)] focus:ring-2 focus:ring-[var(--primary)]/20"
+            className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-3 py-2.5 text-gray-800 dark:text-white
+                       placeholder:text-slate-400 dark:placeholder:text-slate-500 outline-none transition
+                       focus:border-blue-500 dark:focus:border-blue-400 focus:ring-2 focus:ring-blue-500/20 dark:focus:ring-blue-400/20"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             autoComplete="new-password"
@@ -125,7 +125,7 @@ export default function ResetPassword() {
         </div>
 
         <button
-          className="w-full rounded-lg bg-[var(--primary)] py-3 font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+          className="w-full rounded-lg bg-blue-600 dark:bg-blue-600 py-3 font-bold text-white transition hover:bg-blue-700 dark:hover:bg-blue-700 disabled:opacity-50"
           type="submit"
           disabled={loading}
         >

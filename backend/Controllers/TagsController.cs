@@ -37,7 +37,7 @@ public class TagsController : ControllerBase
         return Ok(tags);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     [HttpPost]
     public IActionResult Create([FromBody] CreateTagDto dto)
     {

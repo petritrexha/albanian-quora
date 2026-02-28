@@ -15,7 +15,6 @@ namespace AlbanianQuora.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Microsoft.AspNetCore.Authorization.Authorize]
     public class QuestionsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -39,6 +38,7 @@ namespace AlbanianQuora.Api.Controllers
                 .Include(q => q.AnswersList)
                 .Include(q => q.QuestionTags)
                     .ThenInclude(qt => qt.Tag)
+                .Include(q => q.User)
                 .AsQueryable();
 
             if (categoryId.HasValue)
@@ -82,7 +82,8 @@ namespace AlbanianQuora.Api.Controllers
                 Category = q.Category != null ? q.Category.Name : null,
                 Tags = q.QuestionTags.Select(qt => qt.Tag.Name).ToList(),
                 IsBookmarked = bookmarkMap.ContainsKey(q.Id),
-                BookmarkId = bookmarkMap.ContainsKey(q.Id) ? (int?)bookmarkMap[q.Id] : null
+                BookmarkId = bookmarkMap.ContainsKey(q.Id) ? (int?)bookmarkMap[q.Id] : null,
+                Username = q.User != null ? q.User.Username : null
             });
 
             return Ok(result);
@@ -95,6 +96,7 @@ namespace AlbanianQuora.Api.Controllers
                 .Include(q => q.Category)
                 .Include(q => q.QuestionTags)
                     .ThenInclude(qt => qt.Tag)
+                .Include(q => q.User)
                 .FirstOrDefaultAsync(q => q.Id == id);
 
             if (question == null) return NotFound();
@@ -128,12 +130,14 @@ namespace AlbanianQuora.Api.Controllers
                 Category = question.Category != null ? question.Category.Name : null,
                 Tags = question.QuestionTags.Select(qt => qt.Tag.Name).ToList(),
                 IsBookmarked = isBookmarked,
-                BookmarkId = bookmarkId
+                BookmarkId = bookmarkId,
+                Username = question.User != null ? question.User.Username : null
             };
 
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost("{id}/upvote")]
         public async Task<IActionResult> Upvote(int id)
         {
@@ -144,6 +148,7 @@ namespace AlbanianQuora.Api.Controllers
             return Ok(question.Votes);
         }
 
+        [Authorize]
         [HttpPost("{id}/downvote")]
         public async Task<IActionResult> Downvote(int id)
         {

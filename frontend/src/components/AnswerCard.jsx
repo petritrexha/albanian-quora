@@ -7,10 +7,14 @@ import {
   FaFlag,
   FaStar
 } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { useBookmarks } from "../context/BookmarkContext";
+import { useAuth } from "../context/AuthContext";
 import ReportModal from "./ReportModal";
 
 const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { isAnswerBookmarked, toggleAnswerBookmark } = useBookmarks();
   const [showReport, setShowReport] = useState(false);
 
@@ -46,7 +50,12 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
                       text-slate-500 dark:text-slate-400">
 
         <button
-          className="text-lg hover:text-green-600 transition transform hover:scale-110"
+          disabled={!user}
+          className={`text-lg transition transform ${
+            !user
+              ? "opacity-40 cursor-not-allowed"
+              : "hover:text-green-600 hover:scale-110"
+          }`}
           onClick={() => onUpvote(answer.id)}
         >
           <FaArrowUp />
@@ -63,7 +72,12 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
         </span>
 
         <button
-          className="text-lg hover:text-red-600 transition transform hover:scale-110"
+          disabled={!user}
+          className={`text-lg transition transform ${
+            !user
+              ? "opacity-40 cursor-not-allowed"
+              : "hover:text-red-600 hover:scale-110"
+          }`}
           onClick={() => onDownvote(answer.id)}
         >
           <FaArrowDown />
@@ -108,7 +122,13 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
       <div className="flex flex-col gap-3 items-center">
 
         <button
-          onClick={() => toggleAnswerBookmark(answer, questionTitle)}
+          onClick={() => {
+            if (!user) {
+              navigate("/login");
+              return;
+            }
+            toggleAnswerBookmark(answer, questionTitle);
+          }}
           className={`p-2 rounded-lg transition-all duration-200 transform hover:scale-110 ${
             bookmarked
               ? "text-blue-600"
@@ -119,7 +139,13 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
         </button>
 
         <button
-          onClick={() => setShowReport(true)}
+          onClick={() => {
+            if (!user) {
+              navigate("/login");
+              return;
+            }
+            setShowReport(true);
+          }}
           className="p-2 rounded-lg text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition transform hover:scale-110"
         >
           <FaFlag />
