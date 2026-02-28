@@ -5,94 +5,125 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [hydrating, setHydrating] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const isAuthenticated = !!user;
-  const isAdmin = user?.role === "admin";
+  const isAdmin = (user?.role || "").toLowerCase() === "admin";
 
-  // hydrate user on refresh (if token exists)
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    if (!token) {
-      // Development helper: allow auto-login if DEV_AUTO_LOGIN=1 and devUser is set in localStorage
-      const devAuto = localStorage.getItem("DEV_AUTO_LOGIN");
-      if (devAuto === "1") {
-        try {
-          const dev = JSON.parse(localStorage.getItem("devUser") || "null");
-          if (dev) {
-            setUser(dev);
-            setHydrating(false);
-            return;
-          }
-        } catch { }
-      }
 
-      setHydrating(false);
+    if (!token) {
+      setLoading(false);
       return;
     }
 
     (async () => {
       try {
-        const u = await auth.me();
-        setUser(u);
+        const currentUser = await auth.me();
+        setUser(currentUser);
+        localStorage.setItem("userId", currentUser.id);
       } catch {
         localStorage.removeItem("accessToken");
+        localStorage.removeItem("userId");
+        localStorage.removeItem("user");
         setUser(null);
       } finally {
-        setHydrating(false);
+        setLoading(false);
       }
     })();
   }, []);
 
+  //Login
   const login = async ({ identifier, password }) => {
-    const data = await auth.login({ identifier, password });
-
-    if (data?.accessToken) {
-      localStorage.setItem("accessToken", data.accessToken);
-    }
-    if (data?.user) {
-      setUser(data.user);
-    }
-
-    return data?.user;
+    return await auth.login({ identifier, password });
   };
 
-  const register = async ({ name, username, email, password }) => {
-    const data = await auth.register({ name, username, email, password });
+//Verify 2fa
+  const verify2fa = async ({ loginAttemptId, code }) => {
+    const data = await auth.verify2fa({ loginAttemptId, code });
 
-    if (data?.accessToken && data?.user) {
-      localStorage.setItem("accessToken", data.accessToken);
-      setUser(data.user);
+    const token = data?.accessToken || data?.AccessToken;
+    const userData = data?.user || data?.User;
+
+    if (token) localStorage.setItem("accessToken", token);
+
+    if (userData) {
+      setUser(userData);
+      localStorage.setItem("userId", userData.id);
+      localStorage.setItem("user", JSON.stringify(userData));
+    }
+
+    localStorage.removeItem("loginAttemptId");
+
+    return data;
+  };
+
+  // Resend 2FA
+  const resend2fa = async ({ loginAttemptId }) => {
+    return await auth.resend2fa({ loginAttemptId });
+  };
+
+  // Register
+  const register = async ({ name, username, email, password, confirmPassword }) => {
+    const data = await auth.register({
+      name,
+      username,
+      email,
+      password,
+      confirmPassword,
+    });
+
+    const token = data?.accessToken || data?.AccessToken;
+    const userData = data?.user || data?.User;
+
+    if (token && userData) {
+      localStorage.setItem("accessToken", token);
+      localStorage.setItem("userId", userData.id);
+      localStorage.setItem("user", JSON.stringify(userData));
+      setUser(userData);
       return { autoLoggedIn: true };
     }
 
     return { autoLoggedIn: false };
   };
 
+  // Logout
   const logout = async () => {
-    await auth.logout();
+    try {
+      await auth.logout();
+    } catch {
+      // ignore
+    }
+
     localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("user");
+    localStorage.removeItem("loginAttemptId");
     setUser(null);
   };
 
   const value = useMemo(
     () => ({
       user,
-      hydrating,
+      setUser,
+      loading,
       isAuthenticated,
       isAdmin,
       login,
+      verify2fa,
+      resend2fa,
       register,
       logout,
     }),
-    [user, hydrating, isAuthenticated, isAdmin]
+    [user, loading, isAuthenticated, isAdmin]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used within AuthProvider");
-  return ctx;
+  const context = useContext(AuthContext);
+  if (!context) throw new Error("useAuth must be used within AuthProvider");
+  return context;
 }

@@ -1,7 +1,8 @@
-﻿using AlbanianQuora.Api.Data;
+using AlbanianQuora.Api.Data;
+using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace AlbanianQuora.Api.Controllers;
 
@@ -22,9 +23,7 @@ public class TagsController : ControllerBase
         var query = _context.Tags.AsQueryable();
 
         if (categoryId.HasValue)
-        {
             query = query.Where(t => t.CategoryId == categoryId.Value);
-        }
 
         var tags = query
             .Select(t => new
@@ -38,13 +37,26 @@ public class TagsController : ControllerBase
         return Ok(tags);
     }
 
-
+    [Authorize]
     [HttpPost]
-    public IActionResult Create(Tag tag)
+    public IActionResult Create([FromBody] CreateTagDto dto)
     {
+        if (string.IsNullOrWhiteSpace(dto.Name))
+            return BadRequest("Name is required.");
+
+        var tag = new Tag
+        {
+            Name = dto.Name.Trim(),
+            CategoryId = dto.CategoryId
+        };
         _context.Tags.Add(tag);
         _context.SaveChanges();
 
-        return Ok(tag);
+        return CreatedAtAction(nameof(GetAll), new { id = tag.Id }, new
+        {
+            id = tag.Id,
+            name = tag.Name,
+            categoryId = tag.CategoryId
+        });
     }
 }

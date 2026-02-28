@@ -1,174 +1,210 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import { FaFlag, FaTimes } from "react-icons/fa";
+import { FaFlag, FaTimes, FaCheck } from "react-icons/fa";
 
 const reportReasons = [
-    "Përmbajtje e papërshtatshme",
-    "Spam ose reklamë",
-    "Informacion i rremë",
-    "Gjuhë ofenduese",
-    "Tjetër",
+  "Përmbajtje e papërshtatshme",
+  "Spam ose reklamë",
+  "Informacion i rremë",
+  "Gjuhë ofenduese",
+  "Tjetër",
 ];
 
 const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
-    const [selectedReason, setSelectedReason] = useState("");
-    const [customReason, setCustomReason] = useState("");
-    const [submitted, setSubmitted] = useState(false);
-    const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  const [selectedReason, setSelectedReason] = useState("");
+  const [customReason, setCustomReason] = useState("");
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-    if (!isOpen) return null;
+  useEffect(() => {
+    if (!isOpen) return;
 
-    const { user } = useAuth();
-
-    const handleSubmit = async () => {
-        const reason =
-            selectedReason === "Tjetër" ? customReason : selectedReason;
-        if (!reason.trim()) return;
-
-        setLoading(true);
-
-        // In production this would call the backend API:
-        // POST /api/reports { reporterId, targetType, targetId, reason }
-        try {
-            const reporterId = user?.id || Number(localStorage.getItem("userId")) || 1;
-            await api.post("/api/reports", {
-                reporterId,
-                targetType,
-                targetId,
-                reason,
-            });
-        } catch (e) {
-            console.error("Failed to submit report", e);
-        }
-
-        setLoading(false);
-        setSubmitted(true);
-
-        setTimeout(() => {
-            setSubmitted(false);
-            setSelectedReason("");
-            setCustomReason("");
-            onClose();
-        }, 1500);
+    const handleEsc = (e) => {
+      if (e.key === "Escape") handleClose();
     };
 
-    const handleClose = () => {
-        setSelectedReason("");
-        setCustomReason("");
-        setSubmitted(false);
-        onClose();
+    document.addEventListener("keydown", handleEsc);
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.removeEventListener("keydown", handleEsc);
+      document.body.style.overflow = "auto";
     };
+  }, [isOpen]);
 
-    return (
-        <>
-            {/* Backdrop */}
-            <div
-                className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center"
-                onClick={handleClose}
-            >
-                {/* Modal */}
-                <div
-                    className="bg-white rounded-xl w-full max-w-md mx-4 shadow-xl overflow-hidden"
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    {/* Header */}
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-                        <div className="flex items-center gap-2">
-                            <FaFlag className="text-red-500" />
-                            <h2 className="font-semibold text-text-main">
-                                Raporto {targetType === "Question" ? "pyetjen" : "përgjigjen"}
-                            </h2>
-                        </div>
-                        <button
-                            onClick={handleClose}
-                            className="p-1.5 rounded-lg text-text-light hover:text-text-main hover:bg-gray-100 transition-colors"
-                        >
-                            <FaTimes />
-                        </button>
-                    </div>
+  if (!isOpen) return null;
 
-                    {/* Body */}
-                    <div className="px-6 py-4">
-                        {submitted ? (
-                            <div className="text-center py-6">
-                                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-100 flex items-center justify-center">
-                                    <span className="text-green-600 text-xl">✓</span>
-                                </div>
-                                <p className="font-medium text-text-main">
-                                    Raporti u dërgua me sukses!
-                                </p>
-                                <p className="text-sm text-text-light mt-1">
-                                    Faleminderit për kontributin tuaj.
-                                </p>
-                            </div>
-                        ) : (
-                            <>
-                                <p className="text-sm text-text-light mb-4">
-                                    Zgjedh arsyen e raportimit:
-                                </p>
+  const handleSubmit = async () => {
+    const reason =
+      selectedReason === "Tjetër" ? customReason : selectedReason;
 
-                                <div className="flex flex-col gap-2">
-                                    {reportReasons.map((reason) => (
-                                        <label
-                                            key={reason}
-                                            className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all duration-150 ${selectedReason === reason
-                                                    ? "border-primary bg-accent"
-                                                    : "border-border hover:border-gray-300"
-                                                }`}
-                                        >
-                                            <input
-                                                type="radio"
-                                                name="report-reason"
-                                                value={reason}
-                                                checked={selectedReason === reason}
-                                                onChange={() => setSelectedReason(reason)}
-                                                className="accent-primary"
-                                            />
-                                            <span className="text-sm text-text-main">{reason}</span>
-                                        </label>
-                                    ))}
-                                </div>
+    if (!reason.trim()) return;
 
-                                {selectedReason === "Tjetër" && (
-                                    <textarea
-                                        value={customReason}
-                                        onChange={(e) => setCustomReason(e.target.value)}
-                                        placeholder="Përshkruaj arsyen..."
-                                        className="w-full mt-3 p-3 border border-border rounded-lg text-sm resize-none focus:outline-none focus:border-primary"
-                                        rows={3}
-                                    />
-                                )}
-                            </>
-                        )}
-                    </div>
+    setLoading(true);
 
-                    {/* Footer */}
-                    {!submitted && (
-                        <div className="flex justify-end gap-3 px-6 py-4 border-t border-border">
-                            <button
-                                onClick={handleClose}
-                                className="px-4 py-2 text-sm text-text-light hover:text-text-main rounded-lg hover:bg-gray-100 transition-colors"
-                            >
-                                Anulo
-                            </button>
-                            <button
-                                onClick={handleSubmit}
-                                disabled={
-                                    !selectedReason ||
-                                    (selectedReason === "Tjetër" && !customReason.trim()) ||
-                                    loading
-                                }
-                                className="px-4 py-2 text-sm text-white bg-red-500 rounded-lg hover:bg-red-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {loading ? "Duke dërguar..." : "Dërgo raportin"}
-                            </button>
-                        </div>
-                    )}
-                </div>
+    try {
+      const reporterId =
+        user?.id || Number(localStorage.getItem("userId")) || 1;
+
+      await api.post("/api/reports", {
+        reporterId,
+        targetType,
+        targetId,
+        reason,
+      });
+    } catch (error) {
+      console.error("Failed to submit report", error);
+    }
+
+    setLoading(false);
+    setSubmitted(true);
+
+    setTimeout(() => {
+      handleClose();
+    }, 1500);
+  };
+
+  const handleClose = () => {
+    setSelectedReason("");
+    setCustomReason("");
+    setSubmitted(false);
+    onClose();
+  };
+
+  const disabled =
+    !selectedReason ||
+    (selectedReason === "Tjetër" && !customReason.trim()) ||
+    loading;
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center
+                 bg-black/40 backdrop-blur-sm px-4"
+      onClick={handleClose}
+    >
+      <div
+        className="w-full max-w-md bg-white dark:bg-slate-900
+                   rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800
+                   animate-scaleIn"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* HEADER */}
+        <div className="flex items-center justify-between p-5 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex items-center gap-2 text-red-500">
+            <FaFlag />
+            <h2 className="font-semibold text-slate-800 dark:text-white">
+              Raporto {targetType === "Question" ? "pyetjen" : "përgjigjen"}
+            </h2>
+          </div>
+
+          <button
+            onClick={handleClose}
+            className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
+          >
+            <FaTimes />
+          </button>
+        </div>
+
+        {/* BODY */}
+        <div className="p-5">
+          {submitted ? (
+            <div className="text-center py-6">
+              <div className="w-14 h-14 mx-auto mb-4 rounded-full
+                              bg-green-100 dark:bg-green-500/20
+                              text-green-600 flex items-center justify-center text-xl">
+                <FaCheck />
+              </div>
+              <p className="font-semibold text-slate-800 dark:text-white">
+                Raporti u dërgua!
+              </p>
+              <p className="text-sm text-slate-400 mt-1">
+                Faleminderit për kontributin tuaj.
+              </p>
             </div>
-        </>
-    );
+          ) : (
+            <>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                Zgjidh arsyen e raportimit:
+              </p>
+
+              <div className="flex flex-col gap-3">
+                {reportReasons.map((reason) => (
+                  <label
+                    key={reason}
+                    className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all
+                      ${
+                        selectedReason === reason
+                          ? "border-red-500 bg-red-50 dark:bg-red-500/10"
+                          : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      }`}
+                  >
+                    <input
+                      type="radio"
+                      name="report-reason"
+                      className="accent-red-500"
+                      value={reason}
+                      checked={selectedReason === reason}
+                      onChange={() => setSelectedReason(reason)}
+                    />
+                    <span className="text-sm text-slate-800 dark:text-slate-200">
+                      {reason}
+                    </span>
+                  </label>
+                ))}
+              </div>
+
+              {selectedReason === "Tjetër" && (
+                <textarea
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  placeholder="Përshkruaj arsyen..."
+                  className="w-full mt-4 p-3 rounded-xl
+                             border border-slate-200 dark:border-slate-700
+                             bg-slate-50 dark:bg-slate-800
+                             text-sm text-slate-800 dark:text-slate-200
+                             focus:outline-none focus:ring-2 focus:ring-red-500
+                             transition"
+                  rows={3}
+                />
+              )}
+            </>
+          )}
+        </div>
+
+        {/* FOOTER */}
+        {!submitted && (
+          <div className="flex justify-end gap-3 p-5 border-t border-slate-200 dark:border-slate-800">
+            <button
+              onClick={handleClose}
+              className="px-4 py-2 rounded-lg text-sm font-medium
+                         bg-slate-100 dark:bg-slate-800
+                         text-slate-700 dark:text-slate-300
+                         hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+            >
+              Anulo
+            </button>
+
+            <button
+              onClick={handleSubmit}
+              disabled={disabled}
+              className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all
+                ${
+                  disabled
+                    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                    : "bg-red-600 text-white hover:bg-red-700 active:scale-95"
+                }`}
+            >
+              {loading ? "Duke dërguar..." : "Dërgo raportin"}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>,
+    document.body
+  );
 };
 
 export default ReportModal;
