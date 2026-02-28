@@ -19,9 +19,11 @@ const Sidebar = () => {
   const location = useLocation();
 
   return (
-    <aside className="bg-[var(--card-bg)] border border-[var(--border)] rounded-2xl p-5 sticky top-[90px] h-fit shadow-sm transition-colors duration-300">
+    <aside className="rounded-2xl p-5 sticky top-[90px] h-fit shadow-sm transition-all duration-300
+                      bg-white border border-slate-200
+                      dark:bg-gradient-to-b dark:from-slate-800 dark:to-slate-800/90 dark:border-slate-700/50 dark:shadow-lg dark:shadow-slate-900/20">
       
-      <h3 className="mb-5 text-sm uppercase tracking-wider font-bold text-[var(--text-light)]">
+      <h3 className="mb-5 text-sm uppercase tracking-wider font-bold text-slate-500 dark:text-slate-400">
         Kategoritë
       </h3>
 
@@ -36,8 +38,8 @@ const Sidebar = () => {
                 className={`flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 no-underline
                 ${
                   isActive
-                    ? "bg-[var(--accent)] text-[var(--primary)] shadow-sm"
-                    : "text-[var(--text-light)] hover:bg-[var(--accent)] hover:text-[var(--primary)]"
+                    ? "bg-blue-50 text-blue-600 shadow-sm dark:bg-blue-500/20 dark:text-blue-400"
+                    : "text-slate-600 hover:bg-slate-100 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-700/50 dark:hover:text-blue-400"
                 }`}
               >
                 <span
@@ -51,7 +53,7 @@ const Sidebar = () => {
                 <span className="flex-1">{cat.name}</span>
 
                 {isActive && (
-                  <span className="w-1.5 h-6 bg-[var(--primary)] rounded-full" />
+                  <span className="w-1.5 h-6 bg-blue-500 dark:bg-blue-400 rounded-full" />
                 )}
               </Link>
             </li>

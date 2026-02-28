@@ -3,7 +3,6 @@ import { useState } from "react";
 import {
   FaComments,
   FaHome,
-  FaQuestionCircle,
   FaBookmark,
   FaShieldAlt,
   FaUserCircle,
@@ -79,17 +78,6 @@ const Navbar = ({ onOpenAskModal }) => {
           >
             <FaHome />
           </Link>
-
-          {/* Ask */}
-          <button
-            onClick={onOpenAskModal}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold
-                       bg-blue-600 text-white hover:bg-blue-700
-                       shadow-sm hover:shadow-md transition-all"
-          >
-            <FaQuestionCircle />
-            <span className="hidden lg:inline">Pyet</span>
-          </button>
 
           {/* DARK MODE TOGGLE WITH ANIMATION */}
           <button
