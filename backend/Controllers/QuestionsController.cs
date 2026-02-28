@@ -137,6 +137,7 @@ namespace AlbanianQuora.Api.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost("{id}/upvote")]
         public async Task<IActionResult> Upvote(int id)
         {
@@ -147,6 +148,7 @@ namespace AlbanianQuora.Api.Controllers
             return Ok(question.Votes);
         }
 
+        [Authorize]
         [HttpPost("{id}/downvote")]
         public async Task<IActionResult> Downvote(int id)
         {

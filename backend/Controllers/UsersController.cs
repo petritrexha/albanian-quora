@@ -62,11 +62,15 @@ namespace AlbanianQuora.Api.Controllers
         public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto dto)
         {
             // Only owner or admin can update
-            var sub = User.FindFirst(System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.Sub)?.Value;
+            var sub =
+                User.FindFirstValue(JwtRegisteredClaimNames.Sub) ??
+                User.FindFirstValue(ClaimTypes.NameIdentifier) ??
+                User.FindFirstValue("id");
+
             if (string.IsNullOrWhiteSpace(sub) || !int.TryParse(sub, out var currentUserId))
                 return Unauthorized();
 
-            if (currentUserId != id && !User.IsInRole("Admin"))
+            if (currentUserId != id)
                 return Forbid();
 
             var ok = await _users.UpdateProfileAsync(id, dto);
