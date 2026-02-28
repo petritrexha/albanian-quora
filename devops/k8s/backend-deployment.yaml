@@ -17,3 +17,9 @@ spec:
         image: albanianquoraacr.azurecr.io/albanianquora-backend:v3
         ports:
         - containerPort: 8080
+        env:
+        - name: ConnectionStrings__DefaultConnection
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: ConnectionStrings__DefaultConnection
