@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { FaBell, FaBookmark, FaFlag, FaInfoCircle } from "react-icons/fa";
+import { useAuth } from "../context/AuthContext";
 
 const mockNotifications = [
   {
     id: 1,
     type: "bookmark",
     message: "Pyetja jote u ruajt me sukses.",
-    isRead: false,
+    isRead: true,
     createdAt: "2 min më parë",
   },
   {
@@ -25,8 +26,12 @@ const typeIcons = {
 };
 
 const NotificationDropdown = () => {
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState(mockNotifications);
+
+  // Don't render if user is not logged in
+  if (!user) return null;
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 

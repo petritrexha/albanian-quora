@@ -71,7 +71,11 @@ export default function App() {
                 {/* Main App Routes with Layout */}
                 <Route path="/" element={
                   <Layout onOpenAskModal={() => setShowAskModal(true)} onCategorySelect={setSelectedCategory}>
-                    <Home selectedCategory={selectedCategory} refreshTrigger={refreshHome} />
+                    <Home 
+                      selectedCategory={selectedCategory} 
+                      refreshTrigger={refreshHome}
+                      onOpenAskModal={() => setShowAskModal(true)}
+                    />
                   </Layout>
                 } />
 
@@ -82,14 +86,19 @@ export default function App() {
                 } />
 
                 <Route path="/saved" element={
-                  <Layout onOpenAskModal={() => setShowAskModal(true)}>
-                    <Bookmarks />
-                  </Layout>
+                  <RequireAuth>
+                    <Layout onOpenAskModal={() => setShowAskModal(true)}>
+                      <Bookmarks />
+                    </Layout>
+                  </RequireAuth>
                 } />
 
                 <Route path="/category/:id" element={
                   <Layout onOpenAskModal={() => setShowAskModal(true)}>
-                    <CategoryPage />
+                    <CategoryPage 
+                      onOpenAskModal={() => setShowAskModal(true)}
+                      onSetCategory={setSelectedCategory}
+                    />
                   </Layout>
                 } />
 
@@ -135,6 +144,7 @@ export default function App() {
                       setSelectedTagIds={setSelectedTagIds}
                       handlePostQuestion={handlePostQuestion}
                       onClose={() => { setShowAskModal(false); setSelectedTagIds([]); }}
+                      categoryId={selectedCategory}
                     />
                   </div>
                 </div>

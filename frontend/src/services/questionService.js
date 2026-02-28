@@ -34,8 +34,8 @@ export const createQuestion = async (payload) => {
   const res = await api.post("/api/questions", {
     title: payload.title,
     content: payload.description || "",
-    categoryId: payload.categoryId || 1,
-    tagIds: payload.tagIds || [],
+    categoryId: Number(payload.categoryId) || 1,
+    tagIds: (payload.tagIds || []).map(id => Number(id)),
     userId: Number(userId),
   });
   return res.data;

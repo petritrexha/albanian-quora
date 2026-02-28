@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import { getQuestions } from "../services/questionService";
+import { getQuestions, upvoteQuestion, downvoteQuestion } from "../services/questionService";
 import QuestionCard from "../components/QuestionCard";
 
 const useQuery = () => new URLSearchParams(useLocation().search);
@@ -33,18 +33,42 @@ const SearchPage = () => {
     };
   }, [searchTerm, tagFilter]);
 
+  const handleUpvote = async (id) => {
+    try {
+      const newVotes = await upvoteQuestion(id);
+      setResults((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, votes: newVotes } : q))
+      );
+    } catch (err) {
+      console.error("Upvote failed", err);
+    }
+  };
+
+  const handleDownvote = async (id) => {
+    try {
+      const newVotes = await downvoteQuestion(id);
+      setResults((prev) =>
+        prev.map((q) => (q.id === id ? { ...q, votes: newVotes } : q))
+      );
+    } catch (err) {
+      console.error("Downvote failed", err);
+    }
+  };
+
   const hasFilter = !!(searchTerm || tagFilter);
 
   return (
     <div className="w-full max-w-[900px] mx-auto px-4 py-6">
       <div className="flex flex-col gap-4">
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] px-6 py-5 shadow-sm">
-          <h2 className="text-lg sm:text-xl font-semibold text-[var(--text-main)]">
+        <div className="rounded-2xl px-6 py-5 shadow-sm transition-all duration-300
+                        bg-white border border-slate-200
+                        dark:bg-slate-900 dark:border-slate-800">
+          <h2 className="text-lg sm:text-xl font-semibold text-slate-800 dark:text-white">
             {hasFilter ? (
               <>
                 Rezultatet për{" "}
                 {searchTerm && (
-                  <span className="text-[var(--primary)] font-bold">
+                  <span className="text-blue-600 dark:text-blue-400 font-bold">
                     "{searchTerm}"
                   </span>
                 )}
@@ -52,7 +76,7 @@ const SearchPage = () => {
                   <>
                     {" "}
                     tag:{" "}
-                    <span className="text-[var(--primary)] font-bold">
+                    <span className="text-blue-600 dark:text-blue-400 font-bold">
                       {tagFilter}
                     </span>
                   </>
@@ -63,7 +87,7 @@ const SearchPage = () => {
             )}
           </h2>
 
-          <p className="mt-1 text-sm text-[var(--text-light)]">
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
             {hasFilter
               ? `U gjetën ${results.length} rezultate.`
               : "Shkruaj diçka në search për të parë rezultatet."}
@@ -75,15 +99,23 @@ const SearchPage = () => {
             {results.map((question) => (
               <div
                 key={question.id}
-                className="rounded-2xl border border-[var(--border)] bg-[var(--card-bg)] shadow-sm"
+                className="rounded-2xl shadow-sm
+                           bg-white border border-slate-200
+                           dark:bg-slate-800 dark:border-slate-700/50"
               >
-                <QuestionCard question={question} />
+                <QuestionCard 
+                  question={question}
+                  onUpvote={handleUpvote}
+                  onDownvote={handleDownvote}
+                />
               </div>
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-dashed border-[var(--border)] bg-[var(--card-bg)] p-10 text-center">
-            <p className="text-sm text-[var(--text-light)] italic">
+          <div className="rounded-2xl p-10 text-center transition-all
+                          border border-dashed border-slate-200 bg-white/50
+                          dark:border-slate-700 dark:bg-slate-800/50">
+            <p className="text-sm text-slate-500 dark:text-slate-400 italic">
               {hasFilter
                 ? "Nuk u gjet asnjë pyetje."
                 : "Shkruaj diçka për të kërkuar."}
