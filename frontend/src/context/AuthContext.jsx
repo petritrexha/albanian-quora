@@ -5,7 +5,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [hydrating, setHydrating] = useState(true);
+  const [loading, setLoading] = useState(true);
 
   const isAuthenticated = !!user;
   const isAdmin = (user?.role || "").toLowerCase() === "admin";
@@ -14,7 +14,7 @@ export function AuthProvider({ children }) {
     const token = localStorage.getItem("accessToken");
 
     if (!token) {
-      setHydrating(false);
+      setLoading(false);
       return;
     }
 
@@ -29,7 +29,7 @@ export function AuthProvider({ children }) {
         localStorage.removeItem("user");
         setUser(null);
       } finally {
-        setHydrating(false);
+        setLoading(false);
       }
     })();
   }, []);
@@ -107,7 +107,7 @@ export function AuthProvider({ children }) {
     () => ({
       user,
       setUser,
-      hydrating,
+      loading,
       isAuthenticated,
       isAdmin,
       login,
@@ -116,7 +116,7 @@ export function AuthProvider({ children }) {
       register,
       logout,
     }),
-    [user, hydrating, isAuthenticated, isAdmin]
+    [user, loading, isAuthenticated, isAdmin]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

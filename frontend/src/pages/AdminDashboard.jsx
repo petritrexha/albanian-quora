@@ -65,15 +65,16 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--bg-light)] py-10 px-6 transition-colors duration-300">
+    <div className="min-h-screen py-10 px-6 transition-colors duration-300
+                    bg-slate-50 dark:bg-slate-900">
       <div className="max-w-6xl mx-auto">
 
         {/* Header */}
         <header className="mb-10">
-          <h1 className="text-4xl font-extrabold text-[var(--text-main)] tracking-tight">
+          <h1 className="text-4xl font-extrabold text-slate-800 dark:text-white tracking-tight">
             Paneli i Adminit
           </h1>
-          <p className="text-[var(--text-light)] font-medium mt-1">
+          <p className="text-slate-500 dark:text-slate-400 font-medium mt-1">
             Administratori: {currentUser?.username}
           </p>
         </header>
@@ -83,13 +84,14 @@ export default function AdminDashboard() {
           {['users', 'questions', 'answers'].map((key) => (
             <div
               key={key}
-              className="bg-[var(--card-bg)] p-7 rounded-2xl border border-[var(--border)]
-              shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+              className="p-7 rounded-2xl shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300
+                         bg-white border border-slate-200
+                         dark:bg-gradient-to-br dark:from-slate-800 dark:to-indigo-900/20 dark:border-slate-700/50"
             >
-              <h3 className="text-[var(--text-light)] uppercase text-[10px] font-black tracking-widest mb-2">
+              <h3 className="text-slate-500 dark:text-slate-400 uppercase text-[10px] font-black tracking-widest mb-2">
                 {key === 'users' ? 'Përdorues' : key === 'questions' ? 'Pyetje' : 'Përgjigje'}
               </h3>
-              <p className="text-4xl font-extrabold text-[var(--primary)] tracking-tight">
+              <p className="text-4xl font-extrabold text-blue-600 dark:text-blue-400 tracking-tight">
                 {stats ? (stats[key] ?? stats[key.charAt(0).toUpperCase() + key.slice(1)]) : "0"}
               </p>
             </div>
@@ -97,7 +99,8 @@ export default function AdminDashboard() {
         </section>
 
         {/* Tabs */}
-        <div className="flex gap-2 mb-8 bg-[var(--accent)] p-1.5 rounded-2xl w-fit">
+        <div className="flex gap-2 mb-8 p-1.5 rounded-2xl w-fit
+                        bg-slate-100 dark:bg-slate-800">
           {['users', 'questions', 'answers'].map((tab) => (
             <button
               key={tab}
@@ -105,8 +108,8 @@ export default function AdminDashboard() {
               className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200
               ${
                 activeTab === tab
-                  ? "bg-[var(--card-bg)] text-[var(--primary)] shadow-md scale-[1.03]"
-                  : "text-[var(--text-light)] hover:text-[var(--text-main)]"
+                  ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-md scale-[1.03]"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
               }`}
             >
               {tab === 'users' ? 'Përdoruesit' : tab === 'questions' ? 'Pyetjet' : 'Përgjigjet'}
@@ -115,32 +118,36 @@ export default function AdminDashboard() {
         </div>
 
         {/* Table */}
-        <section className="bg-[var(--card-bg)] rounded-2xl border border-[var(--border)] shadow-sm overflow-hidden">
+        <section className="rounded-2xl shadow-sm overflow-hidden
+                            bg-white border border-slate-200
+                            dark:bg-slate-800 dark:border-slate-700/50">
           <table className="w-full text-left border-collapse">
-            <thead className="bg-[var(--accent)] text-[var(--text-light)] text-xs font-bold uppercase">
+            <thead className="text-xs font-bold uppercase
+                              bg-slate-50 text-slate-500
+                              dark:bg-slate-700/50 dark:text-slate-400">
               <tr>
-                <th className="p-5 border-b border-[var(--border)]">
+                <th className="p-5 border-b border-slate-200 dark:border-slate-700">
                   {activeTab === 'users' ? 'Përdoruesi / Detajet' : 'Përmbajtja e tekstit'}
                 </th>
                 {activeTab !== 'users' && (
-                  <th className="p-5 border-b border-[var(--border)]">Autori</th>
+                  <th className="p-5 border-b border-slate-200 dark:border-slate-700">Autori</th>
                 )}
-                <th className="p-5 border-b border-[var(--border)] text-right">Veprimet</th>
+                <th className="p-5 border-b border-slate-200 dark:border-slate-700 text-right">Veprimet</th>
               </tr>
             </thead>
 
             <tbody className="text-sm">
               {loading ? (
                 <tr>
-                  <td colSpan="3" className="p-20 text-center text-[var(--text-light)] animate-pulse">
+                  <td colSpan="3" className="p-20 text-center text-slate-500 dark:text-slate-400 animate-pulse">
                     Duke u ngarkuar...
                   </td>
                 </tr>
               ) : dataList.length === 0 ? (
                 <tr>
                   <td colSpan="3" className="p-20 text-center">
-                    <div className="flex flex-col items-center gap-3 text-[var(--text-light)]">
-                      <div className="w-12 h-12 rounded-full bg-[var(--accent)] flex items-center justify-center text-lg">
+                    <div className="flex flex-col items-center gap-3 text-slate-500 dark:text-slate-400">
+                      <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center text-lg">
                         📭
                       </div>
                       <p className="italic">
@@ -153,26 +160,26 @@ export default function AdminDashboard() {
                 dataList.map((item) => (
                   <tr
                     key={item.id || item.Id}
-                    className="group transition-all duration-200 hover:bg-[var(--accent)]"
+                    className="group transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-700/50"
                   >
-                    <td className="p-5 border-b border-[var(--border)]">
-                      <div className="font-semibold text-[var(--text-main)]">
+                    <td className="p-5 border-b border-slate-200 dark:border-slate-700">
+                      <div className="font-semibold text-slate-800 dark:text-white">
                         {item.username || item.Username || item.content || item.Content || item.title || item.Title}
                       </div>
                       {item.email && (
-                        <div className="text-xs text-[var(--text-light)] mt-1">
+                        <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                           {item.email}
                         </div>
                       )}
                     </td>
 
                     {activeTab !== 'users' && (
-                      <td className="p-5 border-b border-[var(--border)] text-[var(--text-light)] font-medium">
+                      <td className="p-5 border-b border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 font-medium">
                         {item.username || item.Username || "I panjohur"}
                       </td>
                     )}
 
-                    <td className="p-5 border-b border-[var(--border)] text-right">
+                    <td className="p-5 border-b border-slate-200 dark:border-slate-700 text-right">
                       <button
                         onClick={() => openDeleteModal(item.id || item.Id)}
                         className="px-4 py-1.5 rounded-full font-bold text-xs

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getTags } from "../services/tagService";
+import { getTags, createTag } from "../services/tagService";
 
 const AskModal = ({
   newQuestion,
@@ -8,19 +8,60 @@ const AskModal = ({
   setSelectedTagIds,
   handlePostQuestion,
   onClose,
+  categoryId = null,
 }) => {
   const [tags, setTags] = useState([]);
+  const [loadingTags, setLoadingTags] = useState(true);
+  const [tagsError, setTagsError] = useState(false);
+  const [showCreateTag, setShowCreateTag] = useState(false);
+  const [newTagName, setNewTagName] = useState("");
+  const [creatingTag, setCreatingTag] = useState(false);
   const isDisabled = !newQuestion.trim();
   const maxChars = 300;
 
+  const loadTags = async () => {
+    setLoadingTags(true);
+    setTagsError(false);
+    try {
+      const data = await getTags();
+      setTags(data || []);
+    } catch {
+      setTags([]);
+      setTagsError(true);
+    } finally {
+      setLoadingTags(false);
+    }
+  };
+
   useEffect(() => {
-    getTags().then(setTags).catch(() => setTags([]));
+    loadTags();
   }, []);
 
   const toggleTag = (tagId) => {
     setSelectedTagIds((prev) =>
       prev.includes(tagId) ? prev.filter((id) => id !== tagId) : [...prev, tagId]
     );
+  };
+
+  const handleCreateTag = async () => {
+    if (!newTagName.trim()) return;
+    
+    setCreatingTag(true);
+    try {
+      // Use categoryId from route, or default to 1
+      const createdTag = await createTag(newTagName, categoryId || 1);
+      // Add new tag to list
+      setTags((prev) => [...prev, createdTag]);
+      // Auto-select the newly created tag
+      setSelectedTagIds((prev) => [...prev, createdTag.id]);
+      // Reset form
+      setNewTagName("");
+      setShowCreateTag(false);
+    } catch (error) {
+      alert("Nuk u krijua tag-u. Sigurohu që je i kyçur.");
+    } finally {
+      setCreatingTag(false);
+    }
   };
 
   return (
@@ -56,12 +97,31 @@ const AskModal = ({
       </div>
 
       {/* Tags (opsional) */}
-      {tags.length > 0 && (
-        <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-slate-700 dark:text-slate-200">
             Tags (opsional)
           </span>
+          {selectedTagIds.length > 0 && (
+            <span className="text-xs text-blue-600 dark:text-blue-400">
+              {selectedTagIds.length} zgjedhur
+            </span>
+          )}
+        </div>
 
+        {loadingTags ? (
+          <div className="text-sm text-slate-400 py-2">
+            Duke ngarkuar tags...
+          </div>
+        ) : tagsError ? (
+          <div className="text-sm text-slate-400 py-2">
+            Nuk mund të ngarkohen tags. Mund të vazhdoni pa to.
+          </div>
+        ) : tags.length === 0 ? (
+          <div className="text-sm text-slate-400 py-2">
+            Nuk ka tags të disponueshme.
+          </div>
+        ) : (
           <div className="flex flex-wrap gap-2">
             {tags.map((t) => {
               const active = selectedTagIds.includes(t.id);
@@ -73,7 +133,7 @@ const AskModal = ({
                   className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all
                     ${
                       active
-                        ? "bg-blue-600 text-white border-blue-600"
+                        ? "bg-blue-600 text-white border-blue-600 shadow-sm"
                         : "bg-white/60 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:border-blue-400 dark:hover:border-blue-500"
                     }`}
                 >
@@ -82,8 +142,60 @@ const AskModal = ({
               );
             })}
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Create New Tag Button */}
+        {!loadingTags && !tagsError && (
+          <div className="mt-2">
+            {!showCreateTag ? (
+              <button
+                type="button"
+                onClick={() => setShowCreateTag(true)}
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                + Krijo tag të ri
+              </button>
+            ) : (
+              <div className="flex gap-2 items-center mt-2 p-3 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                <input
+                  type="text"
+                  placeholder="Emri i tag-ut"
+                  value={newTagName}
+                  onChange={(e) => setNewTagName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleCreateTag()}
+                  className="flex-1 px-3 py-1.5 rounded-lg text-sm
+                             border border-slate-200 dark:border-slate-600
+                             bg-white dark:bg-slate-700
+                             text-slate-800 dark:text-slate-200
+                             focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={creatingTag}
+                />
+                <button
+                  type="button"
+                  onClick={handleCreateTag}
+                  disabled={!newTagName.trim() || creatingTag}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium bg-blue-600 text-white
+                             hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition"
+                >
+                  {creatingTag ? "Duke krijuar..." : "Krijo"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateTag(false);
+                    setNewTagName("");
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-500
+                             hover:bg-slate-200 dark:hover:bg-slate-700 transition"
+                  disabled={creatingTag}
+                >
+                  Anulo
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       {/* Actions */}
       <div className="flex justify-between items-center pt-2">
