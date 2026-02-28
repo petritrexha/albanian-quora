@@ -50,7 +50,12 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
                       text-slate-500 dark:text-slate-400">
 
         <button
-          className="text-lg hover:text-green-600 transition transform hover:scale-110"
+          disabled={!user}
+          className={`text-lg transition transform ${
+            !user
+              ? "opacity-40 cursor-not-allowed"
+              : "hover:text-green-600 hover:scale-110"
+          }`}
           onClick={() => onUpvote(answer.id)}
         >
           <FaArrowUp />
@@ -67,7 +72,12 @@ const AnswerCard = ({ answer, onUpvote, onDownvote, questionTitle }) => {
         </span>
 
         <button
-          className="text-lg hover:text-red-600 transition transform hover:scale-110"
+          disabled={!user}
+          className={`text-lg transition transform ${
+            !user
+              ? "opacity-40 cursor-not-allowed"
+              : "hover:text-red-600 hover:scale-110"
+          }`}
           onClick={() => onDownvote(answer.id)}
         >
           <FaArrowDown />

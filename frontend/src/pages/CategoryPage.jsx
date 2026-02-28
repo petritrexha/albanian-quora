@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { getQuestions, upvoteQuestion, downvoteQuestion } from "../services/questionService";
 import AskBox from "../components/AskBox";
 import QuestionCard from "../components/QuestionCard";
@@ -16,6 +17,7 @@ const categoryNames = {
 const CategoryPage = ({ onOpenAskModal, onSetCategory }) => {
   const { id } = useParams();
   const [questions, setQuestions] = useState([]);
+  const { user } = useAuth();
 
   const categoryName = categoryNames[id] || "Kategoria";
 
@@ -44,6 +46,7 @@ const CategoryPage = ({ onOpenAskModal, onSetCategory }) => {
   };
 
   const handleUpvote = async (id) => {
+    if (!user) return;
     try {
       const newVotes = await upvoteQuestion(id);
       setQuestions((prev) =>
@@ -55,6 +58,7 @@ const CategoryPage = ({ onOpenAskModal, onSetCategory }) => {
   };
 
   const handleDownvote = async (id) => {
+    if (!user) return;
     try {
       const newVotes = await downvoteQuestion(id);
       setQuestions((prev) =>

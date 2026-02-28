@@ -106,15 +106,15 @@ export default function Register() {
               value={form.name}
               onChange={onChange}
               placeholder=" "
-              className="peer w-full p-3 pt-5 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
+              className="peer w-full p-3 pt-7 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
                        focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
               className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
-                            peer-placeholder-shown:top-3.5
-                            peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
-                            peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs"
+                            peer-placeholder-shown:top-4
+                            peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
+                            peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
             >
               Emri
             </label>
@@ -127,15 +127,15 @@ export default function Register() {
               value={form.username}
               onChange={onChange}
               placeholder=" "
-              className="peer w-full p-3 pt-5 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
+              className="peer w-full p-3 pt-7 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
                        focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
               className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
-                            peer-placeholder-shown:top-3.5
-                            peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
-                            peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs"
+                            peer-placeholder-shown:top-4
+                            peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
+                            peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
             >
               Emri i përdoruesit
             </label>
@@ -149,15 +149,15 @@ export default function Register() {
               value={form.email}
               onChange={onChange}
               placeholder=" "
-              className="peer w-full p-3 pt-5 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
+              className="peer w-full p-3 pt-7 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
                        focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
               className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
-                            peer-placeholder-shown:top-3.5
-                            peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
-                            peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs"
+                            peer-placeholder-shown:top-4
+                            peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
+                            peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
             >
               Email
             </label>
@@ -171,15 +171,15 @@ export default function Register() {
               value={form.password}
               onChange={onChange}
               placeholder=" "
-              className="peer w-full p-3 pt-5 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
+              className="peer w-full p-3 pt-7 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
                        focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
               className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
-                            peer-placeholder-shown:top-3.5
-                            peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
-                            peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs"
+                            peer-placeholder-shown:top-4
+                            peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
+                            peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
             >
               Fjalëkalimi
             </label>
@@ -193,15 +193,15 @@ export default function Register() {
               value={form.confirm}
               onChange={onChange}
               placeholder=" "
-              className="peer w-full p-3 pt-5 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
+              className="peer w-full p-3 pt-7 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
                        focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
               className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
-                            peer-placeholder-shown:top-3.5
-                            peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
-                            peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs"
+                            peer-placeholder-shown:top-4
+                            peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
+                            peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
             >
               Konfirmo Fjalëkalimin
             </label>

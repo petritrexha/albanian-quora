@@ -31,6 +31,7 @@ const Home = ({ selectedCategory, refreshTrigger, onOpenAskModal }) => {
   }, [user, selectedCategory, tagFilter, refreshTrigger]);
 
   const handleUpvote = async (id) => {
+    if (!user) return;
     try {
       const newVotes = await upvoteQuestion(id);
       setQuestions((prev) =>
@@ -42,6 +43,7 @@ const Home = ({ selectedCategory, refreshTrigger, onOpenAskModal }) => {
   };
 
   const handleDownvote = async (id) => {
+    if (!user) return;
     try {
       const newVotes = await downvoteQuestion(id);
       setQuestions((prev) =>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import { FaFlag, FaTimes, FaCheck } from "react-icons/fa";
@@ -78,11 +79,10 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
     (selectedReason === "Tjetër" && !customReason.trim()) ||
     loading;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center
-                 bg-black/40 backdrop-blur-sm px-4
-                 animate-fadeIn"
+                 bg-black/40 backdrop-blur-sm px-4"
       onClick={handleClose}
     >
       <div
@@ -202,7 +202,8 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
           </div>
         )}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

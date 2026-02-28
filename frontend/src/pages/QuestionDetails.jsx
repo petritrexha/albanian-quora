@@ -61,6 +61,7 @@ const QuestionDetails = () => {
   }, [question?.id]);
 
   const handleQuestionVote = async (dir) => {
+    if (!user) return;
     try {
       const newVotes = dir === 'up' ? await upvoteQuestion(question.id) : await downvoteQuestion(question.id);
       setQuestion(prev => ({ ...prev, votes: newVotes }));
@@ -83,6 +84,7 @@ const QuestionDetails = () => {
   };
 
   const handleUpvote = async (answerId) => {
+    if (!user) return;
     try {
       const newVotes = await upvoteAnswer(answerId);
       setAnswers(prev => prev.map((a) => a.id === answerId ? { ...a, votes: newVotes } : a));
@@ -90,6 +92,7 @@ const QuestionDetails = () => {
   };
 
   const handleDownvote = async (answerId) => {
+    if (!user) return;
     try {
       const newVotes = await downvoteAnswer(answerId);
       setAnswers(prev => prev.map((a) => a.id === answerId ? { ...a, votes: newVotes } : a));
@@ -110,14 +113,24 @@ const QuestionDetails = () => {
           {/* Voting Column */}
           <div className="flex flex-col items-center gap-1 min-w-[40px]">
             <button 
-              className="w-9 h-9 flex items-center justify-center rounded-full text-xl text-slate-400 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-slate-700 dark:hover:text-blue-400 transition-all"
+              disabled={!user}
+              className={`w-9 h-9 flex items-center justify-center rounded-full text-xl transition-all ${
+                !user
+                  ? "text-slate-300 dark:text-slate-600 opacity-40 cursor-not-allowed"
+                  : "text-slate-400 hover:bg-blue-50 hover:text-blue-600 dark:hover:bg-slate-700 dark:hover:text-blue-400"
+              }`}
               onClick={() => handleQuestionVote('up')}
             >
               <FaArrowUp />
             </button>
             <span className="font-bold text-lg text-slate-800 dark:text-white">{question.votes}</span>
             <button 
-              className="w-9 h-9 flex items-center justify-center rounded-full text-xl text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-slate-700 dark:hover:text-red-400 transition-all"
+              disabled={!user}
+              className={`w-9 h-9 flex items-center justify-center rounded-full text-xl transition-all ${
+                !user
+                  ? "text-slate-300 dark:text-slate-600 opacity-40 cursor-not-allowed"
+                  : "text-slate-400 hover:bg-red-50 hover:text-red-500 dark:hover:bg-slate-700 dark:hover:text-red-400"
+              }`}
               onClick={() => handleQuestionVote('down')}
             >
               <FaArrowDown />

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import { getQuestions, upvoteQuestion, downvoteQuestion } from "../services/questionService";
 import QuestionCard from "../components/QuestionCard";
 
@@ -11,6 +12,7 @@ const SearchPage = () => {
   const tagFilter = query.get("tag")?.trim() || null;
 
   const [results, setResults] = useState([]);
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!searchTerm && !tagFilter) {
@@ -34,6 +36,7 @@ const SearchPage = () => {
   }, [searchTerm, tagFilter]);
 
   const handleUpvote = async (id) => {
+    if (!user) return;
     try {
       const newVotes = await upvoteQuestion(id);
       setResults((prev) =>
@@ -45,6 +48,7 @@ const SearchPage = () => {
   };
 
   const handleDownvote = async (id) => {
+    if (!user) return;
     try {
       const newVotes = await downvoteQuestion(id);
       setResults((prev) =>
