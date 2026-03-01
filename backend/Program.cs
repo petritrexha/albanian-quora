@@ -132,15 +132,19 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseCors("FrontendCors"); // <-- Apply CORS first
+
 // ----------------------
 // PIPELINE
 // ----------------------
+
+
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "AlbanianQuora API V1");
-    c.RoutePrefix = string.Empty; // Swagger at root
+    c.RoutePrefix = string.Empty;
 });
 
 app.UseCors("FrontendCors");
