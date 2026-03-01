@@ -36,7 +36,7 @@ export default function App() {
     try {
       await createQuestion({
         title: newQuestion,
-        description: newQuestion,
+        description: "",
         categoryId: selectedCategory || 1,
         tagIds: selectedTagIds,
       });

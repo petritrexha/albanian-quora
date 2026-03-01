@@ -62,10 +62,10 @@ const Home = ({ selectedCategory, refreshTrigger, onOpenAskModal }) => {
                         bg-white border border-slate-200
                         dark:bg-slate-900 dark:border-slate-800">
           <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-            Pyet. Ndaj. Mëso.
+            Pyet / Ndaj / Mëso
           </h1>
           <p className="text-slate-500 dark:text-slate-400 text-sm">
-            Platforma shqiptare për diskutim rreth programimit, teknologjisë dhe dijes.
+            Platforma shqiptare për diskutim rreth fushave të ndryshme.
           </p>
         </div>
 
@@ -82,7 +82,7 @@ const Home = ({ selectedCategory, refreshTrigger, onOpenAskModal }) => {
               onClick={() => setSearchParams({})}
               className="ml-2 text-blue-600 dark:text-blue-400 hover:underline"
             >
-              Hiq filtrim
+              Hiq filtrimin
             </button>
           </div>
         )}
