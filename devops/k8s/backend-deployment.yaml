@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: backend
-        image: albanianquoraacr.azurecr.io/albanianquora-backend:v6
+        image: albanianquoraacr.azurecr.io/albanianquora-backend:v8
         ports:
         - containerPort: 8080
         env:

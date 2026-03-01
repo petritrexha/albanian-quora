@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://20.76.137.14",
+  // UPDATE THIS LINE WITH YOUR NEW BACKEND IP
+  baseURL: "http://20.103.169.185",
   headers: {
     "Content-Type": "application/json",
   },

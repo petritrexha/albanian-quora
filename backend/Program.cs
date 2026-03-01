@@ -14,6 +14,22 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 
 // ----------------------
+// CORS POLICY DEFINITION
+// ----------------------
+var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(name: myAllowSpecificOrigins,
+                      policy =>
+                      {
+                          policy.WithOrigins("http://20.82.32.36") // Your Frontend IP
+                                .AllowAnyHeader()
+                                .AllowAnyMethod();
+                      });
+});
+
+// ----------------------
 // Controllers + JSON
 // ----------------------
 builder.Services.AddControllers()
@@ -32,7 +48,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 // ----------------------
-// Swagger (ALWAYS ENABLED)
+// Swagger
 // ----------------------
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
@@ -113,23 +129,10 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
-// ----------------------
-// CORS (FIXED)
-// ----------------------
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
-});
-
 var app = builder.Build();
 
 // ----------------------
-// PIPELINE
+// PIPELINE (Order Matters!)
 // ----------------------
 
 app.UseSwagger();
@@ -139,7 +142,8 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty; // Swagger at root
 });
 
-app.UseCors("AllowAll");
+// IMPORTANT: UseCors must come after UseRouting (implicit here) and before UseAuthorization
+app.UseCors(myAllowSpecificOrigins);
 
 app.UseAuthentication();
 app.UseAuthorization();

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: albanianquoraacr.azurecr.io/albanianquora-frontend:v4
+        image: albanianquoraacr.azurecr.io/albanianquora-frontend:v5
         imagePullPolicy: Always
         ports:
         - containerPort: 80
