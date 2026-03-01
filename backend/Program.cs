@@ -13,25 +13,35 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Controllers + JSON cycles
+// ----------------------
+// Controllers + JSON
+// ----------------------
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
-    options.JsonSerializerOptions.ReferenceHandler =
-        System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
+        options.JsonSerializerOptions.ReferenceHandler =
+            System.Text.Json.Serialization.ReferenceHandler.IgnoreCycles
     );
 
-// DB
+// ----------------------
+// Database
+// ----------------------
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(
         builder.Configuration.GetConnectionString("DefaultConnection")
     )
 );
 
-// Swagger + JWT support in Swagger
+// ----------------------
+// Swagger (ALWAYS ENABLED)
+// ----------------------
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "AlbanianQuora API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "AlbanianQuora API",
+        Version = "v1"
+    });
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -59,20 +69,21 @@ builder.Services.AddSwaggerGen(c =>
     });
 });
 
-// --- APP SERVICES SECTION ---
+// ----------------------
+// Services
+// ----------------------
 builder.Services.AddScoped<IBookmarkService, BookmarkService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAnswerService, AnswerService>();
-
-// FIXED: Correctly mapping the Interface to the SmtpEmailSender class
 builder.Services.AddScoped<IEmailSender, SmtpEmailSender>();
 
-// JWT Options + Token Service
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 builder.Services.AddScoped<IJwtTokenService, JwtTokenService>();
 
+// ----------------------
 // JWT Authentication
+// ----------------------
 var jwtSection = builder.Configuration.GetSection("Jwt");
 var jwtKey = jwtSection["Key"];
 
@@ -89,12 +100,10 @@ builder.Services
             ValidateAudience = true,
             ValidateIssuerSigningKey = true,
             ValidateLifetime = true,
-
             ValidIssuer = jwtSection["Issuer"],
             ValidAudience = jwtSection["Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
             RoleClaimType = System.Security.Claims.ClaimTypes.Role,
-
             ClockSkew = TimeSpan.FromSeconds(30)
         };
     });
@@ -104,37 +113,44 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
 });
 
+// ----------------------
+// CORS (FIXED)
+// ----------------------
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    options.AddPolicy("AllowAll", policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "https://localhost:5173")
+        policy.AllowAnyOrigin()
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-
+              .AllowAnyMethod();
     });
 });
 
 var app = builder.Build();
 
-// Pipeline
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+// ----------------------
+// PIPELINE
+// ----------------------
 
-app.UseRateLimiting();
-app.UseHttpsRedirection();
-app.UseCors("AllowFrontend");
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "AlbanianQuora API V1");
+    c.RoutePrefix = string.Empty; // Swagger at root
+});
+
+app.UseCors("AllowAll");
+
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.MapGet("/health", () => Results.Ok("Healthy"));
 
-// Seed admin user
+// ----------------------
+// Seed Admin
+// ----------------------
 using (var scope = app.Services.CreateScope())
 {
     var cfg = scope.ServiceProvider.GetRequiredService<IConfiguration>();
@@ -143,12 +159,15 @@ using (var scope = app.Services.CreateScope())
     var adminEmail = cfg["Admin:Email"];
     var adminPassword = cfg["Admin:Password"];
 
-    if (!string.IsNullOrWhiteSpace(adminEmail) && !string.IsNullOrWhiteSpace(adminPassword))
+    if (!string.IsNullOrWhiteSpace(adminEmail) &&
+        !string.IsNullOrWhiteSpace(adminPassword))
     {
         var existing = db.Users.FirstOrDefault(u => u.Email == adminEmail);
+
         if (existing == null)
         {
             PasswordHasher.CreatePasswordHash(adminPassword, out var hash, out var salt);
+
             var admin = new AlbanianQuora.Api.Models.User
             {
                 Name = "Administrator",
@@ -158,6 +177,7 @@ using (var scope = app.Services.CreateScope())
                 PasswordSalt = salt,
                 Role = AlbanianQuora.Api.Models.UserRole.Admin
             };
+
             db.Users.Add(admin);
             db.SaveChanges();
         }

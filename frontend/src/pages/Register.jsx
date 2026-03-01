@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // Added Link here
+import { useNavigate, Link } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
 const passwordPolicy = (pw) => {
@@ -29,6 +30,8 @@ export default function Register() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
@@ -89,7 +92,7 @@ export default function Register() {
 
       <div className="relative z-10 w-full max-w-[420px] p-10 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/70 border border-white/40 dark:border-slate-700/40 shadow-2xl animate-[fadeIn_0.6s_ease]">
         <h2 className="mb-6 text-3xl font-bold text-center text-gray-800 dark:text-white tracking-tight">
-          Krijo Llogari
+          Krijo llogarinë tënde
         </h2>
 
         {error && (
@@ -111,7 +114,7 @@ export default function Register() {
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
-              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
+              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-4
                             peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
                             peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
@@ -132,7 +135,7 @@ export default function Register() {
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
-              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
+              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-4
                             peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
                             peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
@@ -154,7 +157,7 @@ export default function Register() {
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
-              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
+              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-4
                             peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
                             peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
@@ -166,45 +169,59 @@ export default function Register() {
           {/* Fjalëkalimi */}
           <div className="relative">
             <input
-              type="password"
+              type={showPassword ? "text" : "password"}
               name="password"
               value={form.password}
               onChange={onChange}
               placeholder=" "
-              className="peer w-full p-3 pt-7 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
+              className="peer w-full p-3 pt-7 pr-12 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
                        focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
-              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
+              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-4
                             peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
                             peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
             >
               Fjalëkalimi
             </label>
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition"
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
 
           {/* Konfirmo Fjalëkalimin */}
           <div className="relative">
             <input
-              type="password"
+              type={showConfirm ? "text" : "password"}
               name="confirm"
               value={form.confirm}
               onChange={onChange}
               placeholder=" "
-              className="peer w-full p-3 pt-7 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
+              className="peer w-full p-3 pt-7 pr-12 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
                        focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
                        focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200"
             />
             <label
-              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200
+              className="absolute left-3 top-3 text-gray-500 dark:text-gray-400 text-sm transition-all duration-200 pointer-events-none
                             peer-placeholder-shown:top-4
                             peer-focus:top-1 peer-focus:text-xs peer-focus:text-blue-600 dark:peer-focus:text-blue-400
                             peer-not-placeholder-shown:top-1 peer-not-placeholder-shown:text-xs"
             >
               Konfirmo Fjalëkalimin
             </label>
+            <button
+              type="button"
+              onClick={() => setShowConfirm(!showConfirm)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition"
+            >
+              {showConfirm ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
 
           <button

@@ -4,6 +4,7 @@ using AlbanianQuora.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AlbanianQuora.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260227155605_AddLoginOtpTable")]
+    partial class AddLoginOtpTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,35 +56,6 @@ namespace AlbanianQuora.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Answers");
-                });
-
-            modelBuilder.Entity("AlbanianQuora.Api.Entities.QuestionView", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("IpAddress")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("QuestionId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ViewedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.HasIndex("QuestionId", "UserId", "IpAddress", "ViewedAt");
-
-                    b.ToTable("QuestionViews");
                 });
 
             modelBuilder.Entity("AlbanianQuora.Api.Models.Bookmark", b =>
@@ -412,42 +386,42 @@ namespace AlbanianQuora.Migrations
                         new
                         {
                             Id = 1,
-                            CreatedAt = new DateTime(2026, 2, 28, 20, 34, 5, 551, DateTimeKind.Utc).AddTicks(8023),
+                            CreatedAt = new DateTime(2026, 2, 27, 15, 56, 4, 614, DateTimeKind.Utc).AddTicks(2233),
                             IsActive = true,
                             Name = "General"
                         },
                         new
                         {
                             Id = 2,
-                            CreatedAt = new DateTime(2026, 2, 28, 20, 34, 5, 551, DateTimeKind.Utc).AddTicks(8027),
+                            CreatedAt = new DateTime(2026, 2, 27, 15, 56, 4, 614, DateTimeKind.Utc).AddTicks(2236),
                             IsActive = true,
                             Name = "Programim"
                         },
                         new
                         {
                             Id = 3,
-                            CreatedAt = new DateTime(2026, 2, 28, 20, 34, 5, 551, DateTimeKind.Utc).AddTicks(8028),
+                            CreatedAt = new DateTime(2026, 2, 27, 15, 56, 4, 614, DateTimeKind.Utc).AddTicks(2239),
                             IsActive = true,
                             Name = "Teknologji"
                         },
                         new
                         {
                             Id = 4,
-                            CreatedAt = new DateTime(2026, 2, 28, 20, 34, 5, 551, DateTimeKind.Utc).AddTicks(8029),
+                            CreatedAt = new DateTime(2026, 2, 27, 15, 56, 4, 614, DateTimeKind.Utc).AddTicks(2241),
                             IsActive = true,
                             Name = "Shkence"
                         },
                         new
                         {
                             Id = 5,
-                            CreatedAt = new DateTime(2026, 2, 28, 20, 34, 5, 551, DateTimeKind.Utc).AddTicks(8030),
+                            CreatedAt = new DateTime(2026, 2, 27, 15, 56, 4, 614, DateTimeKind.Utc).AddTicks(2243),
                             IsActive = true,
                             Name = "Arsim"
                         },
                         new
                         {
                             Id = 6,
-                            CreatedAt = new DateTime(2026, 2, 28, 20, 34, 5, 551, DateTimeKind.Utc).AddTicks(8032),
+                            CreatedAt = new DateTime(2026, 2, 27, 15, 56, 4, 614, DateTimeKind.Utc).AddTicks(2245),
                             IsActive = true,
                             Name = "Biznes"
                         });
@@ -466,24 +440,6 @@ namespace AlbanianQuora.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Question");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("AlbanianQuora.Api.Entities.QuestionView", b =>
-                {
-                    b.HasOne("AlbanianQuora.Api.Models.Question", "Question")
-                        .WithMany()
-                        .HasForeignKey("QuestionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("AlbanianQuora.Api.Models.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Question");
 

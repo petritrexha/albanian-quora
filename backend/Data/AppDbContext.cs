@@ -22,6 +22,7 @@ namespace AlbanianQuora.Api.Data
         public DbSet<QuestionTag> QuestionTags => Set<QuestionTag>();
         public DbSet<PasswordResetToken> PasswordResetTokens => Set<PasswordResetToken>();
         public DbSet<LoginOtpToken> LoginOtpTokens => Set<LoginOtpToken>();
+        public DbSet<QuestionView> QuestionViews => Set<QuestionView>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -103,6 +104,22 @@ namespace AlbanianQuora.Api.Data
 
             modelBuilder.Entity<LoginOtpToken>()
                 .HasIndex(x => new { x.UserId, x.ExpiresAtUtc });
+
+            // QuestionView Relationships + Index
+            modelBuilder.Entity<QuestionView>()
+                .HasOne(qv => qv.Question)
+                .WithMany()
+                .HasForeignKey(qv => qv.QuestionId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QuestionView>()
+                .HasOne<User>(qv => qv.User)
+                .WithMany()
+                .HasForeignKey(qv => qv.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<QuestionView>()
+                .HasIndex(qv => new { qv.QuestionId, qv.UserId, qv.IpAddress, qv.ViewedAt });
 
             // Seed Data
             modelBuilder.Entity<Category>().HasData(
