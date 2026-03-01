@@ -3,35 +3,28 @@ pipeline {
 
     stages {
         stage('Checkout') {
-            steps {
-                // Pulls the code from your GitHub repository
-                checkout scm
-            }
+            steps { checkout scm }
         }
 
         stage('Build Frontend Image') {
             steps {
-                script {
-                    // Builds the image using the Dockerfile in the frontend folder
-                    sh 'docker build -t albanianquoraregistry123.azurecr.io/albanian-quora-fe:latest ./frontend'
-                }
+                sh 'docker build -t albanianquoraregistry123.azurecr.io/albanian-quora-fe:latest ./frontend'
             }
         }
 
         stage('Build Backend Image') {
             steps {
-                script {
-                    // Builds the image using the Dockerfile in the backend folder
-                    sh 'docker build -t albanianquoraregistry123.azurecr.io/albanian-quora-be:latest ./backend'
-                }
+                sh 'docker build -t albanianquoraregistry123.azurecr.io/albanian-quora-be:latest ./backend'
             }
         }
 
         stage('Push Images to ACR') {
             steps {
-                script {
-                    // This will fail until we configure Azure Credentials in the next step!
-                    echo 'Images built locally. Pushing to ACR skipped until Azure Credentials are set up.'
+                // Log in to Azure and push images
+                withCredentials([usernamePassword(credentialsId: 'azure-credentials-id', passwordVariable: 'AZURE_PASSWORD', usernameVariable: 'AZURE_CLIENT_ID')]) {
+                    sh 'echo $AZURE_PASSWORD | docker login albanianquoraregistry123.azurecr.io -u $AZURE_CLIENT_ID --password-stdin'
+                    sh 'docker push albanianquoraregistry123.azurecr.io/albanian-quora-fe:latest'
+                    sh 'docker push albanianquoraregistry123.azurecr.io/albanian-quora-be:latest'
                 }
             }
         }
