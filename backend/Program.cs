@@ -120,30 +120,29 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendCors", policy =>
     {
-        policy.WithOrigins(
-                "http://20.61.133.37",
-                "https://20.61.133.37"
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .AllowCredentials(); // important for JWT
+        policy.WithOrigins("http://20.61.133.37", "https://20.61.133.37")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
     });
 });
 
 var app = builder.Build();
 
+app.UseCors("FrontendCors"); // <-- Apply CORS first
+
 // ----------------------
 // PIPELINE
 // ----------------------
+
+
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
 {
     c.SwaggerEndpoint("/swagger/v1/swagger.json", "AlbanianQuora API V1");
-    c.RoutePrefix = string.Empty; // Swagger at root
+    c.RoutePrefix = string.Empty;
 });
-
-app.UseCors("FrontendCors");
 
 app.UseAuthentication();
 app.UseAuthorization();
