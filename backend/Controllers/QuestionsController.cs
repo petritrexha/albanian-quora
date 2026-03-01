@@ -5,6 +5,7 @@ using AlbanianQuora.Api.Data;
 using AlbanianQuora.Api.DTOs;
 using AlbanianQuora.Api.Models;
 using AlbanianQuora.Api.Services;
+using AlbanianQuora.Api.Entities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authorization;
@@ -103,8 +104,28 @@ namespace AlbanianQuora.Api.Controllers
 
             var answers = await _answerService.GetByQuestionId(id);
 
-            question.Views += 1;
-            await _context.SaveChangesAsync();
+            var ipAddress = HttpContext.Connection.RemoteIpAddress?.ToString();
+            var cutoffTime = DateTime.UtcNow.AddMinutes(-30);
+
+            var recentView = await _context.QuestionViews
+                .Where(v => v.QuestionId == id &&
+                            v.ViewedAt > cutoffTime &&
+                            ((userId.HasValue && v.UserId == userId.Value) ||
+                             (ipAddress != null && v.IpAddress == ipAddress)))
+                .FirstOrDefaultAsync();
+
+            if (recentView == null)
+            {
+                question.Views += 1;
+                _context.QuestionViews.Add(new QuestionView
+                {
+                    QuestionId = id,
+                    UserId = userId,
+                    IpAddress = ipAddress,
+                    ViewedAt = DateTime.UtcNow
+                });
+                await _context.SaveChangesAsync();
+            }
 
             int? bookmarkId = null;
             bool isBookmarked = false;

@@ -100,9 +100,12 @@ const QuestionCard = ({ question, onUpvote, onDownvote }) => {
           {question.title}
         </h3>
 
-        <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-3">
-          {question.content || question.description}
-        </p>
+        {(question.content || question.description) && 
+         (question.content || question.description) !== question.title && (
+          <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 line-clamp-3">
+            {question.content || question.description}
+          </p>
+        )}
 
         <div className="flex items-center gap-3 text-xs text-slate-400">
           <span>{question.views} shikime</span>

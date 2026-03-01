@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -10,6 +11,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,7 +63,7 @@ export default function Login() {
 
       <div className="relative z-10 w-full max-w-[380px] p-10 rounded-2xl backdrop-blur-xl bg-white/70 dark:bg-slate-800/70 border border-white/40 dark:border-slate-700/40 shadow-2xl animate-[fadeIn_0.6s_ease]">
         <h2 className="mb-6 text-3xl font-bold text-center text-gray-800 dark:text-white tracking-tight">
-          Welcome Back
+          Welcome back 
         </h2>
 
         {error && (
@@ -91,17 +93,27 @@ export default function Login() {
             <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Password
             </label>
-            <input
-              type="password"
-              className="w-full p-3 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
-                         focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
-                         focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200 disabled:opacity-60"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="password"
-              autoComplete="current-password"
-              disabled={loading}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                className="w-full p-3 pr-12 rounded-xl border border-gray-200 dark:border-slate-600 bg-white/60 dark:bg-slate-700/60 text-sm text-gray-800 dark:text-white
+                           focus:outline-none focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-500/50
+                           focus:border-blue-400 dark:focus:border-blue-500 transition-all duration-200 disabled:opacity-60"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="password"
+                autoComplete="current-password"
+                disabled={loading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition"
+                disabled={loading}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </button>
+            </div>
           </div>
 
           <button
