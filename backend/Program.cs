@@ -118,12 +118,11 @@ builder.Services.AddAuthorization(options =>
 // ----------------------
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowFrontend", policy =>
+    options.AddPolicy("FrontendCors", policy =>
     {
-        policy.WithOrigins("http://20.61.133.37") // <-- Explicitly add your Frontend IP
+        policy.WithOrigins("http://20.61.133.37/", "https://20.61.133.37/") // <-- Explicitly add your Frontend IP
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials(); // <-- Sometimes needed with JWT
     });
 });
 
