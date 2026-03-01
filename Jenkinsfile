@@ -38,10 +38,10 @@ pipeline {
                     // 2. Get AKS Credentials
                     sh 'az aks get-credentials --resource-group rg-albanian-quora-dev --name aks-albanian-quora --overwrite-existing'
                     
-                    // 3. Apply the YAML files
-                    sh 'kubectl apply -f backend-deployment.yaml'
-                    sh 'kubectl apply -f frontend-deployment.yaml'
-                    sh 'kubectl apply -f services.yaml'
+                    // 3. Apply the YAML files with the correct paths (devops/k8s/)
+                    sh 'kubectl apply -f devops/k8s/backend-deployment.yaml'
+                    sh 'kubectl apply -f devops/k8s/frontend-deployment.yaml'
+                    sh 'kubectl apply -f devops/k8s/services.yaml'
                 }
             }
         }
