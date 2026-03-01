@@ -118,11 +118,12 @@ builder.Services.AddAuthorization(options =>
 // ----------------------
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://20.61.133.37") // <-- Explicitly add your Frontend IP
               .AllowAnyHeader()
-              .AllowAnyMethod();
+              .AllowAnyMethod()
+              .AllowCredentials(); // <-- Sometimes needed with JWT
     });
 });
 
@@ -139,7 +140,7 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty; // Swagger at root
 });
 
-app.UseCors("AllowAll");
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
