@@ -7,6 +7,8 @@ The platform allows users to ask questions, provide answers, search content, and
 
 This project is developed as part of the **LIFE Program – 2nd Period at Gjirafa**.
 
+Trello: https://trello.com/b/bw8MmrvR/albanian-quora
+
 ---
 
 ## 🎯 Problem Statement
