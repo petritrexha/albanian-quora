@@ -122,7 +122,7 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://20.61.133.37/", "https://20.61.133.37/") // <-- Explicitly add your Frontend IP
               .AllowAnyHeader()
-              .AllowAnyMethod()
+              .AllowAnyMethod();
     });
 });
 
