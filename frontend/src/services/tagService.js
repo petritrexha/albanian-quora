@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getTags = async (categoryId) => {
   try {
-    const url = categoryId ? `/api/tags?categoryId=${categoryId}` : "/api/tags";
+    const url = categoryId ? `tags?categoryId=${categoryId}` : "tags";
     const res = await api.get(url);
     return res.data || [];
   } catch (error) {
@@ -13,7 +13,7 @@ export const getTags = async (categoryId) => {
 
 export const createTag = async (name, categoryId = null) => {
   try {
-    const res = await api.post("/api/tags", {
+    const res = await api.post("tags", {
       name: name.trim(),
       categoryId: categoryId ? Number(categoryId) : null
     });

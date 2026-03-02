@@ -14,7 +14,10 @@ spec:
     spec:
       containers:
       - name: frontend
-        image: albanianquoraacr.azurecr.io/albanianquora-frontend:v4
+        image: albanianquoraregistry123.azurecr.io/albanianquora-frontend:v46
         imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - containerPort: 8080
+        env:
+        - name: VITE_API_URL
+          value: "http://20.103.169.185/api"

@@ -14,7 +14,9 @@ spec:
     spec:
       containers:
       - name: backend
-        image: albanianquoraacr.azurecr.io/albanianquora-backend:v6
+        # Make sure this is v29 to include your SmtpEmailSender fix!
+        image: albanianquoraregistry123.azurecr.io/albanianquora-backend:v33
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
@@ -23,3 +25,28 @@ spec:
             secretKeyRef:
               name: backend-secrets
               key: ConnectionStrings__DefaultConnection
+        - name: Email__SmtpHost
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: Email__SmtpHost
+        - name: Email__SmtpPort
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: Email__SmtpPort
+        - name: Email__Username
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: Email__Username
+        - name: Email__Password
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: Email__Password
+        - name: Email__From
+          valueFrom:
+            secretKeyRef:
+              name: backend-secrets
+              key: Email__From

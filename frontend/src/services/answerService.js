@@ -2,7 +2,7 @@ import api from "./api";
 
 // This matches the POST api/Answers that worked in Swagger
 export const createAnswer = async (questionId, data) => {
-  const res = await api.post("/api/Answers", {
+  const res = await api.post("Answers", {
     questionId: questionId,
     content: data.content
   });
@@ -11,17 +11,17 @@ export const createAnswer = async (questionId, data) => {
 
 // This matches GET api/Answers/question/{id}
 export const getAnswersByQuestionId = async (questionId) => {
-  const res = await api.get(`/api/Answers/question/${questionId}`);
+  const res = await api.get(`Answers/question/${questionId}`);
   return res.data;
 };
 
 export const upvoteAnswer = async (id) => {
-  const res = await api.post(`/api/Answers/${id}/upvote`);
+  const res = await api.post(`Answers/${id}/upvote`);
   return res.data;
 };
 
 export const downvoteAnswer = async (id) => {
-  const res = await api.post(`/api/Answers/${id}/downvote`);
+  const res = await api.post(`Answers/${id}/downvote`);
   return res.data;
 };
 

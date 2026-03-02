@@ -36,10 +36,25 @@ export function AuthProvider({ children }) {
 
   //Login
   const login = async ({ identifier, password }) => {
-    return await auth.login({ identifier, password });
+    const data = await auth.login({ identifier, password });
+
+    const token = data?.accessToken || data?.AccessToken;
+    const userData = data?.user || data?.User;
+
+    if (token) {
+      localStorage.setItem("accessToken", token);
+    }
+
+    if (userData) {
+      setUser(userData);
+      localStorage.setItem("userId", userData.id);
+      localStorage.setItem("user", JSON.stringify(userData));
+    }
+
+    return data;
   };
 
-//Verify 2fa
+  //Verify 2fa
   const verify2fa = async ({ loginAttemptId, code }) => {
     const data = await auth.verify2fa({ loginAttemptId, code });
 

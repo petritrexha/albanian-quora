@@ -30,7 +30,13 @@ export default function Login() {
         password: passwordValue,
       });
 
-      //redirect to 2FA
+      // successful login without 2FA
+      if (result?.accessToken && result?.user && !result?.otpRequired) {
+        navigate("/", { replace: true });
+        return;
+      }
+
+      // redirect to 2FA
       if (result?.otpRequired && result?.loginAttemptId) {
         navigate("/verify-2fa", {
           replace: true,

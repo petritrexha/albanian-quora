@@ -114,25 +114,29 @@ builder.Services.AddAuthorization(options =>
 });
 
 // ----------------------
-// CORS (FIXED)
+// CORS Configuration
 // ----------------------
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.AllowAnyOrigins("http://20.82.32.36") 
               .AllowAnyHeader()
-              .AllowAnyMethod()
-              .AllowCredentials();
-
+              .AllowAnyMethod();
     });
 });
 
+// ----------------------
+// Build App
+// ----------------------
 var app = builder.Build();
 
 // ----------------------
-// PIPELINE
+// Middleware Pipeline
 // ----------------------
+
+// CORS MUST be before Auth and MapControllers
+app.UseCors("AllowFrontend");
 
 app.UseSwagger();
 app.UseSwaggerUI(c =>
@@ -141,13 +145,10 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = string.Empty; // Swagger at root
 });
 
-app.UseCors("AllowAll");
-
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.MapGet("/health", () => Results.Ok("Healthy"));
 
 // ----------------------

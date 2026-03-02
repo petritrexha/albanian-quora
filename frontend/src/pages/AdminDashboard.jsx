@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const [itemToDelete, setItemToDelete] = useState(null);
 
   const fetchStats = () => {
-    api.get("/api/admin/stats")
+    api.get("admin/stats")
       .then(r => setStats(r.data))
       .catch(console.error);
   };
@@ -30,7 +30,7 @@ export default function AdminDashboard() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      const r = await api.get(`/api/admin/${activeTab}`);
+      const r = await api.get(`admin/${activeTab}`);
       const list = Array.isArray(r.data) ? r.data : (r.data.data || r.data.Data || []);
       setDataList(list);
     } catch (e) {
@@ -53,7 +53,7 @@ export default function AdminDashboard() {
   const confirmDelete = async () => {
     if (!itemToDelete) return;
     try {
-      await api.delete(`/api/admin/${activeTab}/${itemToDelete}`);
+      await api.delete(`admin/${activeTab}/${itemToDelete}`);
       setDataList(dataList.filter(item => (item.id || item.Id) !== itemToDelete));
       fetchStats();
     } catch (e) {
@@ -106,11 +106,10 @@ export default function AdminDashboard() {
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all duration-200
-              ${
-                activeTab === tab
+              ${activeTab === tab
                   ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-md scale-[1.03]"
                   : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white"
-              }`}
+                }`}
             >
               {tab === 'users' ? 'Përdoruesit' : tab === 'questions' ? 'Pyetjet' : 'Përgjigjet'}
             </button>
@@ -204,13 +203,12 @@ export default function AdminDashboard() {
           onClose={() => setIsModalOpen(false)}
           onConfirm={confirmDelete}
           title="Konfirmoni Fshirjen"
-          message={`A jeni vërtet i sigurt që dëshironi ta fshini këtë ${
-            activeTab === 'users'
+          message={`A jeni vërtet i sigurt që dëshironi ta fshini këtë ${activeTab === 'users'
               ? 'përdorues'
               : activeTab === 'questions'
-              ? 'pyetje'
-              : 'përgjigje'
-          }? Ky veprim do të fshijë përgjithmonë të dhënat nga baza e të dhënave.`}
+                ? 'pyetje'
+                : 'përgjigje'
+            }? Ky veprim do të fshijë përgjithmonë të dhënat nga baza e të dhënave.`}
         />
       </div>
     </div>

@@ -26,13 +26,13 @@ export function BookmarkProvider({ children }) {
       try {
         setLoading(true);
 
-        const res = await api.get(`/api/bookmarks/user/${userId}`);
+        const res = await api.get(`bookmarks/user/${userId}`);
         const bookmarks = res.data || [];
 
         const questions = await Promise.all(
           bookmarks.map(async (b) => {
             try {
-              const qRes = await api.get(`/api/questions/${b.questionId}`);
+              const qRes = await api.get(`questions/${b.questionId}`);
               return { ...qRes.data, _bookmarkId: b.id };
             } catch {
               return {
@@ -75,7 +75,7 @@ export function BookmarkProvider({ children }) {
         if (existing) {
           // Remove locally (optimistic)
           api
-            .delete(`/api/bookmarks/${existing._bookmarkId}`)
+            .delete(`bookmarks/${existing._bookmarkId}`)
             .catch((err) =>
               console.error("Failed to remove bookmark", err)
             );
@@ -84,7 +84,7 @@ export function BookmarkProvider({ children }) {
         } else {
           // Add locally (optimistic)
           api
-            .post(`/api/bookmarks`, {
+            .post(`bookmarks`, {
               userId,
               questionId: question.id,
             })

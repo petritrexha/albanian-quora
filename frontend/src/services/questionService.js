@@ -2,7 +2,7 @@ import api from "./api";
 
 export const getQuestions = async (userId, categoryId, tag, search) => {
   try {
-    let url = "/api/questions";
+    let url = "questions";
     const params = [];
     if (userId) params.push(`userId=${userId}`);
     if (categoryId) params.push(`categoryId=${categoryId}`);
@@ -20,7 +20,7 @@ export const getQuestions = async (userId, categoryId, tag, search) => {
 
 export const getQuestionById = async (id, userId) => {
   try {
-    const url = userId ? `/api/questions/${id}?userId=${userId}` : `/api/questions/${id}`;
+    const url = userId ? `questions/${id}?userId=${userId}` : `questions/${id}`;
     const res = await api.get(url);
     return res.data;
   } catch (error) {
@@ -31,7 +31,7 @@ export const getQuestionById = async (id, userId) => {
 
 export const createQuestion = async (payload) => {
   const userId = localStorage.getItem("userId");
-  const res = await api.post("/api/questions", {
+  const res = await api.post("questions", {
     title: payload.title,
     content: payload.description || "",
     categoryId: Number(payload.categoryId) || 1,
@@ -43,12 +43,12 @@ export const createQuestion = async (payload) => {
 
 // --- ADD THESE FOR VOTING ---
 export const upvoteQuestion = async (id) => {
-  const res = await api.post(`/api/questions/${id}/upvote`);
+  const res = await api.post(`questions/${id}/upvote`);
   return res.data; // returns new vote count
 };
 
 export const downvoteQuestion = async (id) => {
-  const res = await api.post(`/api/questions/${id}/downvote`);
+  const res = await api.post(`questions/${id}/downvote`);
   return res.data; // returns new vote count
 };
 

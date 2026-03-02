@@ -49,7 +49,7 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
       const reporterId =
         user?.id || Number(localStorage.getItem("userId")) || 1;
 
-      await api.post("/api/reports", {
+      await api.post("reports", {
         reporterId,
         targetType,
         targetId,
@@ -135,10 +135,9 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
                   <label
                     key={reason}
                     className={`flex items-center gap-3 p-3 rounded-xl border cursor-pointer transition-all
-                      ${
-                        selectedReason === reason
-                          ? "border-red-500 bg-red-50 dark:bg-red-500/10"
-                          : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
+                      ${selectedReason === reason
+                        ? "border-red-500 bg-red-50 dark:bg-red-500/10"
+                        : "border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800"
                       }`}
                   >
                     <input
@@ -191,10 +190,9 @@ const ReportModal = ({ isOpen, onClose, targetType, targetId }) => {
               onClick={handleSubmit}
               disabled={disabled}
               className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all
-                ${
-                  disabled
-                    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
-                    : "bg-red-600 text-white hover:bg-red-700 active:scale-95"
+                ${disabled
+                  ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                  : "bg-red-600 text-white hover:bg-red-700 active:scale-95"
                 }`}
             >
               {loading ? "Duke dërguar..." : "Dërgo raportin"}
